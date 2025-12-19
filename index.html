@@ -1,37 +1,84 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rádio Onda Sertaneja</title>
-  <style>
-    body {
-      background: linear-gradient(to bottom, #fff3c2, #ffe18d);
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 50px 20px;
-      margin: 0;
-    }
-    img {
-      max-width: 100%;
-      height: auto;
-      margin: 30px 0;
-    }
-    h1 {
-      color: #8B0000;
-      font-size: 28px;
-    }
-    p {
-      font-size: 20px;
-      color: #222;
-      max-width: 600px;
-      margin: auto;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onda Sertaneja | A Rádio que Toca o Brasil</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
 </head>
 <body>
- 
-  <img src="logo.png" alt="Logo Rádio Onda Sertaneja" />
- 
+
+    <div id="radio-bar" style="background: #fdfaf5; border-bottom: 1px solid #e0d7c6;">
+    <div class="player-container">
+        <img src="caminho-para-sua-logo-suave.png" alt="Onda Sertaneja" class="logo-player">
+        <div class="info-musica">
+            <marquee>Tocando agora: As melhores do modão na Onda Sertaneja!</marquee>
+        </div>
+        <audio id="playerAudio" src="SEU_LINK_DE_STREAMING_AQUI"></audio>
+        <button onclick="controlarRadio()" id="btnPlay">PLAY</button>
+    </div>
+</div>
+
+    <header class="player-bar">
+        <div class="container player-flex">
+            <div class="now-playing">
+                <div class="radio-logo">📻</div>
+                <div>
+                    <span class="status">NO AR AGORA</span>
+                    <p class="song-title">O Melhor do Sertanejo</p>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <audio id="radioPlayer" src="SEU_LINK_DE_STREAMING_AQUI"></audio>
+                <button onclick="togglePlay()" id="playBtn" class="btn-play">OUVIR AGORA</button>
+            </div>
+
+            <div class="social-links">
+                <a href="#" class="btn-whatsapp">Pedir Música</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Onda Sertaneja</h1>
+            <p>Sua companhia diária com os maiores sucessos.</p>
+            <div class="badges">
+                <span>#1 em Audiência</span>
+                <span>Modão & Lançamentos</span>
+            </div>
+        </section>
+
+        <section class="content container">
+            <div class="card">
+                <h2>Programação</h2>
+                <p>Confira o que vem por aí na rádio.</p>
+            </div>
+            <div class="card">
+                <h2>Notícias</h2>
+                <p>Fique por dentro do mundo sertanejo.</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const audio = document.getElementById('radioPlayer');
+        const playBtn = document.getElementById('playBtn');
+
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                playBtn.innerText = "PAUSAR";
+                playBtn.classList.add('playing');
+            } else {
+                audio.pause();
+                playBtn.innerText = "OUVIR AGORA";
+                playBtn.classList.remove('playing');
+            }
+        }
+    </script>
 </body>
 </html>
