@@ -2,41 +2,84 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Onda Sertaneja | A Rádio Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <header>
-        <div class="player-container">
-            <div class="logo-text" style="font-weight: 800; font-size: 1.2rem;">
-                ONDA <span style="color: #C5A059;">SERTANEJA</span>
+    <header class="player-bar">
+        <div class="container player-flex">
+            <div class="logo-area">
+                <span class="logo-onda">ONDA</span>
+                <span class="logo-sertaneja">SERTANEJA</span>
             </div>
-            <button class="btn-play" onclick="document.getElementById('stream').play()">OUVIR AO VIVO</button>
-            <audio id="stream" src="URL_DO_SEU_STREAMING"></audio>
+            
+            <div class="player-controls">
+                <audio id="radioPlayer" src="COLE_AQUI_SEU_LINK_DE_AUDIO"></audio>
+                <button onclick="togglePlay()" id="btnPlay" class="play-button">OUVIR AGORA</button>
+            </div>
+
+            <div class="live-status">
+                <span class="dot"></span> AO VIVO
+            </div>
         </div>
     </header>
 
     <section class="hero">
-        <h1>Onda <span>Sertaneja</span></h1>
-        <p>Sua rádio web com a melhor curadoria musical sertaneja do Brasil. Elegância e tradição em um só lugar.</p>
+        <div class="container">
+            <div class="hero-box">
+                <h1>O seu melhor <br><span>Momento Sertanejo</span></h1>
+                <p>A rádio que une a tradição do modão com a sofisticação do sertanejo moderno.</p>
+                <a href="https://wa.me/SEUNUMERO" target="_blank" class="btn-whatsapp">Pedir Música no Whats</a>
+            </div>
+        </div>
     </section>
 
-    <div class="grid-conteudo">
-        <div class="card">
-            <h2>Pedir Música</h2>
-            <p>Mande seu modão preferido agora pelo nosso WhatsApp.</p>
-        </div>
-        <div class="card">
-            <h2>Programação</h2>
-            <p>Confira os horários dos seus locutores favoritos.</p>
-        </div>
-        <div class="card">
-            <h2>Notícias</h2>
-            <p>Tudo o que acontece no mundo agro e sertanejo.</p>
-        </div>
-    </div>
+    <section class="grid-conteudo">
+        <div class="container grid-flex">
+            
+            <div class="card">
+                <div class="icon">📻</div>
+                <h3>Programação</h3>
+                <p>Os melhores locutores e os horários dos seus programas favoritos.</p>
+            </div>
 
+            <div class="card">
+                <div class="icon">🎸</div>
+                <h3>Top 10</h3>
+                <p>Acompanhe as músicas mais pedidas da semana na rádio.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon">📰</div>
+                <h3>Notícias</h3>
+                <p>Fique por dentro de tudo o que acontece no mundo sertanejo.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Onda Sertaneja - Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        const audio = document.getElementById('radioPlayer');
+        const btn = document.getElementById('btnPlay');
+
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                btn.innerHTML = "PAUSAR ÁUDIO";
+                btn.classList.add('playing');
+            } else {
+                audio.pause();
+                btn.innerHTML = "OUVIR AGORA";
+                btn.classList.remove('playing');
+            }
+        }
+    </script>
 </body>
 </html>
