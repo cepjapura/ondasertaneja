@@ -2,77 +2,41 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onda Sertaneja | A Rádio que Toca o Brasil</title>
+    <title>Onda Sertaneja | A Rádio Premium</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div id="radio-bar" style="background: #fdfaf5; border-bottom: 1px solid #e0d7c6;">
-    
-</div>
-
-    <header class="player-bar">
-        <div class="container player-flex">
-            <div class="now-playing">
-                <div class="radio-logo">📻</div>
-                <div>
-                    <span class="status">NO AR AGORA</span>
-                    <p class="song-title">O Melhor do Sertanejo</p>
-                </div>
+    <header>
+        <div class="player-container">
+            <div class="logo-text" style="font-weight: 800; font-size: 1.2rem;">
+                ONDA <span style="color: #C5A059;">SERTANEJA</span>
             </div>
-            
-            <div class="controls">
-                <audio id="radioPlayer" src="https://stream.zeno.fm/vjigv6jeoayvv"></audio>
-                <button onclick="togglePlay()" id="playBtn" class="btn-play">OUVIR AGORA</button>
-            </div>
-
-            <div class="social-links">
-                <a href="#" class="btn-whatsapp">Pedir Música</a>
-            </div>
+            <button class="btn-play" onclick="document.getElementById('stream').play()">OUVIR AO VIVO</button>
+            <audio id="stream" src="URL_DO_SEU_STREAMING"></audio>
         </div>
     </header>
 
-    <main>
-        <section class="hero">
-            <h1>Onda Sertaneja</h1>
-            <p>Sua companhia diária com os maiores sucessos.</p>
-             <p>Estamos em Manutenção, Logo voltaremos com a Programação Normal</p>
-            <div class="badges">
-                <span>#1 em Audiência</span>
-                <span>Modão & Lançamentos</span>
-            </div>
-        </section>
+    <section class="hero">
+        <h1>Onda <span>Sertaneja</span></h1>
+        <p>Sua rádio web com a melhor curadoria musical sertaneja do Brasil. Elegância e tradição em um só lugar.</p>
+    </section>
 
-        <section class="content container">
-            <div class="card">
-                <h2>Programação</h2>
-                <p>Confira o que vem por aí na rádio.</p>
-            </div>
-            <div class="card">
-                <h2>Notícias</h2>
-                <p>Fique por dentro do mundo sertanejo.</p>
-            </div>
-        </section>
-    </main>
+    <div class="grid-conteudo">
+        <div class="card">
+            <h2>Pedir Música</h2>
+            <p>Mande seu modão preferido agora pelo nosso WhatsApp.</p>
+        </div>
+        <div class="card">
+            <h2>Programação</h2>
+            <p>Confira os horários dos seus locutores favoritos.</p>
+        </div>
+        <div class="card">
+            <h2>Notícias</h2>
+            <p>Tudo o que acontece no mundo agro e sertanejo.</p>
+        </div>
+    </div>
 
-    <script>
-        const audio = document.getElementById('radioPlayer');
-        const playBtn = document.getElementById('playBtn');
-
-        function togglePlay() {
-            if (audio.paused) {
-                audio.play();
-                playBtn.innerText = "PAUSAR";
-                playBtn.classList.add('playing');
-            } else {
-                audio.pause();
-                playBtn.innerText = "OUVIR AGORA";
-                playBtn.classList.remove('playing');
-            }
-        }
-    </script>
 </body>
 </html>
