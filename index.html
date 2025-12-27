@@ -6,29 +6,38 @@
     <title>Onda Sertaneja | A Rádio que Toca o Brasil</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <header class="player-bar">
+<header class="site-header">
+
+<div class="site-notice">
+    <p>
+        🚧 A Onda Sertaneja está em nova fase. PAGINA EM CONSTRUÇÃO !!
+
+        <a
+        href="https://youtube.com/shorts/Ecc8weHmJmY"
+        target="_blank"
+        class="video-link">
+        ▶ Mensagem especial
+</a>
+
+    </p>
+</div>
+
+
+    <div class="player-bar">
         <div class="container player-flex">
             <div class="now-playing">
-                <div class="radio-logo">📻</div>
-                <div>
-                    <span class="status">NO AR AGORA</span>
-                    <p class="song-title">O Melhor do Sertanejo</p>
-                </div>
-            </div>
-            
-            <div class="controls">
-                <audio id="radioPlayer" src="SEU_LINK_DE_STREAMING_AQUI"></audio>
-                <button onclick="togglePlay()" id="playBtn" class="btn-play">OUVIR AGORA</button>
+                <span class="status">NO AR AGORA</span>
+                <p>O melhor do sertanejo</p>
             </div>
 
-            <div class="social-links">
-                <a href="#" class="btn-whatsapp">Pedir Música</a>
-            </div>
+            <button class="btn-play">OUVIR AGORA</button>
         </div>
-    </header>
+    </div>
+
+</header>
+
     <section class="slider">
     <div class="slides">
 
@@ -150,8 +159,6 @@
 </section>
 
     <script>
-        const audio = document.getElementById('radioPlayer');
-        const playBtn = document.getElementById('playBtn');
 
         function togglePlay() {
             if (audio.paused) {
@@ -201,6 +208,35 @@
 
     </div>
 </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const modal = document.getElementById('videoModal');
+    const openBtn = document.getElementById('openVideo');
+    const closeBtn = document.querySelector('.close-video');
+    const iframe = document.getElementById('youtubeVideo');
+
+    if (!modal || !openBtn || !closeBtn || !iframe) {
+        console.warn('Elementos do vídeo não encontrados');
+        return;
+    }
+
+    const videoSrc = iframe.src;
+
+    openBtn.addEventListener('click', () => {
+        modal.style.display = 'flex';
+        iframe.src = videoSrc + '&autoplay=1';
+    });
+
+    closeBtn.addEventListener('click', () => {
+        iframe.src = videoSrc;
+        modal.style.display = 'none';
+    });
+
+});
+</script>
+
 
 </body>
 
