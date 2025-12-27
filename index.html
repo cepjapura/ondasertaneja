@@ -9,7 +9,6 @@
     <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
 </head>
 <body>
-
     <header class="player-bar">
         <div class="container player-flex">
             <div class="now-playing">
@@ -89,14 +88,14 @@
 
         <div class="news-grid">
 
-            <article class="news-card">
+            <a href="noticia.html" class="news-card">
                 <div class="news-image" style="background-image:url('https://images.unsplash.com/photo-1518972559570-9ec8f8f8b3aa');"></div>
                 <div class="news-content">
                     <span class="news-tag">Shows</span>
                     <h3>Grandes nomes do sertanejo anunciam novas turnês</h3>
                     <p>Confira os artistas que vão rodar o Brasil nos próximos meses.</p>
                 </div>
-            </article>
+            </a>
 
             <article class="news-card">
                 <div class="news-image" style="background-image:url('https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2');"></div>
@@ -119,26 +118,34 @@
         </div>
     </div>
 </section>
+<section class="programas-section">
+    <div class="container">
+        <h2 class="section-title">Programas & Locutores</h2>
 
+        <div class="programas-grid">
 
-    <section class="banners">
-    <div class="container banners-flex">
+            <div class="programa-card">
+                <div class="programa-img programa-manha"></div>      
+                <h3>Manhã Sertaneja</h3>
+                <span>Seg a Sex • 08h às 10h</span>
+                <p>Comece o dia com clássicos e sucessos que marcaram época.</p>
+            </div>
 
-        <div class="banner banner-ano">
-            🎆 Feliz 2026!  
-            <span>A Onda Sertaneja segue com você 🎶</span>
+            <div class="programa-card">
+                <div class="programa-img programa-raiz"></div>
+                <h3>Modão Raiz</h3>
+                <span>Seg a Sex • 14h às 16h</span>
+                <p>O sertanejo raiz que mora no coração do Brasil.</p>
+            </div>
+
+            <div class="programa-card">
+                <div class="programa-img programa-noite"></div>
+                <h3>Noite Universitária</h3>
+                <span>Todos os dias • 20h</span>
+                <p>Os hits atuais que dominam as paradas sertanejas.</p>
+            </div>
+
         </div>
-
-        <div class="banner banner-volta">
-            📻 Estamos voltando!
-            <span>Uma nova fase da rádio está sendo construída</span>
-        </div>
-
-        <div class="banner banner-construcao">
-            🚧 Site em construção
-            <span>Novidades serão liberadas em breve</span>
-        </div>
-
     </div>
 </section>
 
@@ -198,6 +205,10 @@
         showSlide(currentSlide);
     }, 5000);
 </script>
+
+<a href="#ao-vivo" class="cta-radio">
+    🎧 Ouça ao Vivo
+</a>
 
 </body>
 </html>
