@@ -209,34 +209,6 @@
     </div>
 </footer>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-
-    const modal = document.getElementById('videoModal');
-    const openBtn = document.getElementById('openVideo');
-    const closeBtn = document.querySelector('.close-video');
-    const iframe = document.getElementById('youtubeVideo');
-
-    if (!modal || !openBtn || !closeBtn || !iframe) {
-        console.warn('Elementos do vídeo não encontrados');
-        return;
-    }
-
-    const videoSrc = iframe.src;
-
-    openBtn.addEventListener('click', () => {
-        modal.style.display = 'flex';
-        iframe.src = videoSrc + '&autoplay=1';
-    });
-
-    closeBtn.addEventListener('click', () => {
-        iframe.src = videoSrc;
-        modal.style.display = 'none';
-    });
-
-});
-</script>
-
 
 </body>
 
