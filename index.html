@@ -3,81 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onda Sertaneja | A Rádio Premium</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <title>Onda Sertaneja | A Rádio que Toca o Brasil</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
     <header class="player-bar">
         <div class="container player-flex">
-            <div class="logo-area">
-                <span class="logo-onda">ONDA</span>
-                <span class="logo-sertaneja">SERTANEJA</span>
+            <div class="now-playing">
+                <div class="radio-logo">📻</div>
+                <div>
+                    <span class="status">NO AR AGORA</span>
+                    <p class="song-title">O Melhor do Sertanejo</p>
+                </div>
             </div>
             
-            <div class="player-controls">
-                <audio id="radioPlayer" src="COLE_AQUI_SEU_LINK_DE_AUDIO"></audio>
-                <button onclick="togglePlay()" id="btnPlay" class="play-button">OUVIR AGORA</button>
+            <div class="controls">
+                <audio id="radioPlayer" src="SEU_LINK_DE_STREAMING_AQUI"></audio>
+                <button onclick="togglePlay()" id="playBtn" class="btn-play">OUVIR AGORA</button>
             </div>
 
-            <div class="live-status">
-                <span class="dot"></span> AO VIVO
+            <div class="social-links">
+                <a href="#" class="btn-whatsapp">Pedir Música</a>
             </div>
         </div>
     </header>
+    <section class="banners">
+    <div class="container banners-flex">
 
-    <section class="hero">
-        <div class="container">
-            <div class="hero-box">
-                <h1>O seu melhor <br><span>Momento Sertanejo</span></h1>
-                <p>A rádio que une a tradição do modão com a sofisticação do sertanejo moderno.</p>
-                <a href="https://wa.me/SEUNUMERO" target="_blank" class="btn-whatsapp">Pedir Música no Whats</a>
-            </div>
+        <div class="banner banner-ano">
+            🎆 Feliz 2026!  
+            <span>A Onda Sertaneja segue com você 🎶</span>
         </div>
-    </section>
 
-    <section class="grid-conteudo">
-        <div class="container grid-flex">
-            
-            <div class="card">
-                <div class="icon">📻</div>
-                <h3>Programação</h3>
-                <p>Os melhores locutores e os horários dos seus programas favoritos.</p>
-            </div>
-
-            <div class="card">
-                <div class="icon">🎸</div>
-                <h3>Top 10</h3>
-                <p>Acompanhe as músicas mais pedidas da semana na rádio.</p>
-            </div>
-
-            <div class="card">
-                <div class="icon">📰</div>
-                <h3>Notícias</h3>
-                <p>Fique por dentro de tudo o que acontece no mundo sertanejo.</p>
-            </div>
-
+        <div class="banner banner-volta">
+            📻 Estamos voltando!
+            <span>Uma nova fase da rádio está sendo construída</span>
         </div>
-    </section>
 
-    <footer>
-        <p>&copy; 2025 Onda Sertaneja - Todos os direitos reservados.</p>
-    </footer>
+        <div class="banner banner-construcao">
+            🚧 Site em construção
+            <span>Novidades serão liberadas em breve</span>
+        </div>
+
+    </div>
+</section>
+
+
+    <main>
+        <section class="hero">
+            <h1>Onda Sertaneja</h1>
+            <p>Sua companhia diária com os maiores sucessos.</p>
+            <div class="badges">
+                <span>#1 em Audiência</span>
+                <span>Modão & Lançamentos</span>
+            </div>
+        </section>
+
+        <section class="content container">
+            <div class="card">
+                <h2>Programação</h2>
+                <p>Confira o que vem por aí na rádio.</p>
+            </div>
+            <div class="card">
+                <h2>Notícias</h2>
+                <p>Fique por dentro do mundo sertanejo.</p>
+            </div>
+        </section>
+    </main>
 
     <script>
         const audio = document.getElementById('radioPlayer');
-        const btn = document.getElementById('btnPlay');
+        const playBtn = document.getElementById('playBtn');
 
         function togglePlay() {
             if (audio.paused) {
                 audio.play();
-                btn.innerHTML = "PAUSAR ÁUDIO";
-                btn.classList.add('playing');
+                playBtn.innerText = "PAUSAR";
+                playBtn.classList.add('playing');
             } else {
                 audio.pause();
-                btn.innerHTML = "OUVIR AGORA";
-                btn.classList.remove('playing');
+                playBtn.innerText = "OUVIR AGORA";
+                playBtn.classList.remove('playing');
             }
         }
     </script>
