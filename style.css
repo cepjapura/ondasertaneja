@@ -163,3 +163,91 @@ footer { text-align: center; padding: 40px; color: #AAA; font-size: 0.8rem; }
     color: #ffcc00;
     border: 1px dashed #ffcc00;
 }
+
+.slider {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    overflow: hidden;
+}
+
+.slides {
+    height: 100%;
+    position: relative;
+}
+
+.slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.slide.active {
+    opacity: 1;
+    z-index: 1;
+}
+
+/* Conteúdo */
+.slide-content {
+    background: rgba(0,0,0,0.6);
+    padding: 35px 45px;
+    border-radius: 12px;
+    color: #fff;
+    max-width: 600px;
+}
+
+.slide-content h2 {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.slide-content p {
+    font-size: 18px;
+    font-weight: 300;
+}
+
+/* Slide Feliz 2026 */
+.slide-ano {
+    background: linear-gradient(
+        rgba(0,0,0,0.5),
+        rgba(0,0,0,0.5)
+    ),
+    url("https://images.unsplash.com/photo-1516455207990-7a41ce80f7ee") center/cover no-repeat;
+}
+
+/* Slide Música */
+.slide-musica {
+    background: linear-gradient(
+        rgba(0,0,0,0.5),
+        rgba(0,0,0,0.5)
+    ),
+    url("https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4") center/cover no-repeat;
+}
+
+/* Pontos */
+.slider-dots {
+    position: absolute;
+    bottom: 18px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.slider-dots .dot {
+    width: 12px;
+    height: 12px;
+    background: #bbb;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.slider-dots .dot.active {
+    background: #c9a227;
+}
