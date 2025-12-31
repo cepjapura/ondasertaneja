@@ -28,11 +28,23 @@
     <div class="player-bar">
         <div class="container player-flex">
             <div class="now-playing">
-                <span class="status">NO AR AGORA</span>
-                <p>O melhor do sertanejo</p>
+                <span class="status" id="liveStatus">OFFLINE</span>
+                <p id="nowPlaying">🎶 Programação Sertaneja Ao Vivo</p>
             </div>
 
-            <button class="btn-play">OUVIR AGORA</button>
+                        <div class="volume-control">
+                <input
+                    type="range"
+                    id="volumeControl"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    aria-label="Controle de volume"
+                >
+            </div>
+
+
+            <button class="btn-play" id="playBtn">OUVIR AGORA</button>
         </div>
     </div>
 
@@ -158,21 +170,7 @@
     </div>
 </section>
 
-    <script>
-
-        function togglePlay() {
-            if (audio.paused) {
-                audio.play();
-                playBtn.innerText = "PAUSAR";
-                playBtn.classList.add('playing');
-            } else {
-                audio.pause();
-                playBtn.innerText = "OUVIR AGORA";
-                playBtn.classList.remove('playing');
-            }
-        }
-    </script>
-    <script>
+<script>
     const slides = document.querySelectorAll('.slide');
     const dots = document.querySelectorAll('.slider-dots .dot');
     let currentSlide = 0;
@@ -208,6 +206,103 @@
 
     </div>
 </footer>
+
+<audio id="radioPlayer" preload="none" crossorigin="anonymous">
+    <source src="https://stream3.svrdedicado.org:8274/stream" type="audio/mpeg">
+    Seu navegador não suporta áudio ao vivo.
+</audio>
+
+<div id="floatingPlayer" class="floating-player">
+    <div class="floating-content">
+        <span class="floating-status" id="floatingStatus">AO VIVO</span>
+
+        <button id="floatingPlayBtn" class="floating-play">
+            ⏸
+        </button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const audio = document.getElementById('radioPlayer');
+    const btn = document.getElementById('playBtn');
+    const status = document.getElementById('liveStatus');
+    const volumeControl = document.getElementById('volumeControl');
+
+    const floating = document.getElementById('floatingPlayer');
+    const floatingBtn = document.getElementById('floatingPlayBtn');
+    const floatingStatus = document.getElementById('floatingStatus');
+
+    if (!audio || !btn || !status || !floating || !floatingBtn) return;
+
+    /* ===== VOLUME ===== */
+    const savedVolume = localStorage.getItem('radioVolume');
+    audio.volume = savedVolume !== null ? savedVolume : 0.8;
+
+    if (volumeControl) {
+        volumeControl.value = audio.volume;
+        volumeControl.addEventListener('input', () => {
+            audio.volume = volumeControl.value;
+            localStorage.setItem('radioVolume', audio.volume);
+        });
+    }
+
+    function showFloating() {
+        floating.style.display = 'flex';
+    }
+
+    function hideFloating() {
+        floating.style.display = 'none';
+    }
+
+    function setLive(live) {
+        if (live) {
+            status.textContent = 'AO VIVO';
+            status.classList.add('live');
+            floatingStatus.textContent = 'AO VIVO';
+        } else {
+            status.textContent = 'OFFLINE';
+            status.classList.remove('live');
+        }
+    }
+
+    async function playRadio() {
+        showFloating();
+        setLive(true);
+        btn.textContent = 'PAUSAR';
+        btn.classList.add('playing');
+        floatingBtn.textContent = '⏸';
+
+        try {
+            audio.load();
+            await audio.play();
+        } catch (e) {
+            console.warn('Falha ao iniciar áudio', e);
+        }
+    }
+
+    function pauseRadio() {
+        audio.pause();
+        hideFloating();
+        setLive(false);
+        btn.textContent = 'OUVIR AGORA';
+        btn.classList.remove('playing');
+        floatingBtn.textContent = '▶';
+    }
+
+    btn.addEventListener('click', () => {
+        if (audio.paused) playRadio();
+        else pauseRadio();
+    });
+
+    floatingBtn.addEventListener('click', () => {
+        if (audio.paused) playRadio();
+        else pauseRadio();
+    });
+});
+</script>
+
+
 
 
 </body>

@@ -735,4 +735,82 @@ footer { text-align: center; padding: 40px; color: #AAA; font-size: 0.8rem; }
     text-decoration: none;
 }
 
+.btn-play.playing {
+    background: var(--cor-principal);
+    color: #000;
+}
+
+/* STATUS AO VIVO */
+.status {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #777;
+}
+
+.status.live {
+    color: #ff3b3b;
+}
+
+.status.live::before {
+    content: "● ";
+}
+
+#nowPlaying {
+    font-size: 14px;
+    color: #bbb;
+    margin-top: 2px;
+}
+
+/* CONTROLE DE VOLUME */
+.volume-control {
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+}
+
+#volumeControl {
+    width: 90px;
+    cursor: pointer;
+}
+
+/* PLAYER FLUTUANTE */
+.floating-player {
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0b0b0b;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50px;
+    padding: 8px 14px;
+    display: none;
+    align-items: center;
+    z-index: 2000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.floating-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.floating-status {
+    color: #ff3b3b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.floating-play {
+    background: transparent;
+    border: 2px solid var(--cor-principal);
+    color: var(--cor-principal);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+}
+
 
