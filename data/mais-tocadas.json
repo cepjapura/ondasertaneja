@@ -1,1 +1,1 @@
-  {{$json}}
+{{ JSON.stringify($json.ranking, null, 2) }}
