@@ -1,0 +1,12 @@
+{
+  "semana": [
+    { "posicao": 1, "artista": "Ana Castela", "musica": "Nosso Quadro" },
+    { "posicao": 2, "artista": "Henrique & Juliano", "musica": "Traumatizei" },
+    { "posicao": 3, "artista": "Jorge & Mateus", "musica": "5 Regras" }
+  ],
+  "ano": [
+    { "posicao": 1, "artista": "Gusttavo Lima", "musica": "Bloqueado" },
+    { "posicao": 2, "artista": "Maiara & Maraisa", "musica": "Medo Bobo" },
+    { "posicao": 3, "artista": "Zé Neto & Cristiano", "musica": "Largado às Traças" }
+  ]
+}

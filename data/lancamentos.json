@@ -1,0 +1,18 @@
+[
+  {
+    "artista": "Jorge & Mateus",
+    "musica": "5 Regras",
+    "capa": "https://i.scdn.co/image/ab67616d0000b273c1",
+    "link": "https://open.spotify.com",
+    "destaque": true,
+    "patrocinado": false
+  },
+  {
+    "artista": "Henrique & Juliano",
+    "musica": "Traumatizei",
+    "capa": "https://i.scdn.co/image/ab67616d0000b273c2",
+    "link": "https://open.spotify.com",
+    "destaque": false,
+    "patrocinado": true
+  }
+]

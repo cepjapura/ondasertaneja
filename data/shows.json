@@ -1,0 +1,20 @@
+[
+  {
+    "artista": "Gusttavo Lima",
+    "cidade": "Curitiba - PR",
+    "data": "2026-02-15",
+    "local": "Pedreira Paulo Leminski",
+    "link": "https://instagram.com/gusttavolima",
+    "destaque": true,
+    "patrocinado": false
+  },
+  {
+    "artista": "Maiara & Maraisa",
+    "cidade": "Londrina - PR",
+    "data": "2026-03-02",
+    "local": "ExpoLondrina",
+    "link": "https://instagram.com/maiaraemaraisa",
+    "destaque": false,
+    "patrocinado": true
+  }
+]
