@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-fetch('data/shows.json')
+fetch('/data/shows.json')
     .then(response => response.json())
     .then(data => {
         const grid = document.getElementById('agendaGrid');
@@ -376,7 +376,7 @@ fetch('data/shows.json')
     .catch(err => console.error('Erro ao carregar agenda:', err));
 </script>
 <script>
-fetch('data/mais-tocadas.json')
+fetch('/data/mais-tocadas.json')
     .then(res => res.json())
     .then(data => {
         const lista = document.getElementById('rankingLista');
