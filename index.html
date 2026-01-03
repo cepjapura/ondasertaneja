@@ -6,49 +6,95 @@
     <title>Onda Sertaneja | A Rádio que Toca o Brasil</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
-</head>
-<body>
-<header class="site-header">
 
-<div class="site-notice">
-    <p>
-        🚧 A Onda Sertaneja está em nova fase. PAGINA EM CONSTRUÇÃO !!
+    <meta name="description" content="Onda Sertaneja é uma web rádio dedicada ao melhor do sertanejo. Clássicos, sucessos atuais e programação ao vivo 24 horas.">
 
-        <a
-        href="https://youtube.com/shorts/Ecc8weHmJmY"
-        target="_blank"
-        class="video-link">
-        ▶ Mensagem especial
-</a>
+    <meta name="keywords" content="rádio sertaneja, web rádio sertaneja, música sertaneja, sertanejo ao vivo, rádio online">
 
-    </p>
-</div>
+    <meta name="author" content="Onda Sertaneja">
 
 
-    <div class="player-bar">
-        <div class="container player-flex">
-            <div class="now-playing">
-                <span class="status" id="liveStatus">OFFLINE</span>
-                <p id="nowPlaying">🎶 Programação Sertaneja Ao Vivo</p>
-            </div>
 
-                        <div class="volume-control">
-                <input
-                    type="range"
-                    id="volumeControl"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    aria-label="Controle de volume"
-                >
-            </div>
+    </head>
+    <body>
 
+    <section class="lancamentos">
+        <h2>🎵 Novos Lançamentos</h2>
 
-            <button class="btn-play" id="playBtn">OUVIR AGORA</button>
+        <div id="lancamentosGrid" class="lancamentos-grid">
+            <!-- Cards gerados via JS -->
         </div>
+    </section>
+<section class="agenda">
+    <h2>🎤 Agenda de Shows</h2>
+
+    <div id="agendaGrid" class="agenda-grid">
+        <!-- Cards via JS -->
+    </div>
+</section>
+
+<section class="mais-tocadas">
+    <h2>🔥 As Mais Tocadas</h2>
+
+    <div class="tabs">
+        <button class="tab active" data-tab="semana">Semana</button>
+        <button class="tab" data-tab="ano">Ano</button>
     </div>
 
-</header>
+    <ol id="rankingLista" class="ranking-lista">
+        <!-- Ranking via JS -->
+    </ol>
+</section>
+
+
+    <header class="site-header">
+
+    <div class="site-notice">
+        <p>
+            🚧 A Onda Sertaneja está vivendo uma nova fase. Em breve, novidades na programação da Onda Sertaneja.
+    !!
+
+            <a
+            href="https://youtube.com/shorts/Ecc8weHmJmY"
+            target="_blank"
+            class="video-link">
+            ▶ Mensagem especial
+    </a>
+
+        </p>
+    </div>
+
+
+        <div class="player-bar">
+            <div class="container player-flex">
+                <div class="now-playing">
+                    <span class="status" id="liveStatus">OFFLINE</span>
+                    <p id="nowPlaying">🎶 Programação Sertaneja Ao Vivo</p>
+                </div>
+
+                            <div class="volume-control">
+                    <input
+                        type="range"
+                        id="volumeControl"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        aria-label="Controle de volume"
+                    >
+                </div>
+
+
+                <button class="btn-play" id="playBtn">OUVIR AGORA</button>
+            </div>
+        </div>
+
+    </header>
+
+    <section class="hero-intro">
+        <h1>O melhor do sertanejo, agora também online</h1>
+        <p>Uma rádio que marcou época e está de volta em uma nova fase.</p>
+    </section>
+
 
     <section class="slider">
     <div class="slides">
@@ -300,6 +346,68 @@ document.addEventListener('DOMContentLoaded', function () {
         else pauseRadio();
     });
 });
+</script>
+
+<script>
+fetch('data/shows.json')
+    .then(response => response.json())
+    .then(data => {
+        const grid = document.getElementById('agendaGrid');
+
+        data.forEach(show => {
+            const card = document.createElement('a');
+            card.href = show.link;
+            card.target = '_blank';
+            card.className = 'agenda-card';
+
+            const dataFormatada = new Date(show.data)
+                .toLocaleDateString('pt-BR');
+
+            card.innerHTML = `
+                <h3>${show.artista}</h3>
+                <div class="data">${dataFormatada}</div>
+                <div class="local">${show.cidade} • ${show.local}</div>
+                ${show.patrocinado ? '<span class="tag">Evento patrocinado</span>' : ''}
+            `;
+
+            grid.appendChild(card);
+        });
+    })
+    .catch(err => console.error('Erro ao carregar agenda:', err));
+</script>
+<script>
+fetch('data/mais-tocadas.json')
+    .then(res => res.json())
+    .then(data => {
+        const lista = document.getElementById('rankingLista');
+        const tabs = document.querySelectorAll('.tab');
+
+        function render(tipo) {
+            lista.innerHTML = '';
+            data[tipo].forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="posicao">${item.posicao}</div>
+                    <div>
+                        <div class="musica">${item.musica}</div>
+                        <div class="artista">${item.artista}</div>
+                    </div>
+                `;
+                lista.appendChild(li);
+            });
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                render(tab.dataset.tab);
+            });
+        });
+
+        render('semana');
+    })
+    .catch(err => console.error('Erro ao carregar ranking:', err));
 </script>
 
 
