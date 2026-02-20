@@ -1,29 +1,47 @@
 [
   {
+    "id": "1",
     "titulo": "Gravação de DVD esgota ingressos em 10 minutos",
     "resumo": "Os fãs de sertanejo raiz provaram mais uma vez a força do gênero no evento mais aguardado do ano em Goiânia...",
+    "conteudo": [
+      "A ansiedade tomou conta dos fãs na manhã desta terça-feira. A abertura das vendas para a tão aguardada gravação do novo DVD em Goiânia surpreendeu até os organizadores: todos os 40 mil ingressos foram vendidos em pouco mais de 10 minutos.",
+      "A produção do evento informou que um lote extra está sendo estudado devido à alta demanda. 'Sabíamos que a procura seria grande, mas a velocidade com que os setores esgotaram foi fenomenal', comentou o diretor da produtora.",
+      "As participações especiais do DVD ainda são um mistério absoluto, mas fontes garantem que teremos encontros inéditos no palco. Fique ligado na programação da Onda Sertaneja para ser o primeiro a saber das novidades!"
+    ],
     "data": "Hoje, 14:30",
     "tag": "Polêmica",
     "classeTag": "tag-hot",
-    "imagem": "https://images.unsplash.com/photo-1540039155732-68473668f420?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "imagem": "https://images.unsplash.com/photo-1540039155732-68473668f420?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
     "link": "noticia.html?id=1"
   },
   {
+    "id": "2",
     "titulo": "Novo clipe bate 1 milhão de views no primeiro dia",
     "resumo": "A dupla sensação do momento liberou o videoclipe oficial da música 'Chão de Terra' com super produção...",
+    "conteudo": [
+      "A música 'Chão de Terra', que já era a mais pedida aqui na programação da Onda Sertaneja, acaba de ganhar um videoclipe de peso. Em 24 horas no ar, o projeto rompeu a barreira de 1 milhão de visualizações no YouTube.",
+      "A produção apostou em um clima de fazenda autêntico, trazendo elementos da vida no campo misturados a muita tecnologia de luz e som. O resultado é um clipe cinematográfico que emociona e faz o fã se sentir em casa.",
+      "Segundo a assessoria da dupla, o projeto faz parte do novo álbum que deve chegar em todas as plataformas nas próximas semanas. Aumente o som e assista o sucesso garantido!"
+    ],
     "data": "Ontem, 19:00",
     "tag": "Lançamento",
     "classeTag": "tag-release",
-    "imagem": "https://images.unsplash.com/photo-1516280440503-6c84c7f0db43?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "imagem": "https://images.unsplash.com/photo-1516280440503-6c84c7f0db43?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
     "link": "noticia.html?id=2"
   },
   {
+    "id": "3",
     "titulo": "Cantor anuncia pausa na carreira para focar na família",
     "resumo": "Após 20 anos de estrada, o ídolo sertanejo emocionou os fãs ao declarar que fará uma pausa em 2027...",
+    "conteudo": [
+      "O mundo sertanejo foi pego de surpresa na noite deste domingo. Durante um show emocionante, o artista revelou que fará uma longa pausa na carreira a partir do próximo ano.",
+      "'A saudade de casa bateu forte. São duas décadas cantando para vocês quase todas as noites, agora preciso cantar para meus filhos dormirem', disse o cantor, visivelmente emocionado no palco.",
+      "A paralisação, no entanto, não é imediata. A turnê de despedida, batizada de 'Até Logo', percorrerá as principais capitais brasileiras. Continue colado na Onda Sertaneja para a gente te atualizar sobre a venda de ingressos e datas oficiais."
+    ],
     "data": "2 dias atrás",
     "tag": "Carreira",
     "classeTag": "tag-career",
-    "imagem": "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "imagem": "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
     "link": "noticia.html?id=3"
   }
 ]

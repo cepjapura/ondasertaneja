@@ -1,70 +1,131 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Notícia | Onda Sertaneja</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=2.2" />
+    <style>
+        .noticia-meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .noticia-article {
+            padding: 40px 20px;
+        }
+
+        .noticia-content p {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+    </style>
 </head>
+
 <body>
 
-<!-- PLAYER FIXO (MESMO DO INDEX) -->
-<header class="player-bar">
-    <div class="container player-flex">
-        <div class="now-playing">
-            <div class="radio-logo">📻</div>
+    <!-- HEADER SIMPLIFICADO -->
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                ONDA<span>SERTANEJA</span>
+            </a>
+            <nav class="nav-menu" style="display: flex;">
+                <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Voltar à Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- PLAYER AO VIVO FIXO -->
+    <div class="player-live">
+        <div class="player-left">
+            <div class="live-pulse"></div>
             <div>
-                <span class="status">NO AR AGORA</span>
-                <p class="song-title">O Melhor do Sertanejo</p>
+                <span class="live-indicator">AO VIVO</span>
+                <span class="program-name">Top 10 Sertanejo com DJ Bastião</span>
             </div>
         </div>
-
-        <div class="controls">
-            <button class="btn-play">OUVIR AGORA</button>
-        </div>
-
-        <div class="social-links">
-            <a href="/" class="btn-whatsapp">Voltar</a>
+        <div class="player-right">
+            <button class="player-btn" data-play><i class="fa-solid fa-play"></i> Ouvir a Rádio</button>
         </div>
     </div>
-</header>
 
-<main class="noticia-page">
-
-    <article class="noticia-article container">
-
-        <div class="noticia-header">
-            <span class="news-tag">Shows</span>
-            <h1>Grandes nomes do sertanejo anunciam novas turnês</h1>
-            <p class="noticia-meta">Publicado em 27 de dezembro de 2025</p>
-        </div>
-
-        <div class="noticia-image"
-             style="background-image:url('https://images.unsplash.com/photo-1518972559570-9ec8f8f8b3aa');">
-        </div>
-
-        <div class="noticia-content">
-            <p>
-                O cenário sertanejo brasileiro começa o ano com grandes novidades.
-                Artistas consagrados anunciaram novas turnês que prometem rodar o Brasil
-                levando sucessos que marcaram gerações.
-            </p>
-
-            <p>
-                Os shows devem passar por capitais e cidades do interior, reforçando a
-                conexão do sertanejo com o público em todas as regiões do país.
-            </p>
-
-            <p>
-                A Onda Sertaneja acompanha tudo de perto e traz as principais informações
-                para você ficar por dentro do que acontece no mundo da música.
+    <!-- HERO DINÂMICO DA NOTÍCIA -->
+    <section class="hero" style="min-height: 400px; padding: 40px 20px; justify-content: flex-end;" id="heroNoticia">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="news-tag" id="newsTag"
+                style="margin-bottom: 15px; display:inline-block; padding: 5px 10px; border-radius: 5px; font-size:0.8rem; font-weight:bold;">Carregando...</span>
+            <h1 id="newsTitle"
+                style="font-size: 2.2rem; margin-bottom: 10px; font-family:var(--font-title); color:var(--text-light)">
+                Carregando Notícia...</h1>
+            <p class="noticia-meta" id="newsDate" style="color:#FFF;"><i class="fa-regular fa-calendar"></i> --/--/----
             </p>
         </div>
+    </section>
 
-    </article>
+    <main class="main-content">
 
-</main>
+        <section class="section grid-layout">
+            <!-- MAIN: Conteúdo da Notícia -->
+            <article class="col-main noticia-article noticia-content" id="newsArticle"
+                style="padding-top: 0; background-color: var(--surface); border-radius: var(--radius-lg); padding: 30px; box-shadow: var(--shadow);">
+                <p style="color: var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Lendo redação...</p>
+            </article>
+
+            <!-- SIDEBAR: Ações -->
+            <aside class="col-sidebar">
+                <div class="sidebar-widget">
+                    <h3><i class="fa-solid fa-share-nodes"></i> Compartilhar</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">
+                        Envie esta notícia para seus amigos nas redes!
+                    </p>
+                    <button class="btn-primary btn-block"
+                        onclick="window.open('https://api.whatsapp.com/send?text=Veja%20isso%20na%20Onda%20Sertaneja:%20' + window.location.href, '_blank')">
+                        <i class="fa-brands fa-whatsapp"></i> Whatsapp
+                    </button>
+                    <button class="btn-outline-primary btn-block" style="margin-top: 10px;"
+                        onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.href), '_blank')">
+                        <i class="fa-brands fa-facebook"></i> Facebook
+                    </button>
+                </div>
+            </aside>
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container" style="margin-bottom: 20px;">
+            <div class="footer-brand">
+                <h3>ONDA<span>SERTANEJA</span></h3>
+                <p>A batida que move o Brasil.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 Onda Sertaneja. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <audio id="radioPlayer" preload="none">
+        <source src="https://SEU_STREAM_AQUI" type="audio/mpeg">
+    </audio>
+
+    <script src="player.js"></script>
+    <script src="noticia_detalhe.js"></script>
 
 </body>
+
 </html>
