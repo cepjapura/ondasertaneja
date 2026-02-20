@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onda Sertaneja - A Rádio que Vive o Sertão</title>
+
+  <!-- Fontes Premium do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
+  <!-- Ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-container">
+      <a href="#" class="logo">
+        ONDA<span>SERTANEJA</span>
+      </a>
+
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <nav class="nav-menu" id="navMenu">
+        <a href="#inicio">Início</a>
+        <a href="#noticias">Notícias</a>
+        <a href="#lancamentos">Lançamentos</a>
+        <a href="#agenda">Agenda de Shows</a>
+        <a href="#entrevistas">Entrevistas</a>
+        <a href="#contato">Contato</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="btn-outline-primary"><i class="fa-solid fa-music"></i> Enviar Música</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- PLAYER AO VIVO FIXO NO TOPO ABAIXO DO HEADER -->
+  <div class="player-live">
+    <div class="player-left">
+      <div class="live-pulse"></div>
+      <div>
+        <span class="live-indicator">AO VIVO</span>
+        <span class="program-name">Top 10 Sertanejo com DJ Bastião</span>
+      </div>
+    </div>
+    <div class="player-right">
+      <button class="player-btn" data-play><i class="fa-solid fa-play"></i> Ouvir a Rádio</button>
+    </div>
+  </div>
+
+  <!-- HERO SECTION -->
+  <section class="hero" id="inicio">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-tag"><i class="fa-solid fa-headphones-simple"></i> O PORTAL DA MÚSICA</span>
+      <h1>A batida que move<br>o Brasil</h1>
+      <p>
+        As principais novidades do mundo sertanejo, lançamentos exclusivos, agenda de shows e entretenimento em um só
+        lugar.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="window.location.href='#noticias'">Ver últimas notícias</button>
+        <button class="btn-play-hero" data-play><i class="fa-solid fa-play"></i> Tocar Rádio</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="main-content">
+
+    <!-- NOTÍCIAS -->
+    <section class="section" id="noticias">
+      <div class="section-header">
+        <h2>🔥 Últimas Notícias</h2>
+        <a href="#" class="view-all">Ver todas <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+
+      <div class="news-grid" id="noticiasGrid">
+        <p class="muted" style="color: var(--text-muted);">Carregando notícias...</p>
+      </div>
+    </section>
+
+    <!-- AGENDA DE SHOWS E TOP MENSAL -->
+    <section class="section grid-layout" id="agenda">
+      <div class="col-main">
+        <div class="section-header">
+          <h2>📅 Agenda de Shows</h2>
+        </div>
+        <div class="agenda-list" id="agendaShows">
+          <!-- Agenda carregada do JS, placeholder bonito abaixo -->
+          <div class="agenda-item skeleton-load"></div>
+          <div class="agenda-item skeleton-load" style="animation-delay: 0.2s"></div>
+          <div class="agenda-item skeleton-load" style="animation-delay: 0.4s"></div>
+        </div>
+      </div>
+
+      <aside class="col-sidebar">
+        <div class="sidebar-widget">
+          <h3><i class="fa-solid fa-trophy"></i> As Mais Tocadas</h3>
+          <ol class="ranking-list" id="topMensal">
+            <!-- Ranking carregado via JS, placeholder -->
+            <li class="ranking-item"><span class="rank-num">1</span>
+              <div class="rank-info"><strong>Carregando...</strong><span>Aguarde</span></div>
+            </li>
+            <li class="ranking-item"><span class="rank-num">2</span>
+              <div class="rank-info"><strong>Carregando...</strong><span>Aguarde</span></div>
+            </li>
+            <li class="ranking-item"><span class="rank-num">3</span>
+              <div class="rank-info"><strong>Carregando...</strong><span>Aguarde</span></div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="sidebar-ad">
+          <span>Publicidade</span>
+          <div class="ad-content">Seu Anúncio Aqui</div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- LANÇAMENTOS -->
+    <section class="section" id="lancamentos">
+      <div class="section-header">
+        <h2>🎧 Som na Caixa (Lançamentos)</h2>
+      </div>
+
+      <div class="release-grid" id="lancamentosGrid">
+        <p class="muted" style="color: var(--text-muted);">Carregando Lançamentos...</p>
+      </div>
+    </section>
+
+    <!-- ARTISTAS EM DESTAQUE -->
+    <section class="section" id="artistas">
+      <div class="section-header">
+        <h2>⭐ Artistas em Destaque</h2>
+      </div>
+      <div class="grid artists-grid" id="artistasDestaque"
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+        <p class="muted" style="color: var(--text-muted);">Carregando artistas...</p>
+      </div>
+    </section>
+
+    <!-- ENTREVISTAS -->
+    <section class="section" id="entrevistas">
+      <div class="section-header">
+        <h2>🎙️ De Frente com o Ídolo</h2>
+      </div>
+
+      <div class="interview-banner"
+        style="background-image: url('https://images.unsplash.com/photo-1598387993441-a364f854c3e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');">
+        <div class="interview-overlay"></div>
+        <div class="interview-content">
+          <span class="tag tag-exclusive">Exclusiva</span>
+          <h2>"O Sertanejo Raiz Nunca Vai Morrer"</h2>
+          <p>Batemos um papo revelador com um dos maiores nomes da música sobre as novas gerações e o legado caipira.
+          </p>
+          <button class="btn-primary">Ler Entrevista Completa</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALERIA DE EVENTOS -->
+    <section class="section" id="galeria">
+      <div class="section-header">
+        <h2>📸 Nossa Lente (Eventos)</h2>
+      </div>
+
+      <div class="gallery-masonry">
+        <div class="gallery-item large"
+          style="background-image: url('https://images.unsplash.com/photo-1470229722913-7c090be5c520?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
+          <div class="gallery-caption">Festival de Inverno 2026</div>
+        </div>
+        <div class="gallery-item"
+          style="background-image: url('https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
+          <div class="gallery-caption">Palco Principal</div>
+        </div>
+        <div class="gallery-item"
+          style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
+          <div class="gallery-caption">Festa do Peão</div>
+        </div>
+        <div class="gallery-item wide"
+          style="background-image: url('https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
+          <div class="gallery-caption">Bastidores</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MÍDIA KIT -->
+    <section class="section split-cta">
+      <div class="cta-text">
+        <h2>💼 Anuncie na Onda Sertaneja</h2>
+        <p>Conecte sua marca com milhares de fãs apaixonados por música sertaneja todos os dias. Temos formatos ideais
+          de mídia para alavancar seu evento ou produto.</p>
+      </div>
+      <div class="cta-action">
+        <button class="btn-outline-primary btn-large"><i class="fa-solid fa-download"></i> Baixar Mídia Kit</button>
+      </div>
+    </section>
+
+    <!-- CONTATO / FORMULÁRIO -->
+    <section class="section" id="contato">
+      <div class="contact-box">
+        <div class="contact-info">
+          <h2>Fale com a Gente</h2>
+          <p>Dúvidas, sugestões de pautas ou pedidos musicais? Mande uma mensagem para nossa equipe.</p>
+
+          <div class="contact-methods">
+            <div class="method">
+              <i class="fa-brands fa-whatsapp"></i>
+              <span>(11) 99999-9999</span>
+            </div>
+            <div class="method">
+              <i class="fa-regular fa-envelope"></i>
+              <span>contato@ondasertaneja.com.br</span>
+            </div>
+          </div>
+        </div>
+
+        <form class="contact-form" id="formContato">
+          <div class="form-group">
+            <label for="nome">Nome Completo</label>
+            <input type="text" id="nome" placeholder="Digite seu nome">
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+              <label for="telefone">WhatsApp</label>
+              <input type="tel" id="telefone" placeholder="(  ) _____-____">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="mensagem">Mensagem</label>
+            <textarea id="mensagem" rows="4" placeholder="Como podemos ajudar?"></textarea>
+          </div>
+          <button type="submit" class="btn-primary btn-block">Enviar Mensagem</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <h3>ONDA<span>SERTANEJA</span></h3>
+        <p>A batida que move o Brasil. As melhores músicas e notícias você encontra aqui, 24 horas por dia com você.</p>
+        <div class="social-links">
+          <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#"><i class="fa-brands fa-spotify"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="#inicio">Início</a></li>
+          <li><a href="#noticias">Notícias</a></li>
+          <li><a href="#agenda">Agenda de Shows</a></li>
+          <li><a href="#lancamentos">Lançamentos</a></li>
+          <li><a href="#entrevistas">Entrevistas</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Política de Privacidade</a></li>
+          <li><a href="#">Termos de Uso</a></li>
+          <li><a href="#">Direitos Autorais</a></li>
+          <li><a href="#">Mídia Kit</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Onda Sertaneja. Todos os direitos reservados.</p>
+      <p class="disclaimer">Website otimizado para a melhor experiência musical.</p>
+    </div>
+  </footer>
+
+  <!-- Áudio Oculto para Player -->
+  <audio id="radioPlayer" preload="none">
+    <source src="https://SEU_STREAM_AQUI" type="audio/mpeg">
+    Seu navegador não suporta áudio.
+  </audio>
+
+  <!-- Scripts -->
+  <script src="player.js"></script>
+  <script src="player.js"></script>
+  <script src="noticias.js"></script>
+  <script src="lancamentos.js"></script>
+  <script src="agenda.js"></script>
+  <script src="top-mensal.js"></script>
+  <script src="artistas.js"></script>
+  <script src="contato.js"></script>
+
+  <script>
+    // Toggle Menu Mobile
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navMenu = document.getElementById('navMenu');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      navMenu.classList.toggle('active');
+    });
+
+    // Fechar menu ao clicar em link
+    navMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('active');
+      });
+    });
+  </script>
+
+</body>
+
+</html>

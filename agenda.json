@@ -1,0 +1,23 @@
+[
+  {
+    "artista": "Gusttavo Lima",
+    "data": "14/02/2026",
+    "cidade": "Curitiba - PR",
+    "local": "Pedreira Paulo Leminski",
+    "destaque": true
+  },
+  {
+    "artista": "Maiara & Maraisa",
+    "data": "01/03/2026",
+    "cidade": "Londrina - PR",
+    "local": "ExpoLondrina",
+    "destaque": false
+  },
+  {
+    "artista": "Ana Castela",
+    "data": "15/03/2026",
+    "cidade": "Campo Grande - MS",
+    "local": "Arena MS",
+    "destaque": false
+  }
+]

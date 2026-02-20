@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onda Sertaneja | A Rádio que Toca o Brasil</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="site-header">
+
+<div class="site-notice">
+    <p>
+        🚧 A Onda Sertaneja está em nova fase. PAGINA EM CONSTRUÇÃO !!
+
+        <a
+        href="https://youtube.com/shorts/Ecc8weHmJmY"
+        target="_blank"
+        class="video-link">
+        ▶ Mensagem especial
+</a>
+
+    </p>
+</div>
+
+
+    <div class="player-bar">
+        <div class="container player-flex">
+            <div class="now-playing">
+                <span class="status">NO AR AGORA</span>
+                <p>O melhor do sertanejo</p>
+            </div>
+
+            <button class="btn-play">OUVIR AGORA</button>
+        </div>
+    </div>
+
+</header>
+
+    <section class="slider">
+    <div class="slides">
+
+        <!-- Slide 1 - Feliz 2026 -->
+        <div class="slide active slide-ano">
+            <div class="slide-content">
+                <h2>Feliz 2026 🎆</h2>
+                <p>A Onda Sertaneja segue tocando os melhores momentos da sua vida</p>
+            </div>
+        </div>
+
+        <!-- Slide 2 - Música / Rádio -->
+        <div class="slide slide-musica">
+            <div class="slide-content">
+                <h2>Sua trilha sonora diária</h2>
+                <p>Clássicos, modões e o sertanejo que marcou época</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="slider-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+    </div>
+</section>
+<section class="spotify-section">
+    <div class="container">
+        <h2 class="section-title">Agora na Onda</h2>
+
+        <div class="card-row">
+
+            <div class="music-card">
+                <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1511379938547-c1f69419868d');"></div>
+                <h3>Ao Vivo</h3>
+                <p>Sertanejo que marcou época</p>
+            </div>
+
+            <div class="music-card">
+                <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4');"></div>
+                <h3>Mais Tocadas</h3>
+                <p>As preferidas da semana</p>
+            </div>
+
+            <div class="music-card">
+                <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1515169067865-5387a5e6f2c3');"></div>
+                <h3>Notícias</h3>
+                <p>O mundo sertanejo agora</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+<section class="noticias-section">
+    <div class="container">
+        <h2 class="section-title">Notícias Sertanejas</h2>
+
+        <div class="news-grid">
+
+            <a href="noticia.html" class="news-card">
+                <div class="news-image" style="background-image:url('https://images.unsplash.com/photo-1518972559570-9ec8f8f8b3aa');"></div>
+                <div class="news-content">
+                    <span class="news-tag">Shows</span>
+                    <h3>Grandes nomes do sertanejo anunciam novas turnês</h3>
+                    <p>Confira os artistas que vão rodar o Brasil nos próximos meses.</p>
+                </div>
+            </a>
+
+            <article class="news-card">
+                <div class="news-image" style="background-image:url('https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2');"></div>
+                <div class="news-content">
+                    <span class="news-tag">Lançamentos</span>
+                    <h3>Novo hit sertanejo domina as plataformas digitais</h3>
+                    <p>A música que está conquistando o público em todo o país.</p>
+                </div>
+            </article>
+
+            <article class="news-card">
+                <div class="news-image" style="background-image:url('https://images.unsplash.com/photo-1515169067865-5387a5e6f2c3');"></div>
+                <div class="news-content">
+                    <span class="news-tag">Bastidores</span>
+                    <h3>Curiosidades do mundo sertanejo que você precisa saber</h3>
+                    <p>Histórias, bastidores e momentos marcantes dos artistas.</p>
+                </div>
+            </article>
+
+        </div>
+    </div>
+</section>
+<section class="programas-section">
+    <div class="container">
+        <h2 class="section-title">Programas & Locutores</h2>
+
+        <div class="programas-grid">
+
+            <div class="programa-card">
+                <div class="programa-img programa-manha"></div>      
+                <h3>Manhã Sertaneja</h3>
+                <span>Seg a Sex • 08h às 10h</span>
+                <p>Comece o dia com clássicos e sucessos que marcaram época.</p>
+            </div>
+
+            <div class="programa-card">
+                <div class="programa-img programa-raiz"></div>
+                <h3>Modão Raiz</h3>
+                <span>Seg a Sex • 14h às 16h</span>
+                <p>O sertanejo raiz que mora no coração do Brasil.</p>
+            </div>
+
+            <div class="programa-card">
+                <div class="programa-img programa-noite"></div>
+                <h3>Noite Universitária</h3>
+                <span>Todos os dias • 20h</span>
+                <p>Os hits atuais que dominam as paradas sertanejas.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+    <script>
+
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                playBtn.innerText = "PAUSAR";
+                playBtn.classList.add('playing');
+            } else {
+                audio.pause();
+                playBtn.innerText = "OUVIR AGORA";
+                playBtn.classList.remove('playing');
+            }
+        }
+    </script>
+    <script>
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.slider-dots .dot');
+    let currentSlide = 0;
+
+    function showSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('active', i === index);
+            dots[i].classList.toggle('active', i === index);
+        });
+    }
+
+    setInterval(() => {
+        currentSlide = (currentSlide + 1) % slides.length;
+        showSlide(currentSlide);
+    }, 5000);
+</script>
+
+<a href="#ao-vivo" class="cta-radio">
+    🎧 Ouça ao Vivo
+</a>
+<footer class="site-footer">
+    <div class="container footer-content">
+
+        <div class="footer-brand">
+            <h3>Onda Sertaneja</h3>
+            <p>Uma nova fase, o sertanejo de sempre.</p>
+        </div>
+
+        <div class="footer-info">
+            <p>© 2026 Onda Sertaneja</p>
+            <p>Todos os direitos reservados</p>
+        </div>
+
+    </div>
+</footer>
+
+
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+[
+    {
+        "nome": "Boteco Vazio",
+        "artista": "João & Maria",
+        "capa": "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+        "destaque": false
+    },
+    {
+        "nome": "Estrada de Chão",
+        "artista": "Lucas Santoro",
+        "capa": "https://images.unsplash.com/photo-1493225457124-a1a2a5f5f9da?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+        "destaque": false
+    },
+    {
+        "nome": "Coração Caipira",
+        "artista": "Trio Modão",
+        "capa": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+        "destaque": false
+    },
+    {
+        "nome": "As Melhores da Semana",
+        "artista": "Ouça nossa seleção oficial",
+        "capa": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+        "destaque": true,
+        "tag": "Spotify Playlist",
+        "linkBtn": "Abrir Spotify",
+        "linkUrl": "#"
+    }
+]
