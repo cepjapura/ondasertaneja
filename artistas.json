@@ -1,17 +1,17 @@
 [
   {
     "nome": "Gusttavo Lima",
-    "imagem": "img/gusttavo.jpg",
+    "imagem": "",
     "patrocinado": true
   },
   {
     "nome": "Maiara & Maraisa",
-    "imagem": "img/maiara-maraisa.jpg",
+    "imagem": "",
     "patrocinado": false
   },
   {
     "nome": "Ana Castela",
-    "imagem": "img/ana-castela.jpg",
+    "imagem": "",
     "patrocinado": false
   }
 ]

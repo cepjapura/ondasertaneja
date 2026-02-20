@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
            <img src="${imgSrc}" alt="${artista.nome}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
         <h3 style="font-family: var(--font-title); font-size: 1.2rem; margin-bottom: 15px;">${artista.nome}</h3>
-        <a class="btn-outline-primary" style="width: 100%; justify-content: center;" href="#agenda">
+        <a class="btn-outline-primary" style="width: 100%; justify-content: center;" href="artista.html?nome=${encodeURIComponent(artista.nome)}">
            <i class="fa-solid fa-calendar-days"></i> Ver Agenda
         </a>
       `;
