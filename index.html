@@ -5,6 +5,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Onda Sertaneja - A Rádio que Vive o Sertão</title>
+  <meta name="description" content="Onda Sertaneja — A melhor rádio sertaneja online 24h: notícias, agenda de shows, lançamentos e mais. A batida que move o Brasil!">
+
+  <!-- Open Graph (SEO WhatsApp/Facebook/Twitter) ATUALIZADO -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.ondasertaneja.com.br/">
+  <meta property="og:title" content="Onda Sertaneja — A batida que move o Brasil">
+  <meta property="og:description" content="A melhor rádio sertaneja online. Notícias, agenda de shows, lançamentos e os maiores artistas do sertanejo 24 horas por dia.">
+  <meta property="og:image" content="https://www.ondasertaneja.com.br/img/og-cover.jpg">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Onda Sertaneja — A batida que move o Brasil">
+  <meta name="twitter:description" content="A melhor rádio sertaneja online. Notícias, agenda de shows e mais.">
+  <meta name="twitter:image" content="https://www.ondasertaneja.com.br/img/og-cover.jpg">
+
+  <!-- Google Analytics 4 ATUALIZADO (substitua G-XXXXXXXXXX pelo seu ID real) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
 
   <!-- Fontes Premium do Google -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +38,7 @@
   <!-- Ícones -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <link rel="stylesheet" href="style.css?v=2.1" />
+  <link rel="stylesheet" href="style.css?v=2.2" />
 </head>
 
 <body>
@@ -303,6 +325,35 @@
       });
     });
   </script>
+  <!-- Botão Flutuante WhatsApp ATUALIZADO -->
+  <a id="btnWhatsappFloat"
+    href="https://wa.me/5544XXXXXXXXX"
+    target="_blank"
+    rel="noopener noreferrer"
+    style="
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9999;
+      background: #25D366;
+      color: white;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.5);
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    "
+    onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 28px rgba(37,211,102,0.7)'"
+    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 20px rgba(37,211,102,0.5)'"
+    title="Fale com a Onda Sertaneja no WhatsApp"
+  >
+    <i class="fa-brands fa-whatsapp"></i>
+  </a>
 
 </body>
 

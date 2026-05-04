@@ -1,9 +1,10 @@
 {
-  "whatsapp": "(11) 99999-9999",
-  "whatsappLink": "https://api.whatsapp.com/send?phone=5511999999999",
+  "whatsapp": "(44) 9XXXX-XXXX",
+  "whatsappLink": "https://wa.me/5544XXXXXXXXX",
   "email": "contato@ondasertaneja.com.br",
   "instagram": "https://instagram.com/ondasertaneja",
+  "facebook": "https://facebook.com/ondasertaneja",
   "tiktok": "https://tiktok.com/@ondasertaneja",
-  "youtube": "https://youtube.com/ondasertaneja",
-  "streamAudioUrl": "https://stream.zeno.fm/k2kxx5puy5quv"
+  "youtube": "https://youtube.com/@ondasertaneja",
+  "streamAudioUrl": "https://SEU_STREAM_AQUI"
 }
