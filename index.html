@@ -156,16 +156,8 @@
         <h2>🎙️ De Frente com o Ídolo</h2>
       </div>
 
-      <div class="interview-banner"
-        style="background-image: url('https://images.unsplash.com/photo-1598387993441-a364f854c3e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');">
-        <div class="interview-overlay"></div>
-        <div class="interview-content">
-          <span class="tag tag-exclusive">Exclusiva</span>
-          <h2>"O Sertanejo Raiz Nunca Vai Morrer"</h2>
-          <p>Batemos um papo revelador com um dos maiores nomes da música sobre as novas gerações e o legado caipira.
-          </p>
-          <button class="btn-primary">Ler Entrevista Completa</button>
-        </div>
+      <div class="interview-banner" id="entrevistaBanner">
+        <p class="muted" style="color: var(--text-muted); text-align: center; padding: 40px;">Carregando entrevista...</p>
       </div>
     </section>
 
@@ -175,23 +167,8 @@
         <h2>📸 Nossa Lente (Eventos)</h2>
       </div>
 
-      <div class="gallery-masonry">
-        <div class="gallery-item large"
-          style="background-image: url('https://images.unsplash.com/photo-1470229722913-7c090be5c520?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
-          <div class="gallery-caption">Festival de Inverno 2026</div>
-        </div>
-        <div class="gallery-item"
-          style="background-image: url('https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
-          <div class="gallery-caption">Palco Principal</div>
-        </div>
-        <div class="gallery-item"
-          style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
-          <div class="gallery-caption">Festa do Peão</div>
-        </div>
-        <div class="gallery-item wide"
-          style="background-image: url('https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
-          <div class="gallery-caption">Bastidores</div>
-        </div>
+      <div class="gallery-masonry" id="galeriaMasonry">
+        <p class="muted" style="color: var(--text-muted); text-align: center; width: 100%;">Carregando fotos...</p>
       </div>
     </section>
 
@@ -217,11 +194,11 @@
           <div class="contact-methods">
             <div class="method">
               <i class="fa-brands fa-whatsapp"></i>
-              <span>(11) 99999-9999</span>
+              <span id="txtContatoWhatsapp">Carregando...</span>
             </div>
             <div class="method">
               <i class="fa-regular fa-envelope"></i>
-              <span>contato@ondasertaneja.com.br</span>
+              <span id="txtContatoEmail">Carregando...</span>
             </div>
           </div>
         </div>
@@ -259,9 +236,9 @@
         <h3>ONDA<span>SERTANEJA</span></h3>
         <p>A batida que move o Brasil. As melhores músicas e notícias você encontra aqui, 24 horas por dia com você.</p>
         <div class="social-links">
-          <a href="#"><i class="fa-brands fa-instagram"></i></a>
-          <a href="#"><i class="fa-brands fa-tiktok"></i></a>
-          <a href="#"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" id="lnkInstagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" id="lnkTiktok" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" id="lnkYoutube" target="_blank"><i class="fa-brands fa-youtube"></i></a>
           <a href="#"><i class="fa-brands fa-spotify"></i></a>
         </div>
       </div>
@@ -300,11 +277,14 @@
   </audio>
 
   <!-- Scripts -->
+  <script src="config.js"></script>
   <script src="player.js"></script>
   <script src="noticias.js"></script>
   <script src="lancamentos.js"></script>
   <script src="agenda.js"></script>
   <script src="artistas.js"></script>
+  <script src="entrevistas.js"></script>
+  <script src="galeria.js"></script>
   <script src="contato.js"></script>
 
   <script>
