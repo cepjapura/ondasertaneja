@@ -1,16 +1,30 @@
 [
   {
-    "artista": "Gusttavo Lima",
-    "data": "14/02/2026",
-    "cidade": "Curitiba - PR",
-    "local": "Pedreira Paulo Leminski",
+    "artista": "Turnê Histórias (Ch&X, Zezé & Luciano, etc)",
+    "data": "09/05/2026",
+    "cidade": "Brasília - DF",
+    "local": "Arena BRB Mané Garrincha",
     "destaque": true
   },
   {
-    "artista": "Maiara & Maraisa",
-    "data": "01/03/2026",
-    "cidade": "Londrina - PR",
-    "local": "ExpoLondrina",
+    "artista": "Pedro Leopoldo Rodeio Show",
+    "data": "05/06/2026",
+    "cidade": "Pedro Leopoldo - MG",
+    "local": "Parque de Exposições",
+    "destaque": true
+  },
+  {
+    "artista": "Turnê Histórias",
+    "data": "22/08/2026",
+    "cidade": "São Paulo - SP",
+    "local": "Allianz Parque",
+    "destaque": false
+  },
+  {
+    "artista": "Turnê Histórias",
+    "data": "12/09/2026",
+    "cidade": "Belo Horizonte - MG",
+    "local": "Mineirão",
     "destaque": false
   },
   {
