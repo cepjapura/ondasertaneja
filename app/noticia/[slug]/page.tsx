@@ -203,19 +203,22 @@ export default async function NewsDetailPage({ params }: NewsPageProps) {
               <i className="fa-solid fa-calendar-days" style={{ color: 'var(--primary)' }}></i> Shows Relacionados
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {noticia.events.map(({ event }) => (
-                <div key={event.id} className="agenda-item" style={{ margin: 0 }}>
-                  <div className="agenda-info">
-                    <h4>{event.title}</h4>
-                    <p><i className="fa-solid fa-location-dot"></i> {event.venue?.name} • {event.city?.name} - {event.city?.stateCode}</p>
+              {noticia.events.map(({ event }) => {
+                const eventLink = event.city?.slug ? `/cidade/${event.city.slug}` : '/agenda';
+                return (
+                  <div key={event.id} className="agenda-item" style={{ margin: 0 }}>
+                    <div className="agenda-info">
+                      <h4>{event.title}</h4>
+                      <p><i className="fa-solid fa-location-dot"></i> {event.venue?.name} • {event.city?.name} - {event.city?.stateCode}</p>
+                    </div>
+                    <div className="agenda-action">
+                      <Link href={eventLink} className="btn-outline-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}>
+                        Ver Cidade / Agenda
+                      </Link>
+                    </div>
                   </div>
-                  <div className="agenda-action">
-                    <Link href={`/artista/${event.slug}`} className="btn-outline-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}>
-                      Ver Detalhes
-                    </Link>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}

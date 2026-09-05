@@ -124,22 +124,31 @@ export default function Header() {
                   {searchResults.events?.length > 0 && (
                     <>
                       <div className="search-category-title">📅 Shows & Eventos</div>
-                      {searchResults.events.map((ev: any) => (
-                        <Link
-                          key={ev.id}
-                          href={`/artista/${ev.artists?.[0]?.artist?.slug || 'ana-castela'}`}
-                          className="search-result-item"
-                          onClick={() => setIsDropdownOpen(false)}
-                        >
-                          <div className="search-item-icon"><i className="fa-solid fa-calendar-days"></i></div>
-                          <div>
-                            <div className="search-item-title">{ev.title}</div>
-                            <span className="search-item-sub">
-                              {ev.city ? `${ev.city.name} - ${ev.city.stateCode}` : ''} • {new Date(ev.eventDate).toLocaleDateString('pt-BR')}
-                            </span>
-                          </div>
-                        </Link>
-                      ))}
+                      {searchResults.events.map((ev: any) => {
+                        const artistSlug = ev.artists?.[0]?.artist?.slug;
+                        const eventLink = artistSlug
+                          ? `/artista/${artistSlug}`
+                          : ev.city?.slug
+                          ? `/cidade/${ev.city.slug}`
+                          : '/agenda';
+
+                        return (
+                          <Link
+                            key={ev.id}
+                            href={eventLink}
+                            className="search-result-item"
+                            onClick={() => setIsDropdownOpen(false)}
+                          >
+                            <div className="search-item-icon"><i className="fa-solid fa-calendar-days"></i></div>
+                            <div>
+                              <div className="search-item-title">{ev.title}</div>
+                              <span className="search-item-sub">
+                                {ev.city ? `${ev.city.name} - ${ev.city.stateCode}` : ''} • {new Date(ev.eventDate).toLocaleDateString('pt-BR')}
+                              </span>
+                            </div>
+                          </Link>
+                        );
+                      })}
                     </>
                   )}
 

@@ -71,7 +71,6 @@ export default async function AgendaPage() {
                   const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
                   const mesStr = meses[dateObj.getMonth()];
                   const artist = event.artists[0]?.artist;
-                  const artistSlug = artist?.slug || 'ana-castela';
 
                   return (
                     <div
@@ -88,9 +87,13 @@ export default async function AgendaPage() {
                       </div>
                       <div className="agenda-info">
                         <h4>
-                          <Link href={`/artista/${artistSlug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                            {event.title}
-                          </Link>
+                          {artist ? (
+                            <Link href={`/artista/${artist.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                              {event.title}
+                            </Link>
+                          ) : (
+                            <span>{event.title}</span>
+                          )}
                         </h4>
                         <p style={{ color: 'var(--text-muted)' }}>
                           <i className="fa-solid fa-location-dot" style={{ color: 'var(--primary)' }}></i>{' '}
@@ -114,13 +117,15 @@ export default async function AgendaPage() {
                             Ingressos
                           </a>
                         )}
-                        <Link
-                          href={`/artista/${artistSlug}`}
-                          className="btn-outline-primary"
-                          style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}
-                        >
-                          Ver Artista
-                        </Link>
+                        {artist && (
+                          <Link
+                            href={`/artista/${artist.slug}`}
+                            className="btn-outline-primary"
+                            style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}
+                          >
+                            Ver Artista
+                          </Link>
+                        )}
                       </div>
                     </div>
                   );

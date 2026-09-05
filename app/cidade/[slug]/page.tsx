@@ -186,7 +186,6 @@ export default async function CityDetailPage({ params }: CityPageProps) {
                   const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
                   const mesStr = meses[dateObj.getMonth()];
                   const primaryArtist = event.artists[0]?.artist;
-                  const artistSlug = primaryArtist?.slug || 'ana-castela';
 
                   return (
                     <div
@@ -203,9 +202,13 @@ export default async function CityDetailPage({ params }: CityPageProps) {
                       </div>
                       <div className="agenda-info">
                         <h4>
-                          <Link href={`/artista/${artistSlug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                            {event.title}
-                          </Link>
+                          {primaryArtist ? (
+                            <Link href={`/artista/${primaryArtist.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                              {event.title}
+                            </Link>
+                          ) : (
+                            <span>{event.title}</span>
+                          )}
                         </h4>
                         <p style={{ color: 'var(--text-muted)' }}>
                           <i className="fa-solid fa-building" style={{ color: 'var(--primary)' }}></i>{' '}
@@ -226,7 +229,7 @@ export default async function CityDetailPage({ params }: CityPageProps) {
                         )}
                         {primaryArtist && (
                           <Link
-                            href={`/artista/${artistSlug}`}
+                            href={`/artista/${primaryArtist.slug}`}
                             className="btn-outline-primary"
                             style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}
                           >

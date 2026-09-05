@@ -57,7 +57,6 @@ export default async function LancamentosPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
               {hits.map(music => {
                 const primaryArtist = music.artists[0]?.artist;
-                const artistSlug = primaryArtist?.slug || 'ana-castela';
 
                 return (
                   <div
@@ -98,7 +97,7 @@ export default async function LancamentosPage() {
                         {music.title}
                       </h3>
                       {primaryArtist && (
-                        <Link href={`/artista/${artistSlug}`} style={{ fontSize: '0.9rem', color: 'var(--primary)', textDecoration: 'none' }}>
+                        <Link href={`/artista/${primaryArtist.slug}`} style={{ fontSize: '0.9rem', color: 'var(--primary)', textDecoration: 'none' }}>
                           {primaryArtist.name} &rarr;
                         </Link>
                       )}
@@ -129,7 +128,6 @@ export default async function LancamentosPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '15px' }}>
             {musics.map(music => {
               const primaryArtist = music.artists[0]?.artist;
-              const artistSlug = primaryArtist?.slug || 'ana-castela';
 
               return (
                 <div
@@ -150,7 +148,7 @@ export default async function LancamentosPage() {
                     {primaryArtist && (
                       <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                         Por{' '}
-                        <Link href={`/artista/${artistSlug}`} style={{ color: 'var(--text-main)', fontWeight: 600, textDecoration: 'none' }}>
+                        <Link href={`/artista/${primaryArtist.slug}`} style={{ color: 'var(--text-main)', fontWeight: 600, textDecoration: 'none' }}>
                           {primaryArtist.name}
                         </Link>
                       </p>
@@ -159,7 +157,7 @@ export default async function LancamentosPage() {
 
                   <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
                     {primaryArtist && (
-                      <Link href={`/artista/${artistSlug}`} className="btn-outline-primary" style={{ width: '100%', justifyContent: 'center', fontSize: '0.85rem', textDecoration: 'none' }}>
+                      <Link href={`/artista/${primaryArtist.slug}`} className="btn-outline-primary" style={{ width: '100%', justifyContent: 'center', fontSize: '0.85rem', textDecoration: 'none' }}>
                         Ver Artista
                       </Link>
                     )}

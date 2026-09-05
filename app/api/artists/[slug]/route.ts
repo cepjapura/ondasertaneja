@@ -44,17 +44,7 @@ export async function GET(
       return NextResponse.json({ error: 'Artista não encontrado' }, { status: 404 });
     }
 
-    // Se não houver relações manuais, buscar fallback por mesmo estilo
-    let relatedArtists = artist.relationsAsArtistA.map(r => r.artistB);
-    if (relatedArtists.length === 0) {
-      relatedArtists = await prisma.artist.findMany({
-        where: {
-          id: { not: artist.id },
-          genreTags: { contains: artist.genreTags || 'Sertanejo' },
-        },
-        take: 4,
-      });
-    }
+    const relatedArtists = artist.relationsAsArtistA.map(r => r.artistB);
 
     return NextResponse.json({
       ...artist,

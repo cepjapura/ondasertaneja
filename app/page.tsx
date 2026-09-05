@@ -44,9 +44,6 @@ export default async function HomePage() {
           </p>
           <div className="hero-actions">
             <Link href="#noticias" className="btn-primary" style={{ textDecoration: 'none' }}>Ver últimas notícias</Link>
-            <Link href="/artista/ana-castela" className="btn-outline-primary" style={{ textDecoration: 'none' }}>
-              <i className="fa-solid fa-star"></i> Ver Especial Ana Castela
-            </Link>
           </div>
         </div>
       </section>
@@ -94,7 +91,7 @@ export default async function HomePage() {
                 const dia = dateObj.getDate().toString().padStart(2, '0');
                 const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
                 const mesStr = meses[dateObj.getMonth()];
-                const artistSlug = event.artists[0]?.artist?.slug || 'turne-historias';
+                const primaryArtist = event.artists[0]?.artist;
 
                 return (
                   <div key={event.id} className="agenda-item" style={{ borderColor: event.isHighlight ? 'var(--primary)' : 'var(--border-color)' }}>
@@ -104,9 +101,13 @@ export default async function HomePage() {
                     </div>
                     <div className="agenda-info">
                       <h4>
-                        <Link href={`/artista/${artistSlug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                          {event.title}
-                        </Link>
+                        {primaryArtist ? (
+                          <Link href={`/artista/${primaryArtist.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                            {event.title}
+                          </Link>
+                        ) : (
+                          <span>{event.title}</span>
+                        )}
                       </h4>
                       <p>
                         <i className="fa-solid fa-location-dot"></i> {event.venue?.name || 'Local'} •{' '}
@@ -117,11 +118,13 @@ export default async function HomePage() {
                         ) : 'Brasil'}
                       </p>
                     </div>
-                    <div className="agenda-action">
-                      <Link href={`/artista/${artistSlug}`} className="btn-outline-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}>
-                        Ver Artista
-                      </Link>
-                    </div>
+                    {primaryArtist && (
+                      <div className="agenda-action">
+                        <Link href={`/artista/${primaryArtist.slug}`} className="btn-outline-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}>
+                          Ver Artista
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 );
               })}
