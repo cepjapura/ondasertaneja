@@ -1,0 +1,309 @@
+// Prisma Schema — Onda Sertaneja V1.2
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Artist {
+  id              String   @id @default(uuid())
+  name            String
+  slug            String   @unique
+  bio             String?
+  avatarUrl       String?
+  coverUrl        String?
+  isDuoOrGroup    Boolean  @default(false)
+  genreTags       String?  // JSON string ou tags separadas por virgula
+  spotifyId       String?
+  youtubeChannel  String?
+  instagramHandle String?
+  tiktokHandle    String?
+  isFeatured      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  members            ArtistMember[]
+  events             EventArtist[]
+  news               NewsArtist[]
+  musics             MusicArtist[]
+  relationsAsArtistA ArtistRelationship[] @relation("ArtistA")
+  relationsAsArtistB ArtistRelationship[] @relation("ArtistB")
+
+  @@index([name])
+  @@index([isFeatured])
+}
+
+model ArtistMember {
+  id       String  @id @default(uuid())
+  artistId String
+  name     String
+  role     String?
+  bio      String?
+  photoUrl String?
+
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@index([artistId])
+}
+
+model City {
+  id        String   @id @default(uuid())
+  name      String
+  stateCode String   // e.g. PR, SP
+  slug      String   @unique // e.g. maringa-pr
+  latitude  Float?
+  longitude Float?
+  ibgeCode  String?
+
+  venues Venue[]
+  events Event[]
+  news   NewsCity[]
+
+  @@index([stateCode])
+  @@index([name])
+}
+
+model Venue {
+  id        String @id @default(uuid())
+  name      String
+  slug      String @unique
+  cityId    String
+  address   String?
+  latitude  Float?
+  longitude Float?
+
+  city   City    @relation(fields: [cityId], references: [id])
+  events Event[]
+
+  @@index([cityId])
+}
+
+model Event {
+  id              String   @id @default(uuid())
+  title           String
+  slug            String   @unique
+  eventDate       DateTime
+  venueId         String?
+  cityId          String
+  status          String   @default("confirmed") // confirmed, postponed, canceled, ended, pending
+  ticketUrl       String?
+  ticketMinPrice  Float?
+  isHighlight     Boolean  @default(false)
+  sourceId        String?
+  confidenceLevel String   @default("verified") // verified, unverified, rumor
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  venue           Venue?               @relation(fields: [venueId], references: [id])
+  city            City                 @relation(fields: [cityId], references: [id])
+  source          Source?              @relation(fields: [sourceId], references: [id])
+  artists         EventArtist[]
+  news            NewsEvent[]
+  statusHistories EventStatusHistory[]
+
+  @@index([eventDate])
+  @@index([cityId])
+  @@index([status])
+  @@index([isHighlight])
+}
+
+model EventArtist {
+  eventId          String
+  artistId         String
+  performanceOrder Int?
+  stageName        String?
+
+  event  Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, artistId])
+  @@index([artistId])
+  @@index([eventId])
+}
+
+model News {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  summary     String
+  contentJson String   // Stored as JSON string or text
+  coverUrl    String?
+  category    String   @default("news") // news, interview, release, gossip
+  trustType   String   @default("confirmed") // confirmed, rumor, opinion, sponsored
+  authorId    String?
+  publishedAt DateTime @default(now())
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author  AdminUser?   @relation(fields: [authorId], references: [id])
+  artists NewsArtist[]
+  events  NewsEvent[]
+  cities  NewsCity[]
+
+  @@index([publishedAt])
+  @@index([category])
+  @@index([trustType])
+}
+
+model NewsArtist {
+  newsId   String
+  artistId String
+
+  news   News   @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@id([newsId, artistId])
+}
+
+model NewsEvent {
+  newsId  String
+  eventId String
+
+  news  News  @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([newsId, eventId])
+}
+
+model NewsCity {
+  newsId String
+  cityId String
+
+  news News @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  city City @relation(fields: [cityId], references: [id], onDelete: Cascade)
+
+  @@id([newsId, cityId])
+}
+
+model Music {
+  id              String    @id @default(uuid())
+  title           String
+  slug            String    @unique
+  durationSeconds Int?
+  releaseDate     DateTime?
+  spotifyTrackId  String?
+  youtubeVideoId  String?
+  isHit           Boolean   @default(false)
+  albumId         String?
+  createdAt       DateTime  @default(now())
+
+  album   Album?        @relation(fields: [albumId], references: [id])
+  artists MusicArtist[]
+
+  @@index([title])
+  @@index([isHit])
+}
+
+model MusicArtist {
+  musicId   String
+  artistId  String
+  isPrimary Boolean @default(true)
+
+  music  Music  @relation(fields: [musicId], references: [id], onDelete: Cascade)
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@id([musicId, artistId])
+}
+
+model Album {
+  id             String    @id @default(uuid())
+  title          String
+  slug           String    @unique
+  coverUrl       String?
+  releaseDate    DateTime?
+  albumType      String    @default("album") // album, ep, dvd, single
+  spotifyAlbumId String?
+
+  musics Music[]
+}
+
+model Video {
+  id          String   @id @default(uuid())
+  title       String
+  youtubeId   String
+  videoType   String   @default("clip") // clip, live, interview
+  publishedAt DateTime @default(now())
+}
+
+model Source {
+  id               String    @id @default(uuid())
+  name             String
+  url              String?
+  sourceType       String    @default("official_artist") // official_artist, press_advisory, official_organizer, official_ticket_seller, specialized_media, unverified_third_party
+  trustLevel       String    @default("high") // high, medium, low
+  lastVerifiedAt   DateTime?
+  reliabilityScore Int       @default(100)
+
+  events                Event[]
+  justifiedStatusEvents EventStatusHistory[]
+}
+
+model ArtistRelationship {
+  id           String   @id @default(uuid())
+  artistAId    String
+  artistBId    String
+  relationType String   // similar_genre, frequent_colab, same_office, duo_split
+  weight       Int      @default(50)
+  createdAt    DateTime @default(now())
+
+  artistA Artist @relation("ArtistA", fields: [artistAId], references: [id], onDelete: Cascade)
+  artistB Artist @relation("ArtistB", fields: [artistBId], references: [id], onDelete: Cascade)
+
+  @@index([artistAId])
+  @@index([artistBId])
+}
+
+model AdminUser {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("editor") // superadmin, editor, moderator
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+
+  news           News[]
+  statusChanges  EventStatusHistory[]
+  auditLogs      AuditLog[]
+}
+
+model EventStatusHistory {
+  id                     String   @id @default(uuid())
+  eventId                String
+  previousStatus         String
+  newStatus              String
+  changedByUserId        String?
+  justificationSourceId String?
+  notes                  String?
+  createdAt              DateTime @default(now())
+
+  event               Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  changedByUser       AdminUser? @relation(fields: [changedByUserId], references: [id])
+  justificationSource Source?    @relation(fields: [justificationSourceId], references: [id])
+
+  @@index([eventId])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  entityName  String
+  entityId    String
+  action      String   // create, update, delete
+  changesJson String
+  userId      String?
+  createdAt   DateTime @default(now())
+
+  user AdminUser? @relation(fields: [userId], references: [id])
+
+  @@index([entityName, entityId])
+}
+
+model SystemConfig {
+  key   String @id
+  value String
+}
