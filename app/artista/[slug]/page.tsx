@@ -102,7 +102,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   // Artistas relacionados com base em registros reais da tabela ArtistRelationship
   const relatedArtists = artist.relationsAsArtistA.map(r => r.artistB);
 
-  const bgImage = artist.coverUrl || artist.avatarUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
+  const heroBgImage = artist.coverUrl || artist.avatarUrl;
 
   return (
     <main className="main-content" style={{ paddingTop: 0 }}>
@@ -112,7 +112,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
         style={{
           minHeight: '420px',
           padding: '60px 20px',
-          backgroundImage: `url('${bgImage}')`,
+          backgroundImage: heroBgImage ? `url('${heroBgImage}')` : 'linear-gradient(135deg, rgba(255, 85, 0, 0.25) 0%, rgba(18, 20, 26, 0.95) 100%)',
           backgroundSize: 'cover',
           backgroundPosition: 'center 20%',
           position: 'relative',
@@ -170,7 +170,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                   const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
                   const mesStr = meses[eventDateObj.getMonth()];
                   const cidadeStr = event.city ? `${event.city.name} - ${event.city.stateCode}` : '';
-                  const localStr = event.venue?.name || 'Local a confirmar';
+                  const localStr = event.venue?.name;
 
                   return (
                     <div key={event.id} className="agenda-item" style={{ borderColor: event.isHighlight ? 'var(--primary)' : 'var(--border-color)' }}>
@@ -179,8 +179,8 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                         <span className="agd-month">{mesStr}</span>
                       </div>
                       <div className="agenda-info">
-                        <h4><i className="fa-solid fa-location-dot" style={{ color: 'var(--primary)' }}></i> {cidadeStr}</h4>
-                        <p style={{ color: 'var(--text-muted)' }}>{localStr}</p>
+                        {cidadeStr && <h4><i className="fa-solid fa-location-dot" style={{ color: 'var(--primary)' }}></i> {cidadeStr}</h4>}
+                        {localStr && <p style={{ color: 'var(--text-muted)' }}>{localStr}</p>}
                       </div>
                       <div className="agenda-action">
                         {event.ticketUrl ? (
@@ -266,17 +266,25 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
               <h2>⭐ Quem ouve {artist.name} também escuta</h2>
             </div>
             <div className="grid artists-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-              {relatedArtists.map(rel => (
-                <div key={rel.id} className="artist-card" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '15px', textAlign: 'center' }}>
-                  <div style={{ width: '100%', height: '180px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', marginBottom: '12px' }}>
-                    <img src={rel.avatarUrl || rel.coverUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'} alt={rel.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {relatedArtists.map(rel => {
+                const relImage = rel.avatarUrl || rel.coverUrl;
+
+                return (
+                  <div key={rel.id} className="artist-card" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '15px', textAlign: 'center' }}>
+                    <div style={{ width: '100%', height: '180px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', marginBottom: '12px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {relImage ? (
+                        <img src={relImage} alt={rel.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <i className="fa-solid fa-user" style={{ fontSize: '2.5rem', color: 'var(--text-muted)' }}></i>
+                      )}
+                    </div>
+                    <h3 style={{ fontFamily: 'var(--font-title)', fontSize: '1.1rem', marginBottom: '12px' }}>{rel.name}</h3>
+                    <Link href={`/artista/${rel.slug}`} className="btn-outline-primary" style={{ width: '100%', justifyContent: 'center' }}>
+                      Ver Perfil
+                    </Link>
                   </div>
-                  <h3 style={{ fontFamily: 'var(--font-title)', fontSize: '1.1rem', marginBottom: '12px' }}>{rel.name}</h3>
-                  <Link href={`/artista/${rel.slug}`} className="btn-outline-primary" style={{ width: '100%', justifyContent: 'center' }}>
-                    Ver Perfil
-                  </Link>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}

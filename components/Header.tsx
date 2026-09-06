@@ -106,11 +106,15 @@ export default function Header() {
                           className="search-result-item"
                           onClick={() => setIsDropdownOpen(false)}
                         >
-                          <img
-                            src={art.avatarUrl || '/img/sponsors/mioto.png'}
-                            className="search-item-img"
-                            alt={art.name}
-                          />
+                          {art.avatarUrl ? (
+                            <img
+                              src={art.avatarUrl}
+                              className="search-item-img"
+                              alt={art.name}
+                            />
+                          ) : (
+                            <div className="search-item-icon"><i className="fa-solid fa-user"></i></div>
+                          )}
                           <div>
                             <div className="search-item-title">{art.name}</div>
                             <span className="search-item-sub">Perfil do Artista</span>

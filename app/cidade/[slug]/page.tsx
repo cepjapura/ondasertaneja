@@ -212,7 +212,7 @@ export default async function CityDetailPage({ params }: CityPageProps) {
                         </h4>
                         <p style={{ color: 'var(--text-muted)' }}>
                           <i className="fa-solid fa-building" style={{ color: 'var(--primary)' }}></i>{' '}
-                          {event.venue?.name || 'Local a confirmar'} • {city.name} - {city.stateCode}
+                          {event.venue?.name ? `${event.venue.name} • ` : ''}{city.name} - {city.stateCode}
                         </p>
                       </div>
                       <div className="agenda-action" style={{ display: 'flex', gap: '8px' }}>
@@ -250,24 +250,31 @@ export default async function CityDetailPage({ params }: CityPageProps) {
                   <h2>⭐ Artistas com Show em {city.name}</h2>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-                  {performingArtists.map(artist => (
-                    <div
-                      key={artist.id}
-                      style={{
-                        background: 'var(--bg-card)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: 'var(--radius-md)',
-                        padding: '16px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      <div style={{ width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden', margin: '0 auto 12px' }}>
-                        <img
-                          src={artist.avatarUrl || artist.coverUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'}
-                          alt={artist.name}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                      </div>
+                  {performingArtists.map(artist => {
+                    const artistImage = artist.avatarUrl || artist.coverUrl;
+
+                    return (
+                      <div
+                        key={artist.id}
+                        style={{
+                          background: 'var(--bg-card)',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: 'var(--radius-md)',
+                          padding: '16px',
+                          textAlign: 'center',
+                        }}
+                      >
+                        <div style={{ width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden', margin: '0 auto 12px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {artistImage ? (
+                            <img
+                              src={artistImage}
+                              alt={artist.name}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          ) : (
+                            <i className="fa-solid fa-user" style={{ fontSize: '1.8rem', color: 'var(--text-muted)' }}></i>
+                          )}
+                        </div>
                       <h3 style={{ fontSize: '1.05rem', margin: '0 0 10px', fontFamily: 'var(--font-title)' }}>
                         {artist.name}
                       </h3>
@@ -279,7 +286,8 @@ export default async function CityDetailPage({ params }: CityPageProps) {
                         Ver Perfil
                       </Link>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}

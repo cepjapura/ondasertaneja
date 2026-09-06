@@ -95,15 +95,18 @@ export default async function AgendaPage() {
                             <span>{event.title}</span>
                           )}
                         </h4>
-                        <p style={{ color: 'var(--text-muted)' }}>
-                          <i className="fa-solid fa-location-dot" style={{ color: 'var(--primary)' }}></i>{' '}
-                          {event.venue?.name || 'Local a definir'} •{' '}
-                          {event.city ? (
-                            <Link href={`/cidade/${event.city.slug}`} style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: 600 }}>
-                              {event.city.name} - {event.city.stateCode}
-                            </Link>
-                          ) : 'Brasil'}
-                        </p>
+                        {(event.venue || event.city) && (
+                          <p style={{ color: 'var(--text-muted)' }}>
+                            <i className="fa-solid fa-location-dot" style={{ color: 'var(--primary)' }}></i>{' '}
+                            {event.venue?.name}
+                            {event.venue?.name && event.city ? ' • ' : ''}
+                            {event.city && (
+                              <Link href={`/cidade/${event.city.slug}`} style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: 600 }}>
+                                {event.city.name} - {event.city.stateCode}
+                              </Link>
+                            )}
+                          </p>
+                        )}
                       </div>
                       <div className="agenda-action" style={{ display: 'flex', gap: '8px' }}>
                         {event.ticketUrl && (
@@ -154,11 +157,17 @@ export default async function AgendaPage() {
                       background: 'rgba(255,255,255,0.03)',
                     }}
                   >
-                    <img
-                      src={art.avatarUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'}
-                      alt={art.name}
-                      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
-                    />
+                    {art.avatarUrl ? (
+                      <img
+                        src={art.avatarUrl}
+                        alt={art.name}
+                        style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className="fa-solid fa-user" style={{ fontSize: '1rem', color: 'var(--text-muted)' }}></i>
+                      </div>
+                    )}
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{art.name}</div>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Ver agenda &rarr;</span>

@@ -109,14 +109,18 @@ export default async function HomePage() {
                           <span>{event.title}</span>
                         )}
                       </h4>
-                      <p>
-                        <i className="fa-solid fa-location-dot"></i> {event.venue?.name || 'Local'} •{' '}
-                        {event.city ? (
-                          <Link href={`/cidade/${event.city.slug}`} style={{ color: 'inherit', textDecoration: 'none', fontWeight: 600 }}>
-                            {event.city.name} - {event.city.stateCode}
-                          </Link>
-                        ) : 'Brasil'}
-                      </p>
+                      {(event.venue || event.city) && (
+                        <p>
+                          <i className="fa-solid fa-location-dot"></i>{' '}
+                          {event.venue?.name}
+                          {event.venue?.name && event.city ? ' • ' : ''}
+                          {event.city && (
+                            <Link href={`/cidade/${event.city.slug}`} style={{ color: 'inherit', textDecoration: 'none', fontWeight: 600 }}>
+                              {event.city.name} - {event.city.stateCode}
+                            </Link>
+                          )}
+                        </p>
+                      )}
                     </div>
                     {primaryArtist && (
                       <div className="agenda-action">
@@ -162,8 +166,12 @@ export default async function HomePage() {
                 {artista.isFeatured && (
                   <span className="tag tag-exclusive" style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10 }}>Destaque</span>
                 )}
-                <div style={{ width: '100%', height: '200px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', marginBottom: '15px' }}>
-                  <img src={artista.avatarUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'} alt={artista.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ width: '100%', height: '200px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', marginBottom: '15px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {artista.avatarUrl ? (
+                    <img src={artista.avatarUrl} alt={artista.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <i className="fa-solid fa-user" style={{ fontSize: '3rem', color: 'var(--text-muted)' }}></i>
+                  )}
                 </div>
                 <h3 style={{ fontFamily: 'var(--font-title)', fontSize: '1.2rem', marginBottom: '15px' }}>{artista.name}</h3>
                 <Link href={`/artista/${artista.slug}`} className="btn-outline-primary" style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}>
