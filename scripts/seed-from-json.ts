@@ -4,6 +4,13 @@ import path from 'path';
 
 const prisma = new PrismaClient();
 
+type ArtistSeed = {
+  nome: string;
+  slug?: string;
+  imagem?: string;
+  destaque?: boolean;
+};
+
 type ShowSeed = {
   artista: string;
   cidade: string;
@@ -94,6 +101,45 @@ async function findArtistByName(name: string) {
   }
 
   return artist;
+}
+
+async function seedArtists(dataDir: string) {
+  const filePath = path.join(dataDir, 'artistas.json');
+  const artists = readJson<ArtistSeed[]>(filePath);
+
+  if (!artists) {
+    console.log('ℹ️ data/artistas.json não encontrado. Nenhum artista importado.');
+    return;
+  }
+
+  let imported = 0;
+
+  for (const item of artists) {
+    if (!item.nome) {
+      throw new Error(`Artista inválido em data/artistas.json: ${JSON.stringify(item)}`);
+    }
+
+    const artistSlug = item.slug ?? slugify(item.nome);
+
+    await prisma.artist.upsert({
+      where: { slug: artistSlug },
+      update: {
+        name: item.nome,
+        avatarUrl: item.imagem ?? null,
+        isFeatured: item.destaque ?? false,
+      },
+      create: {
+        name: item.nome,
+        slug: artistSlug,
+        avatarUrl: item.imagem ?? null,
+        isFeatured: item.destaque ?? false,
+      },
+    });
+
+    imported++;
+  }
+
+  console.log(`✅ ${imported} artistas cadastrados via data/artistas.json.`);
 }
 
 async function seedShows(dataDir: string) {
@@ -286,6 +332,7 @@ async function main() {
     throw new Error(`Diretório de dados não encontrado: ${dataDir}`);
   }
 
+  await seedArtists(dataDir);
   await seedShows(dataDir);
   await seedReleases(dataDir);
   validateCharts(dataDir);
