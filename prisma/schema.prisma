@@ -32,6 +32,7 @@ model Artist {
   musics             MusicArtist[]
   relationsAsArtistA ArtistRelationship[] @relation("ArtistA")
   relationsAsArtistB ArtistRelationship[] @relation("ArtistB")
+  chartEntries       ChartEntry[]
 
   @@index([name])
   @@index([isFeatured])
@@ -192,8 +193,9 @@ model Music {
   albumId         String?
   createdAt       DateTime  @default(now())
 
-  album   Album?        @relation(fields: [albumId], references: [id])
-  artists MusicArtist[]
+  album        Album?        @relation(fields: [albumId], references: [id])
+  artists      MusicArtist[]
+  chartEntries ChartEntry[]
 
   @@index([title])
   @@index([isHit])
@@ -306,4 +308,22 @@ model AuditLog {
 model SystemConfig {
   key   String @id
   value String
+}
+
+model ChartEntry {
+  id         String   @id @default(uuid())
+  period     String   // "semana" ou "ano"
+  position   Int
+  artistName String
+  songTitle  String
+  artistId   String?
+  musicId    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  artist Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  music  Music?  @relation(fields: [musicId], references: [id], onDelete: SetNull)
+
+  @@unique([period, position])
+  @@index([period])
 }

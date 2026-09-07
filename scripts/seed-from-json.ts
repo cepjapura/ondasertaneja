@@ -413,23 +413,74 @@ async function seedNews(dataDir: string) {
   }
 }
 
-function validateCharts(dataDir: string) {
+async function seedCharts(dataDir: string) {
   const filePath = path.join(dataDir, 'mais-tocadas.json');
   const charts = readJson<ChartsSeed>(filePath);
 
   if (!charts) {
-    console.log('ℹ️ data/mais-tocadas.json não encontrado.');
+    console.log('ℹ️ data/mais-tocadas.json não encontrado. Nenhum chart importado.');
     return;
   }
 
-  const entries = [...(charts.semana ?? []), ...(charts.ano ?? [])];
-  for (const item of entries) {
-    if (!Number.isInteger(item.posicao) || item.posicao < 1 || !item.artista || !item.musica) {
-      throw new Error(`Entrada inválida em data/mais-tocadas.json: ${JSON.stringify(item)}`);
+  const periods: Array<{ key: 'semana' | 'ano'; items?: ChartEntrySeed[] }> = [
+    { key: 'semana', items: charts.semana },
+    { key: 'ano', items: charts.ano },
+  ];
+
+  let totalEntries = 0;
+  let resolvedArtists = 0;
+  let resolvedMusics = 0;
+  let unlinkedEntries = 0;
+
+  for (const { key, items } of periods) {
+    if (!items || !Array.isArray(items)) continue;
+
+    for (const item of items) {
+      if (!Number.isInteger(item.posicao) || item.posicao < 1 || !item.artista || !item.musica) {
+        throw new Error(`Entrada inválida em data/mais-tocadas.json (${key}): ${JSON.stringify(item)}`);
+      }
+
+      const artist = await prisma.artist.findUnique({
+        where: { slug: slugify(item.artista) },
+      });
+
+      const music = await prisma.music.findFirst({
+        where: { title: item.musica },
+      });
+
+      if (artist) resolvedArtists++;
+      if (music) resolvedMusics++;
+      if (!artist && !music) unlinkedEntries++;
+
+      await prisma.chartEntry.upsert({
+        where: {
+          period_position: {
+            period: key,
+            position: item.posicao,
+          },
+        },
+        update: {
+          artistName: item.artista,
+          songTitle: item.musica,
+          artistId: artist?.id ?? null,
+          musicId: music?.id ?? null,
+        },
+        create: {
+          period: key,
+          position: item.posicao,
+          artistName: item.artista,
+          songTitle: item.musica,
+          artistId: artist?.id ?? null,
+          musicId: music?.id ?? null,
+        },
+      });
+
+      totalEntries++;
     }
   }
 
-  console.log(`ℹ️ mais-tocadas.json validado: ${entries.length} entradas. Persistência do ranking será implementada com o modelo de charts.`);
+  console.log(`✅ ${totalEntries} entradas do ranking ("mais-tocadas.json") processadas com sucesso.`);
+  console.log(`ℹ️ Resolução: ${resolvedArtists} artistas vinculados, ${resolvedMusics} músicas vinculadas, ${unlinkedEntries} mantidas sem vínculo.`);
 }
 
 async function main() {
@@ -447,7 +498,7 @@ async function main() {
   await seedShows(dataDir);
   await seedReleases(dataDir);
   await seedNews(dataDir);
-  validateCharts(dataDir);
+  await seedCharts(dataDir);
 
   console.log('🎉 Seed concluído sem criação artificial de artistas, fontes ou conteúdo legado.');
 }
