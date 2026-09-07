@@ -1,0 +1,64 @@
+[
+  {
+    "slug": "turne-historias-reune-lendas-do-sertanejo-em-2026",
+    "titulo": "Turnê 'Histórias' reúne lendas do sertanejo em 2026",
+    "resumo": "Chitãozinho & Xororó, Zezé Di Camargo & Luciano, Leonardo e Bruno & Marrone anunciam novas datas pelo Brasil...",
+    "conteudo": [
+      "A turnê 'Histórias', que reúne alguns dos maiores nomes da história da música sertaneja, confirmou novas datas para o primeiro semestre de 2026. O projeto, que já atraiu centenas de milhares de fãs em edições anteriores, promete um espetáculo de mais de 4 horas de duração com os maiores clássicos dos anos 90 e 2000.",
+      "Entre as cidades confirmadas no itinerário oficial estão Brasília, São Paulo e Belo Horizonte. A organização informou que a venda de ingressos começará no próximo mês através dos canais oficiais.",
+      "Os artistas envolvidos destacam a emoção de compartilhar o mesmo palco e celebrar a trajetória da música sertaneja em grandes arenas pelo país."
+    ],
+    "imagem": "https://images.unsplash.com/photo-1540039155732-68473668f420?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "categoria": "news",
+    "destaque": true,
+    "artistas": ["turne-historias"],
+    "cidades": ["brasilia-df", "sao-paulo-sp"],
+    "eventos": ["turne-historias-chx-zeze-luciano-etc-09052026-brasilia-df", "turne-historias-22082026-sao-paulo-sp"]
+  },
+  {
+    "slug": "ana-castela-domina-o-agronejo-e-atinge-topo-das-paradas",
+    "titulo": "Ana Castela domina o 'Agronejo' e atinge topo das paradas",
+    "resumo": "A 'Boiadeira' continua sua ascensão meteórica com novos lançamentos e recordes no streaming...",
+    "conteudo": [
+      "Ana Castela, carinhosamente chamada de 'Boiadeira', consolidou-se como a maior referência do agronejo em 2026. Seus lançamentos recentes dominam as playlists de 'Top 100 Sertanejo' nas plataformas digitais.",
+      "O estilo, que mistura o sertanejo com elementos do country pop e batidas modernas, caiu no gosto do público jovem e das grandes feiras agropecuárias do país.",
+      "A artista já é presença confirmada nos principais rodeios do ano, incluindo o Pedro Leopoldo Rodeio Show em junho."
+    ],
+    "imagem": "https://images.unsplash.com/photo-1516280440503-6c84c7f0db43?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "categoria": "news",
+    "destaque": false,
+    "artistas": ["ana-castela"],
+    "cidades": ["pedro-leopoldo-mg"],
+    "eventos": ["pedro-leopoldo-rodeio-show-05062026-pedro-leopoldo-mg"]
+  },
+  {
+    "slug": "gusttavo-lima-anuncia-novos-projetos-para-o-segundo-semestre",
+    "titulo": "Gusttavo Lima anuncia novos projetos para o segundo semestre",
+    "resumo": "O 'Embaixador' prepara gravação de novo DVD com participações especiais internacionais...",
+    "conteudo": [
+      "Gusttavo Lima não para. O cantor anunciou que gravará um novo projeto audiovisual no segundo semestre de 2026, com foco em uma sonoridade mais voltada para o mercado latino.",
+      "Fontes próximas ao artista indicam que parcerias com nomes do reggaeton e da bachata estão sendo negociadas para este novo trabalho.",
+      "Enquanto isso, o cantor segue lotando estádios com sua turnê atual, mantendo-se como um dos cachês mais valorizados do mercado nacional."
+    ],
+    "imagem": "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "categoria": "news",
+    "destaque": false,
+    "artistas": ["gusttavo-lima"],
+    "cidades": [],
+    "eventos": []
+  },
+  {
+    "slug": "o-agronejo-e-a-nova-cara-do-brasil",
+    "titulo": "\"O Agronejo é a nova cara do Brasil\"",
+    "resumo": "Conversamos com Ana Castela sobre a explosão do gênero e como ela lida com o sucesso estrondoso aos 22 anos.",
+    "conteudo": [
+      "Conversamos com Ana Castela sobre a explosão do gênero e como ela lida com o sucesso estrondoso aos 22 anos."
+    ],
+    "imagem": "https://images.unsplash.com/photo-1598387993441-a364f854c3e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "categoria": "interview",
+    "destaque": true,
+    "artistas": ["ana-castela"],
+    "cidades": [],
+    "eventos": []
+  }
+]

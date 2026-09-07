@@ -30,6 +30,19 @@ type ReleaseSeed = {
   patrocinado?: boolean;
 };
 
+type NewsSeed = {
+  slug: string;
+  titulo: string;
+  resumo: string;
+  conteudo?: string[];
+  imagem?: string;
+  categoria?: string;
+  destaque?: boolean;
+  artistas?: string[];
+  cidades?: string[];
+  eventos?: string[];
+};
+
 type ChartEntrySeed = {
   posicao: number;
   artista: string;
@@ -302,6 +315,104 @@ async function seedReleases(dataDir: string) {
   }
 }
 
+async function seedNews(dataDir: string) {
+  const filePath = path.join(dataDir, 'noticias.json');
+  const newsList = readJson<NewsSeed[]>(filePath);
+
+  if (!newsList) {
+    console.log('ℹ️ data/noticias.json não encontrado. Nenhuma notícia importada.');
+    return;
+  }
+
+  let imported = 0;
+  let unresolvedRelations = 0;
+
+  for (const item of newsList) {
+    if (!item.titulo || !item.slug || !item.resumo) {
+      throw new Error(`Notícia inválida em data/noticias.json: ${JSON.stringify(item)}`);
+    }
+
+    const contentJson = JSON.stringify(item.conteudo || [item.resumo]);
+
+    const news = await prisma.news.upsert({
+      where: { slug: item.slug },
+      update: {
+        title: item.titulo,
+        summary: item.resumo,
+        contentJson,
+        coverUrl: item.imagem ?? null,
+        category: item.categoria ?? 'news',
+        isFeatured: item.destaque ?? false,
+      },
+      create: {
+        title: item.titulo,
+        slug: item.slug,
+        summary: item.resumo,
+        contentJson,
+        coverUrl: item.imagem ?? null,
+        category: item.categoria ?? 'news',
+        trustType: 'confirmed',
+        isFeatured: item.destaque ?? false,
+      },
+    });
+
+    if (item.artistas && Array.isArray(item.artistas)) {
+      for (const artistSlug of item.artistas) {
+        const artist = await prisma.artist.findUnique({ where: { slug: artistSlug } });
+        if (!artist) {
+          console.warn(`⚠️ Artista com slug "${artistSlug}" não encontrado para notícia "${item.slug}". Vínculo ignorado.`);
+          unresolvedRelations++;
+          continue;
+        }
+        await prisma.newsArtist.upsert({
+          where: { newsId_artistId: { newsId: news.id, artistId: artist.id } },
+          update: {},
+          create: { newsId: news.id, artistId: artist.id },
+        });
+      }
+    }
+
+    if (item.cidades && Array.isArray(item.cidades)) {
+      for (const citySlug of item.cidades) {
+        const city = await prisma.city.findUnique({ where: { slug: citySlug } });
+        if (!city) {
+          console.warn(`⚠️ Cidade com slug "${citySlug}" não encontrada para notícia "${item.slug}". Vínculo ignorado.`);
+          unresolvedRelations++;
+          continue;
+        }
+        await prisma.newsCity.upsert({
+          where: { newsId_cityId: { newsId: news.id, cityId: city.id } },
+          update: {},
+          create: { newsId: news.id, cityId: city.id },
+        });
+      }
+    }
+
+    if (item.eventos && Array.isArray(item.eventos)) {
+      for (const eventSlug of item.eventos) {
+        const event = await prisma.event.findUnique({ where: { slug: eventSlug } });
+        if (!event) {
+          console.warn(`⚠️ Evento com slug "${eventSlug}" não encontrado para notícia "${item.slug}". Vínculo ignorado.`);
+          unresolvedRelations++;
+          continue;
+        }
+        await prisma.newsEvent.upsert({
+          where: { newsId_eventId: { newsId: news.id, eventId: event.id } },
+          update: {},
+          create: { newsId: news.id, eventId: event.id },
+        });
+      }
+    }
+
+    imported++;
+  }
+
+  console.log(`✅ ${newsList.length} notícias/entrevistas processadas (${imported} upsertadas).`);
+  if (unresolvedRelations > 0) {
+    console.warn(`⚠️ ${unresolvedRelations} vínculos editoriais foram ignorados pois as entidades relacionadas não existem no banco.`);
+  }
+}
+
 function validateCharts(dataDir: string) {
   const filePath = path.join(dataDir, 'mais-tocadas.json');
   const charts = readJson<ChartsSeed>(filePath);
@@ -335,6 +446,7 @@ async function main() {
   await seedArtists(dataDir);
   await seedShows(dataDir);
   await seedReleases(dataDir);
+  await seedNews(dataDir);
   validateCharts(dataDir);
 
   console.log('🎉 Seed concluído sem criação artificial de artistas, fontes ou conteúdo legado.');
