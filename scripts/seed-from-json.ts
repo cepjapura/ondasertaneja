@@ -4,9 +4,38 @@ import path from 'path';
 
 const prisma = new PrismaClient();
 
+type ShowSeed = {
+  artista: string;
+  cidade: string;
+  data: string;
+  local: string;
+  link?: string;
+  destaque?: boolean;
+  patrocinado?: boolean;
+};
+
+type ReleaseSeed = {
+  artista: string;
+  musica: string;
+  capa?: string;
+  link?: string;
+  destaque?: boolean;
+  patrocinado?: boolean;
+};
+
+type ChartEntrySeed = {
+  posicao: number;
+  artista: string;
+  musica: string;
+};
+
+type ChartsSeed = {
+  semana?: ChartEntrySeed[];
+  ano?: ChartEntrySeed[];
+};
+
 function slugify(text: string): string {
   return text
-    .toString()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
@@ -16,281 +45,257 @@ function slugify(text: string): string {
     .replace(/\-\-+/g, '-');
 }
 
-function parseDataBr(dataStr: string): Date {
-  const partes = dataStr.split('/');
-  if (partes.length === 3) {
-    return new Date(parseInt(partes[2], 10), parseInt(partes[1], 10) - 1, parseInt(partes[0], 10));
+function readJson<T>(filePath: string): T | null {
+  if (!fs.existsSync(filePath)) return null;
+  return JSON.parse(fs.readFileSync(filePath, 'utf-8')) as T;
+}
+
+function parseDate(value: string): Date {
+  const trimmed = value.trim();
+
+  // ISO: YYYY-MM-DD
+  const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed);
+  if (iso) {
+    return new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]), 12, 0, 0);
   }
-  return new Date();
+
+  // BR: DD/MM/YYYY
+  const br = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(trimmed);
+  if (br) {
+    return new Date(Number(br[3]), Number(br[2]) - 1, Number(br[1]), 12, 0, 0);
+  }
+
+  throw new Error(`Data inválida: "${value}". Use YYYY-MM-DD ou DD/MM/YYYY.`);
+}
+
+function splitCity(value: string): { name: string; stateCode: string } {
+  const parts = value.split(/\s*-\s*/);
+  const stateCode = parts.length > 1 ? parts.pop()!.trim().toUpperCase() : '';
+  const name = parts.join(' - ').trim();
+
+  if (!name || !stateCode) {
+    throw new Error(`Cidade inválida: "${value}". Use "Cidade - UF".`);
+  }
+
+  return { name, stateCode };
+}
+
+function extractSpotifyTrackId(link?: string): string | undefined {
+  if (!link) return undefined;
+  const match = link.match(/open\.spotify\.com\/track\/([A-Za-z0-9]+)/i);
+  return match?.[1];
+}
+
+async function findArtistByName(name: string) {
+  const artist = await prisma.artist.findUnique({ where: { slug: slugify(name) } });
+
+  if (!artist) {
+    console.warn(`⚠️ Artista não cadastrado: "${name}". Registro não será criado automaticamente.`);
+  }
+
+  return artist;
+}
+
+async function seedShows(dataDir: string) {
+  const filePath = path.join(dataDir, 'shows.json');
+  const shows = readJson<ShowSeed[]>(filePath);
+
+  if (!shows) {
+    console.log('ℹ️ data/shows.json não encontrado. Nenhum show importado.');
+    return;
+  }
+
+  let imported = 0;
+  let unresolvedArtists = 0;
+
+  for (const item of shows) {
+    if (!item.artista || !item.cidade || !item.data || !item.local) {
+      throw new Error(`Show inválido em data/shows.json: ${JSON.stringify(item)}`);
+    }
+
+    const { name: cityName, stateCode } = splitCity(item.cidade);
+    const citySlug = slugify(`${cityName}-${stateCode}`);
+
+    const city = await prisma.city.upsert({
+      where: { slug: citySlug },
+      update: { name: cityName, stateCode },
+      create: { name: cityName, stateCode, slug: citySlug },
+    });
+
+    const venueSlug = slugify(`${item.local}-${citySlug}`);
+    const venue = await prisma.venue.upsert({
+      where: { slug: venueSlug },
+      update: { name: item.local, cityId: city.id },
+      create: { name: item.local, slug: venueSlug, cityId: city.id },
+    });
+
+    const eventDate = parseDate(item.data);
+    const eventSlug = slugify(`${item.artista}-${item.data}-${citySlug}-${item.local}`);
+
+    const event = await prisma.event.upsert({
+      where: { slug: eventSlug },
+      update: {
+        title: item.artista,
+        eventDate,
+        venueId: venue.id,
+        cityId: city.id,
+        isHighlight: item.destaque ?? false,
+        confidenceLevel: 'unverified',
+        sourceId: null,
+      },
+      create: {
+        title: item.artista,
+        slug: eventSlug,
+        eventDate,
+        venueId: venue.id,
+        cityId: city.id,
+        isHighlight: item.destaque ?? false,
+        status: 'confirmed',
+        confidenceLevel: 'unverified',
+      },
+    });
+
+    const artist = await findArtistByName(item.artista);
+
+    if (!artist) {
+      unresolvedArtists++;
+      continue;
+    }
+
+    await prisma.eventArtist.upsert({
+      where: {
+        eventId_artistId: { eventId: event.id, artistId: artist.id },
+      },
+      update: {},
+      create: { eventId: event.id, artistId: artist.id },
+    });
+
+    imported++;
+  }
+
+  console.log(`✅ ${shows.length} shows processados (${imported} com artista vinculado).`);
+  if (unresolvedArtists > 0) {
+    console.warn(`⚠️ ${unresolvedArtists} shows ficaram sem vínculo de artista porque o artista não existe no banco.`);
+  }
+}
+
+async function seedReleases(dataDir: string) {
+  const filePath = path.join(dataDir, 'lancamentos.json');
+  const releases = readJson<ReleaseSeed[]>(filePath);
+
+  if (!releases) {
+    console.log('ℹ️ data/lancamentos.json não encontrado. Nenhum lançamento importado.');
+    return;
+  }
+
+  let linked = 0;
+  let unresolvedArtists = 0;
+
+  for (const item of releases) {
+    if (!item.artista || !item.musica) {
+      throw new Error(`Lançamento inválido em data/lancamentos.json: ${JSON.stringify(item)}`);
+    }
+
+    const artist = await findArtistByName(item.artista);
+    if (!artist) {
+      unresolvedArtists++;
+      continue;
+    }
+
+    const musicSlug = slugify(`${item.musica}-${item.artista}`);
+    const spotifyTrackId = extractSpotifyTrackId(item.link);
+
+    let albumId: string | undefined;
+
+    // A capa pertence ao lançamento. Como Music não possui coverUrl,
+    // usamos Album como entidade de capa para singles, sem inventar metadados externos.
+    if (item.capa) {
+      const albumSlug = slugify(`${item.musica}-${item.artista}-single`);
+      const album = await prisma.album.upsert({
+        where: { slug: albumSlug },
+        update: { title: item.musica, coverUrl: item.capa, albumType: 'single' },
+        create: {
+          title: item.musica,
+          slug: albumSlug,
+          coverUrl: item.capa,
+          albumType: 'single',
+        },
+      });
+      albumId = album.id;
+    }
+
+    const music = await prisma.music.upsert({
+      where: { slug: musicSlug },
+      update: {
+        title: item.musica,
+        isHit: item.destaque ?? false,
+        spotifyTrackId,
+        albumId,
+      },
+      create: {
+        title: item.musica,
+        slug: musicSlug,
+        isHit: item.destaque ?? false,
+        spotifyTrackId,
+        albumId,
+      },
+    });
+
+    await prisma.musicArtist.upsert({
+      where: { musicId_artistId: { musicId: music.id, artistId: artist.id } },
+      update: {},
+      create: { musicId: music.id, artistId: artist.id, isPrimary: true },
+    });
+
+    linked++;
+  }
+
+  console.log(`✅ ${releases.length} lançamentos processados (${linked} vinculados a artistas existentes).`);
+  if (unresolvedArtists > 0) {
+    console.warn(`⚠️ ${unresolvedArtists} lançamentos não foram criados porque o artista não existe no banco.`);
+  }
+}
+
+function validateCharts(dataDir: string) {
+  const filePath = path.join(dataDir, 'mais-tocadas.json');
+  const charts = readJson<ChartsSeed>(filePath);
+
+  if (!charts) {
+    console.log('ℹ️ data/mais-tocadas.json não encontrado.');
+    return;
+  }
+
+  const entries = [...(charts.semana ?? []), ...(charts.ano ?? [])];
+  for (const item of entries) {
+    if (!Number.isInteger(item.posicao) || item.posicao < 1 || !item.artista || !item.musica) {
+      throw new Error(`Entrada inválida em data/mais-tocadas.json: ${JSON.stringify(item)}`);
+    }
+  }
+
+  console.log(`ℹ️ mais-tocadas.json validado: ${entries.length} entradas. Persistência do ranking será implementada com o modelo de charts.`);
 }
 
 async function main() {
-  console.log('🌱 Iniciando migração dos 7 arquivos JSON para o Banco de Dados...');
+  console.log('🌱 Seed Onda Sertaneja — fonte estruturada em /data');
+  console.log('📌 Regra: o seed nunca cria artista automaticamente.');
 
   const rootDir = path.resolve(__dirname, '..');
+  const dataDir = path.join(rootDir, 'data');
 
-  // 1. Configurações Globais (config.json)
-  const configPath = path.join(rootDir, 'config.json');
-  if (fs.existsSync(configPath)) {
-    const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-    for (const [key, value] of Object.entries(configData)) {
-      await prisma.systemConfig.upsert({
-        where: { key },
-        update: { value: String(value) },
-        create: { key, value: String(value) },
-      });
-    }
-    console.log('✅ config.json migrado para SystemConfig.');
+  if (!fs.existsSync(dataDir)) {
+    throw new Error(`Diretório de dados não encontrado: ${dataDir}`);
   }
 
-  // Fonte padrão de migração
-  const defaultSource = await prisma.source.upsert({
-    where: { id: 'source-oficial' },
-    update: {},
-    create: {
-      id: 'source-oficial',
-      name: 'Assessoria Oficial Onda Sertaneja',
-      sourceType: 'official_artist',
-      trustLevel: 'high',
-      reliabilityScore: 100,
-    },
-  });
+  await seedShows(dataDir);
+  await seedReleases(dataDir);
+  validateCharts(dataDir);
 
-  // 2. Artistas (artistas.json)
-  const artistasMap = new Map<string, string>(); // nome -> id
-  const artistasPath = path.join(rootDir, 'artistas.json');
-  if (fs.existsSync(artistasPath)) {
-    const artistasData = JSON.parse(fs.readFileSync(artistasPath, 'utf-8'));
-    for (const art of artistasData) {
-      const slug = slugify(art.nome);
-      const created = await prisma.artist.upsert({
-        where: { slug },
-        update: {
-          name: art.nome,
-          avatarUrl: art.imagem,
-          coverUrl: art.imagem,
-          isFeatured: art.patrocinado || false,
-        },
-        create: {
-          name: art.nome,
-          slug,
-          avatarUrl: art.imagem,
-          coverUrl: art.imagem,
-          isFeatured: art.patrocinado || false,
-          genreTags: 'Sertanejo',
-        },
-      });
-      artistasMap.set(art.nome, created.id);
-    }
-    console.log(`✅ ${artistasData.length} Artistas migrados com sucesso.`);
-  }
-
-  // 3. Agenda de Shows (agenda.json)
-  const agendaPath = path.join(rootDir, 'agenda.json');
-  if (fs.existsSync(agendaPath)) {
-    const agendaData = JSON.parse(fs.readFileSync(agendaPath, 'utf-8'));
-    for (const item of agendaData) {
-      // Processar Cidade e Estado (ex: "Brasília - DF", "Pedro Leopoldo - MG")
-      const partesCidade = item.cidade.split('-');
-      const nomeCidade = partesCidade[0]?.trim() || item.cidade;
-      const estadoCode = partesCidade[1]?.trim() || 'PR';
-      const citySlug = slugify(`${nomeCidade}-${estadoCode}`);
-
-      const city = await prisma.city.upsert({
-        where: { slug: citySlug },
-        update: { name: nomeCidade, stateCode: estadoCode },
-        create: { name: nomeCidade, stateCode: estadoCode, slug: citySlug },
-      });
-
-      // Processar Venue
-      const venueSlug = slugify(`${item.local}-${citySlug}`);
-      const venue = await prisma.venue.upsert({
-        where: { slug: venueSlug },
-        update: { name: item.local },
-        create: { name: item.local, slug: venueSlug, cityId: city.id },
-      });
-
-      // Processar Evento
-      const eventSlug = slugify(`${item.artista}-${item.data}-${citySlug}`);
-      const eventDate = parseDataBr(item.data);
-
-      const event = await prisma.event.upsert({
-        where: { slug: eventSlug },
-        update: {
-          title: item.artista,
-          eventDate,
-          venueId: venue.id,
-          cityId: city.id,
-          isHighlight: item.destaque || false,
-          sourceId: defaultSource.id,
-        },
-        create: {
-          title: item.artista,
-          slug: eventSlug,
-          eventDate,
-          venueId: venue.id,
-          cityId: city.id,
-          isHighlight: item.destaque || false,
-          sourceId: defaultSource.id,
-          status: 'confirmed',
-          confidenceLevel: 'verified',
-        },
-      });
-
-      // Se o artista coincidir com um artista cadastrado, vincular EventArtist
-      let artistId = artistasMap.get(item.artista);
-      if (!artistId) {
-        // Tentar encontrar artista por slug
-        const artistSlug = slugify(item.artista);
-        const existingArtist = await prisma.artist.findUnique({ where: { slug: artistSlug } });
-        if (existingArtist) {
-          artistId = existingArtist.id;
-        } else {
-          // Criar artista se não existir
-          const newArt = await prisma.artist.create({
-            data: { name: item.artista, slug: artistSlug, genreTags: 'Sertanejo' },
-          });
-          artistId = newArt.id;
-          artistasMap.set(item.artista, artistId);
-        }
-      }
-
-      if (artistId) {
-        await prisma.eventArtist.upsert({
-          where: {
-            eventId_artistId: { eventId: event.id, artistId },
-          },
-          update: {},
-          create: { eventId: event.id, artistId },
-        });
-      }
-    }
-    console.log(`✅ ${agendaData.length} Shows migrados para Agenda/Events.`);
-  }
-
-  // 4. Notícias (noticias.json)
-  const noticiasPath = path.join(rootDir, 'noticias.json');
-  if (fs.existsSync(noticiasPath)) {
-    const noticiasData = JSON.parse(fs.readFileSync(noticiasPath, 'utf-8'));
-    for (const not of noticiasData) {
-      const slug = slugify(not.titulo);
-      const contentJson = JSON.stringify(not.conteudo || [not.resumo]);
-
-      let trustType = 'confirmed';
-      if (not.classeTag === 'tag-hot') trustType = 'confirmed';
-      if (not.tag === 'Exclusivo') trustType = 'confirmed';
-
-      await prisma.news.upsert({
-        where: { slug },
-        update: {
-          title: not.titulo,
-          summary: not.resumo,
-          contentJson,
-          coverUrl: not.imagem,
-          trustType,
-        },
-        create: {
-          title: not.titulo,
-          slug,
-          summary: not.resumo,
-          contentJson,
-          coverUrl: not.imagem,
-          category: 'news',
-          trustType,
-          isFeatured: not.tag === 'Destaque',
-        },
-      });
-    }
-    console.log(`✅ ${noticiasData.length} Notícias migradas com sucesso.`);
-  }
-
-  // 5. Entrevistas (entrevistas.json)
-  const entrevistasPath = path.join(rootDir, 'entrevistas.json');
-  if (fs.existsSync(entrevistasPath)) {
-    const entrevistaData = JSON.parse(fs.readFileSync(entrevistasPath, 'utf-8'));
-    if (entrevistaData && entrevistaData.titulo) {
-      const slug = slugify(entrevistaData.titulo);
-      await prisma.news.upsert({
-        where: { slug },
-        update: {
-          title: entrevistaData.titulo,
-          summary: entrevistaData.resumo,
-          coverUrl: entrevistaData.imagemFundo,
-          category: 'interview',
-        },
-        create: {
-          title: entrevistaData.titulo,
-          slug,
-          summary: entrevistaData.resumo,
-          contentJson: JSON.stringify([entrevistaData.resumo]),
-          coverUrl: entrevistaData.imagemFundo,
-          category: 'interview',
-          trustType: 'confirmed',
-          isFeatured: true,
-        },
-      });
-      console.log('✅ entrevistas.json migrado para News (Entrevista).');
-    }
-  }
-
-  // 6. Lançamentos / Músicas (lancamentos.json)
-  const lancamentosPath = path.join(rootDir, 'lancamentos.json');
-  if (fs.existsSync(lancamentosPath)) {
-    const lancamentosData = JSON.parse(fs.readFileSync(lancamentosPath, 'utf-8'));
-    for (const item of lancamentosData) {
-      if (item.destaque && item.linkUrl) {
-        // Trata-se do destaque de playlist
-        await prisma.systemConfig.upsert({
-          where: { key: 'spotifyPlaylistUrl' },
-          update: { value: item.linkUrl },
-          create: { key: 'spotifyPlaylistUrl', value: item.linkUrl },
-        });
-        continue;
-      }
-
-      const slug = slugify(`${item.nome}-${item.artista}`);
-      const music = await prisma.music.upsert({
-        where: { slug },
-        update: { title: item.nome, isHit: true },
-        create: { title: item.nome, slug, isHit: true },
-      });
-
-      // Vincular com o artista se existir
-      const artistSlug = slugify(item.artista);
-      let artist = await prisma.artist.findUnique({ where: { slug: artistSlug } });
-      if (!artist) {
-        artist = await prisma.artist.create({
-          data: { name: item.artista, slug: artistSlug, avatarUrl: item.capa },
-        });
-      }
-
-      await prisma.musicArtist.upsert({
-        where: { musicId_artistId: { musicId: music.id, artistId: artist.id } },
-        update: {},
-        create: { musicId: music.id, artistId: artist.id, isPrimary: true },
-      });
-    }
-    console.log(`✅ Lançamentos migrados para Músicas.`);
-  }
-
-  // 7. Galeria (galeria.json)
-  const galeriaPath = path.join(rootDir, 'galeria.json');
-  if (fs.existsSync(galeriaPath)) {
-    const galeriaData = JSON.parse(fs.readFileSync(galeriaPath, 'utf-8'));
-    await prisma.systemConfig.upsert({
-      where: { key: 'galleryPhotos' },
-      update: { value: JSON.stringify(galeriaData) },
-      create: { key: 'galleryPhotos', value: JSON.stringify(galeriaData) },
-    });
-    console.log(`✅ ${galeriaData.length} fotos da Galeria migradas com sucesso para SystemConfig.`);
-  }
-
-  console.log('🎉 Migração concluída com 100% de integridade!');
+  console.log('🎉 Seed concluído sem criação artificial de artistas, fontes ou conteúdo legado.');
 }
 
 main()
-  .catch(e => {
-    console.error('❌ Erro na migração:', e);
+  .catch((error) => {
+    console.error('❌ Erro no seed:', error);
     process.exit(1);
   })
   .finally(async () => {
