@@ -63,6 +63,8 @@ export default function Header() {
         <nav className={`nav-menu ${mobileMenuOpen ? 'active' : ''}`} id="navMenu">
           <Link href="/" onClick={() => setMobileMenuOpen(false)}>Início</Link>
           <Link href="/#noticias" onClick={() => setMobileMenuOpen(false)}>Notícias</Link>
+          <Link href="/entrevistas" onClick={() => setMobileMenuOpen(false)}>Entrevistas</Link>
+          <Link href="/mais-tocadas" onClick={() => setMobileMenuOpen(false)}>Mais Tocadas</Link>
           <Link href="/agenda" onClick={() => setMobileMenuOpen(false)}>Agenda de Shows</Link>
           <Link href="/lancamentos" onClick={() => setMobileMenuOpen(false)}>Lançamentos</Link>
           <Link href="/contato" onClick={() => setMobileMenuOpen(false)}>Contato</Link>
