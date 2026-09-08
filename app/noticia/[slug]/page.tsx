@@ -56,6 +56,23 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
   };
 }
 
+function parseContentParagraphs(contentJson: string): string[] {
+  try {
+    const parsed = JSON.parse(contentJson);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
+    }
+    if (typeof parsed === 'string' && parsed.trim().length > 0) {
+      return [parsed];
+    }
+  } catch {
+    if (contentJson && typeof contentJson === 'string' && contentJson.trim().length > 0) {
+      return contentJson.split('\n\n').filter(p => p.trim().length > 0);
+    }
+  }
+  return [];
+}
+
 export default async function NewsDetailPage({ params }: NewsPageProps) {
   const { slug } = params;
 
@@ -99,6 +116,8 @@ export default async function NewsDetailPage({ params }: NewsPageProps) {
     orderBy: { publishedAt: 'desc' },
   });
 
+  const paragraphs = parseContentParagraphs(noticia.contentJson);
+
   return (
     <main className="main-content" style={{ paddingTop: '40px' }}>
       <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 20px' }}>
@@ -139,26 +158,28 @@ export default async function NewsDetailPage({ params }: NewsPageProps) {
         )}
 
         {/* Conteúdo da Notícia */}
-        <article
-          style={{
-            fontSize: '1.1rem',
-            lineHeight: '1.8',
-            color: 'var(--text-main)',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-md)',
-            padding: '30px',
-            marginBottom: '40px',
-          }}
-        >
-          {noticia.contentJson.split('\n\n').map((paragraph, idx) => (
-            <p key={idx} style={{ marginBottom: '20px' }}>
-              {paragraph}
-            </p>
-          ))}
-        </article>
+        {paragraphs.length > 0 && (
+          <article
+            style={{
+              fontSize: '1.1rem',
+              lineHeight: '1.8',
+              color: 'var(--text-main)',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              padding: '30px',
+              marginBottom: '40px',
+            }}
+          >
+            {paragraphs.map((paragraph, idx) => (
+              <p key={idx} style={{ marginBottom: idx === paragraphs.length - 1 ? '0' : '20px' }}>
+                {paragraph}
+              </p>
+            ))}
+          </article>
+        )}
 
-        {/* ARTISTAS VINCULADOS A ESTA NOTÍCIA (Conexão do Produto) */}
+        {/* ARTISTAS VINCULADOS A ESTA NOTÍCIA */}
         {noticia.artists.length > 0 && (
           <section style={{ marginBottom: '40px' }}>
             <h3 style={{ fontSize: '1.3rem', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -195,6 +216,42 @@ export default async function NewsDetailPage({ params }: NewsPageProps) {
                   <div>
                     <h4 style={{ margin: 0, fontSize: '1rem' }}>{artist.name}</h4>
                     <span style={{ fontSize: '0.8rem', color: 'var(--primary)' }}>Ver perfil completo &rarr;</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* CIDADES VINCULADAS A ESTA NOTÍCIA */}
+        {noticia.cities.length > 0 && (
+          <section style={{ marginBottom: '40px' }}>
+            <h3 style={{ fontSize: '1.3rem', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <i className="fa-solid fa-location-dot" style={{ color: 'var(--primary)' }}></i> Cidades citadas nesta matéria
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
+              {noticia.cities.map(({ city }) => (
+                <Link
+                  key={city.id}
+                  href={`/cidade/${city.slug}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '12px',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                  }}
+                >
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className="fa-solid fa-city" style={{ fontSize: '1rem', color: 'var(--primary)' }}></i>
+                  </div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '1rem' }}>{city.name} - {city.stateCode}</h4>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--primary)' }}>Ver eventos da cidade &rarr;</span>
                   </div>
                 </Link>
               ))}
@@ -243,10 +300,16 @@ export default async function NewsDetailPage({ params }: NewsPageProps) {
               {recommendedNews.map(rec => (
                 <article key={rec.id} className="news-card">
                   <Link href={`/noticia/${rec.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
-                    <div className="news-img" style={{ backgroundImage: `url('${rec.coverUrl || ''}')` }}>
-                      <span className="tag tag-hot">Notícia</span>
-                    </div>
-                    <div className="news-content">
+                    {rec.coverUrl ? (
+                      <div className="news-img" style={{ backgroundImage: `url('${rec.coverUrl}')` }}>
+                        <span className="tag tag-hot">Notícia</span>
+                      </div>
+                    ) : (
+                      <div style={{ padding: '15px 20px 0 20px' }}>
+                        <span className="tag tag-hot">Notícia</span>
+                      </div>
+                    )}
+                    <div className="news-content" style={!rec.coverUrl ? { paddingTop: '10px' } : undefined}>
                       <span className="news-date">{new Date(rec.publishedAt).toLocaleDateString('pt-BR')}</span>
                       <h3>{rec.title}</h3>
                       <p>{rec.summary}</p>
