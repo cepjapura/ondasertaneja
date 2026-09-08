@@ -202,13 +202,9 @@ export default async function CityDetailPage({ params }: CityPageProps) {
                       </div>
                       <div className="agenda-info">
                         <h4>
-                          {primaryArtist ? (
-                            <Link href={`/artista/${primaryArtist.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                              {event.title}
-                            </Link>
-                          ) : (
-                            <span>{event.title}</span>
-                          )}
+                          <Link href={`/evento/${event.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                            {event.title}
+                          </Link>
                         </h4>
                         <p style={{ color: 'var(--text-muted)' }}>
                           <i className="fa-solid fa-building" style={{ color: 'var(--primary)' }}></i>{' '}
@@ -227,15 +223,13 @@ export default async function CityDetailPage({ params }: CityPageProps) {
                             Ingressos
                           </a>
                         )}
-                        {primaryArtist && (
-                          <Link
-                            href={`/artista/${primaryArtist.slug}`}
-                            className="btn-outline-primary"
-                            style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}
-                          >
-                            Ver Artista
-                          </Link>
-                        )}
+                        <Link
+                          href={`/evento/${event.slug}`}
+                          className="btn-outline-primary"
+                          style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}
+                        >
+                          Ver Detalhes
+                        </Link>
                       </div>
                     </div>
                   );

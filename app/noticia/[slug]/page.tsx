@@ -210,16 +210,20 @@ export default async function NewsDetailPage({ params }: NewsPageProps) {
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {noticia.events.map(({ event }) => {
-                const eventLink = event.city?.slug ? `/cidade/${event.city.slug}` : '/agenda';
+                const eventLink = `/evento/${event.slug}`;
                 return (
                   <div key={event.id} className="agenda-item" style={{ margin: 0 }}>
                     <div className="agenda-info">
-                      <h4>{event.title}</h4>
+                      <h4>
+                        <Link href={eventLink} style={{ color: 'inherit', textDecoration: 'none' }}>
+                          {event.title}
+                        </Link>
+                      </h4>
                       <p><i className="fa-solid fa-location-dot"></i> {event.venue?.name} • {event.city?.name} - {event.city?.stateCode}</p>
                     </div>
                     <div className="agenda-action">
                       <Link href={eventLink} className="btn-outline-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}>
-                        Ver Cidade / Agenda
+                        Ver Evento
                       </Link>
                     </div>
                   </div>

@@ -11,7 +11,6 @@
     "data": "Hoje, 10:15",
     "tag": "Destaque",
     "classeTag": "tag-hot",
-    "imagem": "https://images.unsplash.com/photo-1540039155732-68473668f420?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
     "link": "noticia.html?id=1"
   },
   {
@@ -26,7 +25,6 @@
     "data": "Ontem, 14:00",
     "tag": "Carreira",
     "classeTag": "tag-career",
-    "imagem": "https://images.unsplash.com/photo-1516280440503-6c84c7f0db43?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
     "link": "noticia.html?id=2"
   },
   {

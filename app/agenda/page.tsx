@@ -87,13 +87,9 @@ export default async function AgendaPage() {
                       </div>
                       <div className="agenda-info">
                         <h4>
-                          {artist ? (
-                            <Link href={`/artista/${artist.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                              {event.title}
-                            </Link>
-                          ) : (
-                            <span>{event.title}</span>
-                          )}
+                          <Link href={`/evento/${event.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                            {event.title}
+                          </Link>
                         </h4>
                         {(event.venue || event.city) && (
                           <p style={{ color: 'var(--text-muted)' }}>
@@ -120,15 +116,13 @@ export default async function AgendaPage() {
                             Ingressos
                           </a>
                         )}
-                        {artist && (
-                          <Link
-                            href={`/artista/${artist.slug}`}
-                            className="btn-outline-primary"
-                            style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}
-                          >
-                            Ver Artista
-                          </Link>
-                        )}
+                        <Link
+                          href={`/evento/${event.slug}`}
+                          className="btn-outline-primary"
+                          style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}
+                        >
+                          Ver Detalhes
+                        </Link>
                       </div>
                     </div>
                   );

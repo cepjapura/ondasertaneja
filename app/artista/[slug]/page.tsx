@@ -179,19 +179,19 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                         <span className="agd-month">{mesStr}</span>
                       </div>
                       <div className="agenda-info">
-                        {cidadeStr && <h4><i className="fa-solid fa-location-dot" style={{ color: 'var(--primary)' }}></i> {cidadeStr}</h4>}
+                        {cidadeStr && (
+                          <h4>
+                            <Link href={`/evento/${event.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                              <i className="fa-solid fa-location-dot" style={{ color: 'var(--primary)' }}></i> {cidadeStr}
+                            </Link>
+                          </h4>
+                        )}
                         {localStr && <p style={{ color: 'var(--text-muted)' }}>{localStr}</p>}
                       </div>
                       <div className="agenda-action">
-                        {event.ticketUrl ? (
-                          <a href={event.ticketUrl} target="_blank" rel="noreferrer" className="btn-outline-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}>
-                            Ingressos
-                          </a>
-                        ) : (
-                          <button className="btn-outline-primary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
-                            Ingressos
-                          </button>
-                        )}
+                        <Link href={`/evento/${event.slug}`} className="btn-outline-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}>
+                          Ver Evento
+                        </Link>
                       </div>
                     </div>
                   );
