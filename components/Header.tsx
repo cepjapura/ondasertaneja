@@ -10,6 +10,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -19,11 +20,14 @@ export default function Header() {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setIsDropdownOpen(false);
+        if (!searchQuery.trim()) {
+          setIsSearchExpanded(false);
+        }
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [searchQuery]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -59,6 +63,23 @@ export default function Header() {
     }
   };
 
+  const openSearch = () => {
+    setIsSearchExpanded(true);
+    setTimeout(() => inputRef.current?.focus(), 50);
+  };
+
+  const closeSearch = () => {
+    if (searchQuery) {
+      setSearchQuery('');
+      setIsDropdownOpen(false);
+      setSearchResults(null);
+      inputRef.current?.focus();
+    } else {
+      setIsSearchExpanded(false);
+      setIsDropdownOpen(false);
+    }
+  };
+
   return (
     <header className="header">
       <div className="header-container">
@@ -84,79 +105,56 @@ export default function Header() {
           <Link href="/contato" onClick={() => setMobileMenuOpen(false)}>Contato</Link>
         </nav>
 
-        <div className="search-container" ref={dropdownRef}>
-          <form onSubmit={handleSearchSubmit} className="search-input-wrapper" style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center' }}>
+        <div className={`search-container ${isSearchExpanded ? 'expanded' : ''}`} ref={dropdownRef}>
+          {!isSearchExpanded ? (
             <button
-              type="submit"
-              aria-label="Buscar"
-              title="Buscar"
-              style={{
-                position: 'absolute',
-                left: '10px',
-                background: 'none',
-                border: 'none',
-                color: searchQuery.trim().length >= 2 ? 'var(--primary)' : 'var(--text-muted)',
-                fontSize: '0.95rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '6px',
-                zIndex: 2,
-                transition: 'var(--transition)',
-              }}
-              onClick={(e) => {
-                if (!searchQuery.trim()) {
-                  e.preventDefault();
-                  inputRef.current?.focus();
-                }
-              }}
+              type="button"
+              className="search-toggle-btn"
+              aria-label="Abrir busca"
+              title="Abrir busca"
+              onClick={openSearch}
             >
               <i className="fa-solid fa-magnifying-glass"></i>
+              <span className="search-toggle-label">Buscar...</span>
             </button>
-            <input
-              ref={inputRef}
-              type="text"
-              className="search-input"
-              placeholder="Buscar artista, show, cidade..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onFocus={() => {
-                if (searchQuery.trim().length >= 2) setIsDropdownOpen(true);
-              }}
-              autoComplete="off"
-              style={{
-                paddingLeft: '38px',
-                paddingRight: searchQuery ? '35px' : '15px',
-              }}
-            />
-            {searchQuery && (
+          ) : (
+            <form onSubmit={handleSearchSubmit} className="search-input-wrapper">
+              <button
+                type="submit"
+                aria-label="Buscar"
+                title="Buscar"
+                className="search-submit-btn"
+              >
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </button>
+              <input
+                ref={inputRef}
+                type="text"
+                className="search-input"
+                placeholder="Buscar artista, show, cidade ou música..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onFocus={() => {
+                  if (searchQuery.trim().length >= 2) setIsDropdownOpen(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    closeSearch();
+                  }
+                }}
+                autoComplete="off"
+              />
               <button
                 type="button"
-                aria-label="Limpar busca"
-                title="Limpar busca"
-                onClick={() => {
-                  setSearchQuery('');
-                  setIsDropdownOpen(false);
-                  setSearchResults(null);
-                  inputRef.current?.focus();
-                }}
-                style={{
-                  position: 'absolute',
-                  right: '10px',
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-muted)',
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  padding: '6px',
-                  zIndex: 2,
-                }}
+                aria-label="Fechar ou limpar busca"
+                title="Fechar ou limpar busca"
+                className="search-close-btn"
+                onClick={closeSearch}
               >
                 <i className="fa-solid fa-xmark"></i>
               </button>
-            )}
-          </form>
+            </form>
+          )}
 
           {isDropdownOpen && searchResults && (
             <div className="search-dropdown" style={{ display: 'block' }}>
