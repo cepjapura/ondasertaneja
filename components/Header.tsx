@@ -95,7 +95,7 @@ export default function Header() {
           <i className="fa-solid fa-bars"></i>
         </button>
 
-        <nav className={`nav-menu ${mobileMenuOpen ? 'active' : ''}`} id="navMenu">
+        <nav className={`nav-menu ${mobileMenuOpen ? 'active' : ''} ${isSearchExpanded ? 'search-active' : ''}`} id="navMenu">
           <Link href="/" onClick={() => setMobileMenuOpen(false)}>Início</Link>
           <Link href="/#noticias" onClick={() => setMobileMenuOpen(false)}>Notícias</Link>
           <Link href="/entrevistas" onClick={() => setMobileMenuOpen(false)}>Entrevistas</Link>
