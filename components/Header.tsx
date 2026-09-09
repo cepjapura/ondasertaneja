@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any>(null);
@@ -45,6 +47,15 @@ export default function Header() {
     }, 200);
   };
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim().length >= 2) {
+      setIsDropdownOpen(false);
+      setMobileMenuOpen(false);
+      router.push(`/busca?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   return (
     <header className="header">
       <div className="header-container">
@@ -71,7 +82,7 @@ export default function Header() {
         </nav>
 
         <div className="search-container" ref={dropdownRef}>
-          <div className="search-input-wrapper">
+          <form onSubmit={handleSearchSubmit} className="search-input-wrapper">
             <i className="fa-solid fa-magnifying-glass"></i>
             <input
               type="text"
@@ -84,14 +95,15 @@ export default function Header() {
               }}
               autoComplete="off"
             />
-          </div>
+          </form>
 
           {isDropdownOpen && searchResults && (
             <div className="search-dropdown" style={{ display: 'block' }}>
               {(!searchResults.artists?.length &&
                 !searchResults.events?.length &&
                 !searchResults.news?.length &&
-                !searchResults.cities?.length) ? (
+                !searchResults.cities?.length &&
+                !searchResults.musics?.length) ? (
                 <div style={{ padding: '15px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
                   Nenhum resultado encontrado para &quot;{searchQuery}&quot;.
                 </div>
@@ -130,26 +142,65 @@ export default function Header() {
                   {searchResults.events?.length > 0 && (
                     <>
                       <div className="search-category-title">📅 Shows & Eventos</div>
-                      {searchResults.events.map((ev: any) => {
-                        const artistSlug = ev.artists?.[0]?.artist?.slug;
-                        const eventLink = artistSlug
-                          ? `/artista/${artistSlug}`
-                          : ev.city?.slug
-                          ? `/cidade/${ev.city.slug}`
-                          : '/agenda';
+                      {searchResults.events.map((ev: any) => (
+                        <Link
+                          key={ev.id}
+                          href={`/evento/${ev.slug}`}
+                          className="search-result-item"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <div className="search-item-icon"><i className="fa-solid fa-calendar-days"></i></div>
+                          <div>
+                            <div className="search-item-title">{ev.title}</div>
+                            <span className="search-item-sub">
+                              {ev.city ? `${ev.city.name} - ${ev.city.stateCode}` : ''} • {new Date(ev.eventDate).toLocaleDateString('pt-BR')}
+                            </span>
+                          </div>
+                        </Link>
+                      ))}
+                    </>
+                  )}
 
+                  {/* Cidades */}
+                  {searchResults.cities?.length > 0 && (
+                    <>
+                      <div className="search-category-title">📍 Cidades</div>
+                      {searchResults.cities.map((c: any) => (
+                        <Link
+                          key={c.id}
+                          href={`/cidade/${c.slug}`}
+                          className="search-result-item"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <div className="search-item-icon"><i className="fa-solid fa-location-dot"></i></div>
+                          <div>
+                            <div className="search-item-title">{c.name} - {c.stateCode}</div>
+                            <span className="search-item-sub">Ver agenda de shows da cidade</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </>
+                  )}
+
+                  {/* Músicas */}
+                  {searchResults.musics?.length > 0 && (
+                    <>
+                      <div className="search-category-title">🎵 Músicas</div>
+                      {searchResults.musics.map((m: any) => {
+                        const primaryArtist = m.artists?.[0]?.artist;
+                        const artistLink = primaryArtist ? `/artista/${primaryArtist.slug}` : '/lancamentos';
                         return (
                           <Link
-                            key={ev.id}
-                            href={eventLink}
+                            key={m.id}
+                            href={artistLink}
                             className="search-result-item"
                             onClick={() => setIsDropdownOpen(false)}
                           >
-                            <div className="search-item-icon"><i className="fa-solid fa-calendar-days"></i></div>
+                            <div className="search-item-icon"><i className="fa-solid fa-music"></i></div>
                             <div>
-                              <div className="search-item-title">{ev.title}</div>
+                              <div className="search-item-title">{m.title}</div>
                               <span className="search-item-sub">
-                                {ev.city ? `${ev.city.name} - ${ev.city.stateCode}` : ''} • {new Date(ev.eventDate).toLocaleDateString('pt-BR')}
+                                {primaryArtist ? `por ${primaryArtist.name}` : 'Música'}
                               </span>
                             </div>
                           </Link>
@@ -178,6 +229,25 @@ export default function Header() {
                       ))}
                     </>
                   )}
+
+                  {/* Botão Ver Todos os Resultados */}
+                  <Link
+                    href={`/busca?q=${encodeURIComponent(searchQuery.trim())}`}
+                    style={{
+                      display: 'block',
+                      padding: '12px 15px',
+                      textAlign: 'center',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      color: 'var(--primary)',
+                      borderTop: '1px solid var(--border-color)',
+                      background: 'rgba(255, 85, 0, 0.08)',
+                      textDecoration: 'none',
+                    }}
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    Ver todos os resultados para &quot;{searchQuery}&quot; &rarr;
+                  </Link>
                 </>
               )}
             </div>

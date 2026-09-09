@@ -103,10 +103,11 @@ export async function GET(request: Request) {
       where: {
         title: { contains: q },
       },
-      take: 3,
+      take: 4,
       include: {
+        album: { select: { coverUrl: true } },
         artists: {
-          include: { artist: { select: { name: true, slug: true } } },
+          include: { artist: { select: { name: true, slug: true, avatarUrl: true } } },
         },
       },
     });
