@@ -12,6 +12,8 @@ out/
 
 # Database / Prisma local storage
 prisma/dev.db
+prisma/*.db
+prisma/*.bak
 prisma/*.db-journal
 prisma/*.db-shm
 prisma/*.db-wal

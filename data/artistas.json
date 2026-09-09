@@ -1,18 +1,46 @@
 [
   {
+    "nome": "Ana Castela",
+    "slug": "ana-castela"
+  },
+  {
+    "nome": "Bruno & Marrone",
+    "slug": "bruno-marrone"
+  },
+  {
+    "nome": "Chitãozinho & Xororó",
+    "slug": "chitaozinho-xororo"
+  },
+  {
     "nome": "Gusttavo Lima",
     "slug": "gusttavo-lima"
   },
   {
-    "nome": "Maiara & Maraisa",
-    "slug": "maiara-maraisa"
+    "nome": "Henrique & Juliano",
+    "slug": "henrique-juliano"
+  },
+  {
+    "nome": "Hugo & Guilherme",
+    "slug": "hugo-guilherme"
   },
   {
     "nome": "Jorge & Mateus",
     "slug": "jorge-mateus"
   },
   {
-    "nome": "Henrique & Juliano",
-    "slug": "henrique-juliano"
+    "nome": "Leonardo",
+    "slug": "leonardo"
+  },
+  {
+    "nome": "Maiara & Maraisa",
+    "slug": "maiara-maraisa"
+  },
+  {
+    "nome": "Zé Neto & Cristiano",
+    "slug": "ze-neto-cristiano"
+  },
+  {
+    "nome": "Zezé Di Camargo & Luciano",
+    "slug": "zeze-di-camargo-luciano"
   }
 ]
