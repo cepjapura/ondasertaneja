@@ -12,6 +12,7 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -53,6 +54,8 @@ export default function Header() {
       setIsDropdownOpen(false);
       setMobileMenuOpen(false);
       router.push(`/busca?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      inputRef.current?.focus();
     }
   };
 
@@ -82,9 +85,37 @@ export default function Header() {
         </nav>
 
         <div className="search-container" ref={dropdownRef}>
-          <form onSubmit={handleSearchSubmit} className="search-input-wrapper">
-            <i className="fa-solid fa-magnifying-glass"></i>
+          <form onSubmit={handleSearchSubmit} className="search-input-wrapper" style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center' }}>
+            <button
+              type="submit"
+              aria-label="Buscar"
+              title="Buscar"
+              style={{
+                position: 'absolute',
+                left: '10px',
+                background: 'none',
+                border: 'none',
+                color: searchQuery.trim().length >= 2 ? 'var(--primary)' : 'var(--text-muted)',
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '6px',
+                zIndex: 2,
+                transition: 'var(--transition)',
+              }}
+              onClick={(e) => {
+                if (!searchQuery.trim()) {
+                  e.preventDefault();
+                  inputRef.current?.focus();
+                }
+              }}
+            >
+              <i className="fa-solid fa-magnifying-glass"></i>
+            </button>
             <input
+              ref={inputRef}
               type="text"
               className="search-input"
               placeholder="Buscar artista, show, cidade..."
@@ -94,7 +125,37 @@ export default function Header() {
                 if (searchQuery.trim().length >= 2) setIsDropdownOpen(true);
               }}
               autoComplete="off"
+              style={{
+                paddingLeft: '38px',
+                paddingRight: searchQuery ? '35px' : '15px',
+              }}
             />
+            {searchQuery && (
+              <button
+                type="button"
+                aria-label="Limpar busca"
+                title="Limpar busca"
+                onClick={() => {
+                  setSearchQuery('');
+                  setIsDropdownOpen(false);
+                  setSearchResults(null);
+                  inputRef.current?.focus();
+                }}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  padding: '6px',
+                  zIndex: 2,
+                }}
+              >
+                <i className="fa-solid fa-xmark"></i>
+              </button>
+            )}
           </form>
 
           {isDropdownOpen && searchResults && (
