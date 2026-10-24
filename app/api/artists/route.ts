@@ -20,8 +20,11 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json(artists);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro ao listar artistas:', error);
-    return NextResponse.json({ error: 'Erro ao listar artistas' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Erro ao listar artistas', message: error?.message || String(error) },
+      { status: 500 }
+    );
   }
 }
