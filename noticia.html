@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Notícia | Onda Sertaneja</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎸</text></svg>">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,7 +27,7 @@
         }
 
         .noticia-content p {
-            color: var(--text-light);
+            color: var(--text-main);
             line-height: 1.8;
             margin-bottom: 20px;
             font-size: 1.1rem;
@@ -42,11 +43,18 @@
             <a href="index.html" class="logo">
                 ONDA<span>SERTANEJA</span>
             </a>
-            <nav class="nav-menu" style="display: flex;">
-                <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Voltar à Home</a>
-            </nav>
+            <div class="search-container">
+        <div class="search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="globalSearchInput" class="search-input" placeholder="Buscar artista, show, cidade..." autocomplete="off">
         </div>
-    </header>
+        <div class="search-dropdown" id="globalSearchDropdown"></div>
+      </div>
+      <nav class="nav-menu" style="display: flex;">
+        <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Voltar à Home</a>
+      </nav>
+    </div>
+  </header>
 
     <!-- PLAYER AO VIVO FIXO -->
     <div class="player-live">
@@ -81,7 +89,7 @@
         <section class="section grid-layout">
             <!-- MAIN: Conteúdo da Notícia -->
             <article class="col-main noticia-article noticia-content" id="newsArticle"
-                style="padding-top: 0; background-color: var(--surface); border-radius: var(--radius-lg); padding: 30px; box-shadow: var(--shadow);">
+                style="padding-top: 0; background-color: var(--bg-card); border-radius: var(--radius-lg); padding: 30px; box-shadow: 0 4px 24px rgba(0,0,0,0.4);">
                 <p style="color: var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Lendo redação...</p>
             </article>
 
@@ -123,7 +131,9 @@
         <source src="https://SEU_STREAM_AQUI" type="audio/mpeg">
     </audio>
 
+    <script src="config.js"></script>
     <script src="player.js"></script>
+    <script src="busca.js"></script>
     <script src="noticia_detalhe.js"></script>
 
 </body>

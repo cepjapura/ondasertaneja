@@ -4,34 +4,34 @@ const artistaNome = params.get('nome') || 'Artista Desconhecido';
 document.getElementById('artistNameTop').innerText = `Ouvindo: Especial ${artistaNome}`;
 document.getElementById('artistName').innerText = artistaNome;
 
-// 1. Carregar Dados do Artista (Foto) para o Hero e Info Extra
-fetch('artistas.json')
+// Carregar dados completos do artista a partir da API
+fetch(`/api/artists/${encodeURIComponent(artistaNome)}`)
   .then(res => res.json())
-  .then(data => {
-    const artistaInfo = data.find(a => a.nome === artistaNome);
+  .then(artistData => {
+    if (artistData && !artistData.error) {
+      document.getElementById('artistNameTop').innerText = `Ouvindo: Especial ${artistData.name}`;
+      document.getElementById('artistName').innerText = artistData.name;
 
-    if (artistaInfo && artistaInfo.imagem) {
-      document.getElementById('heroArtista').style.backgroundImage = `url('${artistaInfo.imagem}')`;
-      document.getElementById('heroArtista').style.backgroundSize = 'cover';
-      document.getElementById('heroArtista').style.backgroundPosition = 'center 20%';
+      if (artistData.coverUrl || artistData.avatarUrl) {
+        document.getElementById('heroArtista').style.backgroundImage = `url('${artistData.coverUrl || artistData.avatarUrl}')`;
+        document.getElementById('heroArtista').style.backgroundSize = 'cover';
+        document.getElementById('heroArtista').style.backgroundPosition = 'center 20%';
+      }
+
+      // Mapear shows vindos do relacionamento da API
+      const eventsList = (artistData.events || []).map(e => ({
+        cidade: e.event?.city ? `${e.event.city.name} - ${e.event.city.stateCode}` : (e.event?.title || ''),
+        local: e.event?.venue?.name || 'Local a confirmar',
+        data: e.event?.eventDate ? new Date(e.event.eventDate).toLocaleDateString('pt-BR') : '',
+      }));
+      renderAgenda(eventsList);
     } else {
-      // Placeholder caso não tenha foto específica
-      document.getElementById('heroArtista').style.backgroundImage = `url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`;
-      document.getElementById('heroArtista').style.backgroundSize = 'cover';
+      document.getElementById('agendaArtista').innerHTML =
+        '<div class="agenda-item"><p style="color: var(--text-muted);">Artista não encontrado.</p></div>';
     }
   })
-  .catch(err => console.error('Erro ao buscar metadados do artista', err));
-
-
-// 2. Carregar Agenda Específica deste Artista
-fetch('agenda.json')
-  .then(res => res.json())
-  .then(data => {
-    // Filtrar apenas shows do artista selecionado
-    const agenda = data.filter(show => show.artista === artistaNome);
-    renderAgenda(agenda);
-  })
-  .catch(() => {
+  .catch(err => {
+    console.error('Erro ao buscar artista:', err);
     document.getElementById('agendaArtista').innerHTML =
       '<div class="agenda-item"><p style="color: var(--text-muted);">Erro ao carregar agenda.</p></div>';
   });

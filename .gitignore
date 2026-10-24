@@ -9,10 +9,9 @@ node_modules/
 # Next.js build output
 .next/
 out/
+*.tsbuildinfo
 
 # Database / Prisma local storage
-prisma/dev.db
-prisma/*.db
 prisma/*.bak
 prisma/*.db-journal
 prisma/*.db-shm

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('config.json')
+    fetch('/api/config')
         .then(response => response.json())
         .then(data => {
             // Aplicar links de Redes Sociais no Footer
@@ -19,12 +19,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const contatoEmailTxt = document.getElementById('txtContatoEmail');
             if (contatoEmailTxt) contatoEmailTxt.innerText = data.email;
 
+            // Atualizar botão flutuante do WhatsApp com o link real do config
+            const btnWhatsappFloat = document.getElementById('btnWhatsappFloat');
+            if (btnWhatsappFloat && data.whatsappLink) {
+                btnWhatsappFloat.href = data.whatsappLink;
+            }
+
+            // Expor número de WhatsApp para o contato.js usar
+            window.ONDA_WHATSAPP_NUMERO = data.whatsappLink
+                ? data.whatsappLink.replace('https://wa.me/', '')
+                : null;
+
             // Substituir src do Audio Player global
             const radioPlayer = document.getElementById('radioPlayer');
-            if (radioPlayer && radioPlayer.querySelector('source')) {
-                // Seta o source mas nao da autoplay pra nao quebrar a regra do browser
+            if (radioPlayer && radioPlayer.querySelector('source') && data.streamAudioUrl) {
                 radioPlayer.querySelector('source').src = data.streamAudioUrl;
-                radioPlayer.load(); // forca recarregar a source nova
+                radioPlayer.load(); // força recarregar a source nova
             }
         })
         .catch(error => console.error('Erro ao carregar config.json:', error));

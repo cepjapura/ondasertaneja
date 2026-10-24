@@ -1,15 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('galeria.json')
+    fetch('/api/config')
         .then(response => response.json())
-        .then(data => {
+        .then(configData => {
             const container = document.getElementById('galeriaMasonry');
             if (!container) return;
+
+            let data = [];
+            if (configData.galleryPhotos) {
+                try {
+                    data = JSON.parse(configData.galleryPhotos);
+                } catch {
+                    data = [];
+                }
+            }
+
+            if (!data || data.length === 0) return;
 
             container.innerHTML = ''; // Limpar o placeholder
 
             data.forEach(item => {
                 const galleryItem = document.createElement('div');
-                // Se houver classe de tamanho (large, wide), aplica, senão só gallery-item
                 galleryItem.className = `gallery-item ${item.classeTamanho || ''}`.trim();
                 galleryItem.style.backgroundImage = `url('${item.imagem}')`;
 
@@ -21,5 +31,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 container.appendChild(galleryItem);
             });
         })
-        .catch(error => console.error('Erro ao carregar galeria.json:', error));
+        .catch(error => console.error('Erro ao carregar galeria da API:', error));
 });

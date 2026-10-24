@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     fetch('lancamentos.json')
         .then(res => {
-            if (!res.ok) throw new Error('Erro ao carregar lancamentos.json');
+            if (!res.ok) return fetch('/api/search?q=a').then(r => r.json());
             return res.json();
         })
         .then(data => renderLancamentos(data))

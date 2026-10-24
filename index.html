@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Onda Sertaneja - A Rádio que Vive o Sertão</title>
   <meta name="description" content="Onda Sertaneja — A melhor rádio sertaneja online 24h: notícias, agenda de shows, lançamentos e mais. A batida que move o Brasil!">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎸</text></svg>">
 
   <!-- Open Graph (SEO WhatsApp/Facebook/Twitter) ATUALIZADO -->
   <meta property="og:type" content="website">
@@ -38,7 +39,7 @@
   <!-- Ícones -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <link rel="stylesheet" href="style.css?v=2.2" />
+  <link rel="stylesheet" href="style.css?v=2.3" />
 </head>
 
 <body>
@@ -62,6 +63,14 @@
         <a href="#entrevistas">Entrevistas</a>
         <a href="#contato">Contato</a>
       </nav>
+
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="globalSearchInput" class="search-input" placeholder="Buscar artista, show, cidade..." autocomplete="off">
+        </div>
+        <div class="search-dropdown" id="globalSearchDropdown"></div>
+      </div>
 
       <div class="header-actions">
         <button class="btn-outline-primary"><i class="fa-solid fa-music"></i> Enviar Música</button>
@@ -301,6 +310,7 @@
   <!-- Scripts -->
   <script src="config.js"></script>
   <script src="player.js"></script>
+  <script src="busca.js"></script>
   <script src="noticias.js"></script>
   <script src="lancamentos.js"></script>
   <script src="agenda.js"></script>

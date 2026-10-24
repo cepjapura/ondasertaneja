@@ -15,13 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Número fictício do WhatsApp da rádio - Substitua depois
-            const numeroWhatsApp = '5511999999999';
+            // Usa o número carregado do config.json (via config.js) ou um fallback
+            const numeroWhatsApp = window.ONDA_WHATSAPP_NUMERO || '5544999999999';
 
             let texto = `*Contato via Site - Onda Sertaneja*%0A%0A`;
             texto += `*Nome:* ${nome}%0A`;
             if (email) texto += `*E-mail:* ${email}%0A`;
-            if (telefone) texto += `*WahtsApp:* ${telefone}%0A%0A`;
+            if (telefone) texto += `*WhatsApp:* ${telefone}%0A%0A`;
             texto += `*Mensagem:*%0A${mensagem}`;
 
             const url = `https://wa.me/${numeroWhatsApp}?text=${texto}`;
