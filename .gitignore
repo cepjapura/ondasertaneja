@@ -3,7 +3,6 @@
 .env.local
 .env.*.local
 !.env.example
-!.env.production
 
 # Dependencies
 node_modules/
@@ -14,7 +13,13 @@ out/
 *.tsbuildinfo
 
 # Database / Prisma local storage
+*.db
+prisma/*.db
+dev.db
+prisma/dev.db
 prisma/*.bak
+prisma/*.pre_migration_backup
+*.pre_migration_backup
 prisma/*.db-journal
 prisma/*.db-shm
 prisma/*.db-wal

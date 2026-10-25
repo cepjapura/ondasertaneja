@@ -1,0 +1,883 @@
+{
+  "SystemConfig": [
+    {
+      "key": "whatsapp",
+      "value": "(44) 9XXXX-XXXX"
+    },
+    {
+      "key": "whatsappLink",
+      "value": "https://wa.me/5544XXXXXXXXX"
+    },
+    {
+      "key": "email",
+      "value": "contato@ondasertaneja.com.br"
+    },
+    {
+      "key": "instagram",
+      "value": "https://instagram.com/ondasertaneja"
+    },
+    {
+      "key": "facebook",
+      "value": "https://facebook.com/ondasertaneja"
+    },
+    {
+      "key": "tiktok",
+      "value": "https://tiktok.com/@ondasertaneja"
+    },
+    {
+      "key": "youtube",
+      "value": "https://youtube.com/@ondasertaneja"
+    },
+    {
+      "key": "streamAudioUrl",
+      "value": "https://SEU_STREAM_AQUI"
+    },
+    {
+      "key": "spotifyPlaylistUrl",
+      "value": "https://open.spotify.com/playlist/7110oQdXKCBofaBanEYo1Z"
+    },
+    {
+      "key": "galleryPhotos",
+      "value": "[{\"imagem\":\"https://images.unsplash.com/photo-1470229722913-7c090be5c520?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80\",\"legenda\":\"Festival de Inverno 2026\",\"classeTamanho\":\"large\"},{\"imagem\":\"https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80\",\"legenda\":\"Palco Principal\",\"classeTamanho\":\"\"},{\"imagem\":\"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80\",\"legenda\":\"Festa do Peão\",\"classeTamanho\":\"\"},{\"imagem\":\"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80\",\"legenda\":\"Bastidores\",\"classeTamanho\":\"wide\"}]"
+    }
+  ],
+  "City": [
+    {
+      "id": "6105d1e1-07da-4ab0-b03f-657a59da027f",
+      "name": "Brasília",
+      "stateCode": "DF",
+      "slug": "brasilia-df",
+      "latitude": null,
+      "longitude": null,
+      "ibgeCode": null
+    },
+    {
+      "id": "2f56c3f9-a655-4db4-8b59-0ce7cf845c7a",
+      "name": "Pedro Leopoldo",
+      "stateCode": "MG",
+      "slug": "pedro-leopoldo-mg",
+      "latitude": null,
+      "longitude": null,
+      "ibgeCode": null
+    },
+    {
+      "id": "32835325-3aca-4eb7-93ab-89c585e69c2f",
+      "name": "São Paulo",
+      "stateCode": "SP",
+      "slug": "sao-paulo-sp",
+      "latitude": null,
+      "longitude": null,
+      "ibgeCode": null
+    },
+    {
+      "id": "bab44688-2aba-4d79-86f9-4bd9a622be2f",
+      "name": "Belo Horizonte",
+      "stateCode": "MG",
+      "slug": "belo-horizonte-mg",
+      "latitude": null,
+      "longitude": null,
+      "ibgeCode": null
+    },
+    {
+      "id": "244d0ddb-71f6-4a13-a76b-ac263fb1ec52",
+      "name": "Campo Grande",
+      "stateCode": "MS",
+      "slug": "campo-grande-ms",
+      "latitude": null,
+      "longitude": null,
+      "ibgeCode": null
+    },
+    {
+      "id": "de561e3a-112e-4dd7-8d0a-5f53549b3f74",
+      "name": "Curitiba",
+      "stateCode": "PR",
+      "slug": "curitiba-pr",
+      "latitude": null,
+      "longitude": null,
+      "ibgeCode": null
+    },
+    {
+      "id": "6f68a38f-671f-42ae-82ff-b7c364b0c48d",
+      "name": "Londrina",
+      "stateCode": "PR",
+      "slug": "londrina-pr",
+      "latitude": null,
+      "longitude": null,
+      "ibgeCode": null
+    }
+  ],
+  "Venue": [
+    {
+      "id": "8f196abc-116d-4e66-8199-afa19f9cf062",
+      "name": "Arena BRB Mané Garrincha",
+      "slug": "arena-brb-mane-garrincha-brasilia-df",
+      "cityId": "6105d1e1-07da-4ab0-b03f-657a59da027f",
+      "address": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "6896e7eb-5d4d-40f2-93eb-a09f402e2e36",
+      "name": "Parque de Exposições",
+      "slug": "parque-de-exposicoes-pedro-leopoldo-mg",
+      "cityId": "2f56c3f9-a655-4db4-8b59-0ce7cf845c7a",
+      "address": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "6ad55ca7-176d-4333-854e-e605ded2dcc0",
+      "name": "Allianz Parque",
+      "slug": "allianz-parque-sao-paulo-sp",
+      "cityId": "32835325-3aca-4eb7-93ab-89c585e69c2f",
+      "address": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "8421ecbf-af9f-4a7a-9972-b9463c3a9387",
+      "name": "Mineirão",
+      "slug": "mineirao-belo-horizonte-mg",
+      "cityId": "bab44688-2aba-4d79-86f9-4bd9a622be2f",
+      "address": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "1bb0ff92-def5-477b-b404-816a3e06d74a",
+      "name": "Arena MS",
+      "slug": "arena-ms-campo-grande-ms",
+      "cityId": "244d0ddb-71f6-4a13-a76b-ac263fb1ec52",
+      "address": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "14add322-509f-4354-a019-534dae7e8f38",
+      "name": "Pedreira Paulo Leminski",
+      "slug": "pedreira-paulo-leminski-curitiba-pr",
+      "cityId": "de561e3a-112e-4dd7-8d0a-5f53549b3f74",
+      "address": null,
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "6ebbc904-b949-4649-bf15-d2a16d30d72f",
+      "name": "ExpoLondrina",
+      "slug": "expolondrina-londrina-pr",
+      "cityId": "6f68a38f-671f-42ae-82ff-b7c364b0c48d",
+      "address": null,
+      "latitude": null,
+      "longitude": null
+    }
+  ],
+  "Source": [
+    {
+      "id": "source-oficial",
+      "name": "Assessoria Oficial Onda Sertaneja",
+      "url": null,
+      "sourceType": "official_artist",
+      "trustLevel": "high",
+      "lastVerifiedAt": null,
+      "reliabilityScore": 100
+    }
+  ],
+  "Artist": [
+    {
+      "id": "86482132-bde4-4b41-9869-6f36346bd9d0",
+      "name": "Gusttavo Lima",
+      "slug": "gusttavo-lima",
+      "bio": null,
+      "avatarUrl": null,
+      "coverUrl": null,
+      "isDuoOrGroup": 0,
+      "genreTags": "Sertanejo",
+      "spotifyId": null,
+      "youtubeChannel": null,
+      "instagramHandle": null,
+      "tiktokHandle": null,
+      "isFeatured": 0,
+      "createdAt": 1787799880001,
+      "updatedAt": 1788916474387
+    },
+    {
+      "id": "6b5b2d91-6f97-4fe7-ab9c-a7e75c3e5e32",
+      "name": "Ana Castela",
+      "slug": "ana-castela",
+      "bio": null,
+      "avatarUrl": null,
+      "coverUrl": null,
+      "isDuoOrGroup": 0,
+      "genreTags": "Sertanejo",
+      "spotifyId": null,
+      "youtubeChannel": null,
+      "instagramHandle": null,
+      "tiktokHandle": null,
+      "isFeatured": 0,
+      "createdAt": 1787799880003,
+      "updatedAt": 1788916474379
+    },
+    {
+      "id": "02d7fa9f-4372-4faf-9003-6d64b233c377",
+      "name": "Hugo & Guilherme",
+      "slug": "hugo-guilherme",
+      "bio": null,
+      "avatarUrl": null,
+      "coverUrl": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      "isDuoOrGroup": 0,
+      "genreTags": "Sertanejo",
+      "spotifyId": null,
+      "youtubeChannel": null,
+      "instagramHandle": null,
+      "tiktokHandle": null,
+      "isFeatured": 0,
+      "createdAt": 1787799880005,
+      "updatedAt": 1788916474392
+    },
+    {
+      "id": "71dbafa1-ce32-4d97-9964-7f3f7e99f31b",
+      "name": "Zé Neto & Cristiano",
+      "slug": "ze-neto-cristiano",
+      "bio": null,
+      "avatarUrl": null,
+      "coverUrl": "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      "isDuoOrGroup": 0,
+      "genreTags": "Sertanejo",
+      "spotifyId": null,
+      "youtubeChannel": null,
+      "instagramHandle": null,
+      "tiktokHandle": null,
+      "isFeatured": 0,
+      "createdAt": 1787799880007,
+      "updatedAt": 1788916474402
+    },
+    {
+      "id": "dd5a06f3-2f77-48f3-b351-ee1c94c7703c",
+      "name": "Maiara & Maraisa",
+      "slug": "maiara-maraisa",
+      "bio": null,
+      "avatarUrl": null,
+      "coverUrl": null,
+      "isDuoOrGroup": 0,
+      "genreTags": null,
+      "spotifyId": null,
+      "youtubeChannel": null,
+      "instagramHandle": null,
+      "tiktokHandle": null,
+      "isFeatured": 0,
+      "createdAt": 1788790905164,
+      "updatedAt": 1788916474400
+    },
+    {
+      "id": "a23c5440-2d73-43dc-be96-a521a2c39986",
+      "name": "Jorge & Mateus",
+      "slug": "jorge-mateus",
+      "bio": null,
+      "avatarUrl": null,
+      "coverUrl": null,
+      "isDuoOrGroup": 0,
+      "genreTags": null,
+      "spotifyId": null,
+      "youtubeChannel": null,
+      "instagramHandle": null,
+      "tiktokHandle": null,
+      "isFeatured": 0,
+      "createdAt": 1788790905166,
+      "updatedAt": 1788916474394
+    },
+    {
+      "id": "56c36984-cceb-4971-9c89-15dbafd25dc6",
+      "name": "Henrique & Juliano",
+      "slug": "henrique-juliano",
+      "bio": null,
+      "avatarUrl": null,
+      "coverUrl": null,
+      "isDuoOrGroup": 0,
+      "genreTags": null,
+      "spotifyId": null,
+      "youtubeChannel": null,
+      "instagramHandle": null,
+      "tiktokHandle": null,
+      "isFeatured": 0,
+      "createdAt": 1788790905169,
+      "updatedAt": 1788916474389
+    },
+    {
+      "id": "312acd6e-f485-4abf-a6ee-809e5835326d",
+      "name": "Chitãozinho & Xororó",
+      "slug": "chitaozinho-xororo",
+      "bio": null,
+      "avatarUrl": null,
+      "coverUrl": null,
+      "isDuoOrGroup": 0,
+      "genreTags": "Sertanejo",
+      "spotifyId": null,
+      "youtubeChannel": null,
+      "instagramHandle": null,
+      "tiktokHandle": null,
+      "isFeatured": 0,
+      "createdAt": 1788916377488,
+      "updatedAt": 1788916474385
+    },
+    {
+      "id": "915e8303-f6a2-49a6-8705-08666d9589df",
+      "name": "Zezé Di Camargo & Luciano",
+      "slug": "zeze-di-camargo-luciano",
+      "bio": null,
+      "avatarUrl": null,
+      "coverUrl": null,
+      "isDuoOrGroup": 0,
+      "genreTags": "Sertanejo",
+      "spotifyId": null,
+      "youtubeChannel": null,
+      "instagramHandle": null,
+      "tiktokHandle": null,
+      "isFeatured": 0,
+      "createdAt": 1788916377495,
+      "updatedAt": 1788916474406
+    },
+    {
+      "id": "7d0676a1-2e4e-4cb1-b191-b611a425d1c2",
+      "name": "Leonardo",
+      "slug": "leonardo",
+      "bio": null,
+      "avatarUrl": null,
+      "coverUrl": null,
+      "isDuoOrGroup": 0,
+      "genreTags": "Sertanejo",
+      "spotifyId": null,
+      "youtubeChannel": null,
+      "instagramHandle": null,
+      "tiktokHandle": null,
+      "isFeatured": 0,
+      "createdAt": 1788916377499,
+      "updatedAt": 1788916474397
+    },
+    {
+      "id": "73fe2675-df38-4eb8-b4d5-0a914304026a",
+      "name": "Bruno & Marrone",
+      "slug": "bruno-marrone",
+      "bio": null,
+      "avatarUrl": null,
+      "coverUrl": null,
+      "isDuoOrGroup": 0,
+      "genreTags": "Sertanejo",
+      "spotifyId": null,
+      "youtubeChannel": null,
+      "instagramHandle": null,
+      "tiktokHandle": null,
+      "isFeatured": 0,
+      "createdAt": 1788916377502,
+      "updatedAt": 1788916474383
+    }
+  ],
+  "Album": [
+    {
+      "id": "6b0c55aa-aeba-4090-9949-a723cd321474",
+      "title": "5 Regras",
+      "slug": "5-regras-jorge-mateus-single",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b273c1",
+      "releaseDate": null,
+      "albumType": "single",
+      "spotifyAlbumId": null
+    },
+    {
+      "id": "b4df39df-5de8-40bd-bb31-f782d52daa4b",
+      "title": "Traumatizei",
+      "slug": "traumatizei-henrique-juliano-single",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b273c2",
+      "releaseDate": null,
+      "albumType": "single",
+      "spotifyAlbumId": null
+    }
+  ],
+  "Music": [
+    {
+      "id": "ed0cdda9-aac6-4373-814b-a84c68a8cf3e",
+      "title": "Solteiro Forçado",
+      "slug": "solteiro-forcado-ana-castela",
+      "durationSeconds": null,
+      "releaseDate": null,
+      "spotifyTrackId": null,
+      "youtubeVideoId": null,
+      "isHit": 1,
+      "albumId": null,
+      "createdAt": 1787799880095
+    },
+    {
+      "id": "4aedfbca-7cd1-4945-8c79-afbdf263ba4a",
+      "title": "Mala dos Porta-Mala",
+      "slug": "mala-dos-porta-mala-hugo-guilherme",
+      "durationSeconds": null,
+      "releaseDate": null,
+      "spotifyTrackId": null,
+      "youtubeVideoId": null,
+      "isHit": 1,
+      "albumId": null,
+      "createdAt": 1787799880102
+    },
+    {
+      "id": "1bb860fc-51a8-479f-a751-93ee6b50d777",
+      "title": "Oi Balde",
+      "slug": "oi-balde-ze-neto-cristiano",
+      "durationSeconds": null,
+      "releaseDate": null,
+      "spotifyTrackId": null,
+      "youtubeVideoId": null,
+      "isHit": 1,
+      "albumId": null,
+      "createdAt": 1787799880108
+    },
+    {
+      "id": "7e994724-e459-45b6-be3f-3c7949b42025",
+      "title": "5 Regras",
+      "slug": "5-regras-jorge-mateus",
+      "durationSeconds": null,
+      "releaseDate": null,
+      "spotifyTrackId": null,
+      "youtubeVideoId": null,
+      "isHit": 1,
+      "albumId": "6b0c55aa-aeba-4090-9949-a723cd321474",
+      "createdAt": 1788790905204
+    },
+    {
+      "id": "e3d6aac4-df4b-4052-afc5-aa6eb405be95",
+      "title": "Traumatizei",
+      "slug": "traumatizei-henrique-juliano",
+      "durationSeconds": null,
+      "releaseDate": null,
+      "spotifyTrackId": null,
+      "youtubeVideoId": null,
+      "isHit": 0,
+      "albumId": "b4df39df-5de8-40bd-bb31-f782d52daa4b",
+      "createdAt": 1788790905213
+    }
+  ],
+  "MusicArtist": [
+    {
+      "musicId": "ed0cdda9-aac6-4373-814b-a84c68a8cf3e",
+      "artistId": "6b5b2d91-6f97-4fe7-ab9c-a7e75c3e5e32",
+      "isPrimary": 1
+    },
+    {
+      "musicId": "4aedfbca-7cd1-4945-8c79-afbdf263ba4a",
+      "artistId": "02d7fa9f-4372-4faf-9003-6d64b233c377",
+      "isPrimary": 1
+    },
+    {
+      "musicId": "1bb860fc-51a8-479f-a751-93ee6b50d777",
+      "artistId": "71dbafa1-ce32-4d97-9964-7f3f7e99f31b",
+      "isPrimary": 1
+    },
+    {
+      "musicId": "7e994724-e459-45b6-be3f-3c7949b42025",
+      "artistId": "a23c5440-2d73-43dc-be96-a521a2c39986",
+      "isPrimary": 1
+    },
+    {
+      "musicId": "e3d6aac4-df4b-4052-afc5-aa6eb405be95",
+      "artistId": "56c36984-cceb-4971-9c89-15dbafd25dc6",
+      "isPrimary": 1
+    }
+  ],
+  "Event": [
+    {
+      "id": "59884f39-dfd2-40d4-bfc5-68c97b25509f",
+      "title": "Turnê Histórias (Ch&X, Zezé & Luciano, etc)",
+      "slug": "turne-historias-chx-zeze-luciano-etc-09052026-brasilia-df",
+      "eventDate": 1778295600000,
+      "venueId": "8f196abc-116d-4e66-8199-afa19f9cf062",
+      "cityId": "6105d1e1-07da-4ab0-b03f-657a59da027f",
+      "status": "confirmed",
+      "ticketUrl": null,
+      "ticketMinPrice": null,
+      "isHighlight": 1,
+      "sourceId": "source-oficial",
+      "confidenceLevel": "verified",
+      "createdAt": 1787799880021,
+      "updatedAt": 1787800602181
+    },
+    {
+      "id": "1d7f8c03-cce4-484f-a7dc-4e078f939d4c",
+      "title": "Pedro Leopoldo Rodeio Show",
+      "slug": "pedro-leopoldo-rodeio-show-05062026-pedro-leopoldo-mg",
+      "eventDate": 1780628400000,
+      "venueId": "6896e7eb-5d4d-40f2-93eb-a09f402e2e36",
+      "cityId": "2f56c3f9-a655-4db4-8b59-0ce7cf845c7a",
+      "status": "confirmed",
+      "ticketUrl": null,
+      "ticketMinPrice": null,
+      "isHighlight": 1,
+      "sourceId": "source-oficial",
+      "confidenceLevel": "verified",
+      "createdAt": 1787799880035,
+      "updatedAt": 1787800602189
+    },
+    {
+      "id": "b76ca7c7-ecaf-4c07-b1e0-a065ea729e47",
+      "title": "Turnê Histórias",
+      "slug": "turne-historias-22082026-sao-paulo-sp",
+      "eventDate": 1787367600000,
+      "venueId": "6ad55ca7-176d-4333-854e-e605ded2dcc0",
+      "cityId": "32835325-3aca-4eb7-93ab-89c585e69c2f",
+      "status": "confirmed",
+      "ticketUrl": null,
+      "ticketMinPrice": null,
+      "isHighlight": 0,
+      "sourceId": "source-oficial",
+      "confidenceLevel": "verified",
+      "createdAt": 1787799880049,
+      "updatedAt": 1787800602199
+    },
+    {
+      "id": "e285eba7-568a-45ca-928f-38e1817270ca",
+      "title": "Turnê Histórias",
+      "slug": "turne-historias-12092026-belo-horizonte-mg",
+      "eventDate": 1789182000000,
+      "venueId": "8421ecbf-af9f-4a7a-9972-b9463c3a9387",
+      "cityId": "bab44688-2aba-4d79-86f9-4bd9a622be2f",
+      "status": "confirmed",
+      "ticketUrl": null,
+      "ticketMinPrice": null,
+      "isHighlight": 0,
+      "sourceId": "source-oficial",
+      "confidenceLevel": "verified",
+      "createdAt": 1787799880064,
+      "updatedAt": 1787800602208
+    },
+    {
+      "id": "76545550-5bf3-4974-aaee-08f61474d9c2",
+      "title": "Ana Castela",
+      "slug": "ana-castela-15032026-campo-grande-ms",
+      "eventDate": 1773543600000,
+      "venueId": "1bb0ff92-def5-477b-b404-816a3e06d74a",
+      "cityId": "244d0ddb-71f6-4a13-a76b-ac263fb1ec52",
+      "status": "confirmed",
+      "ticketUrl": null,
+      "ticketMinPrice": null,
+      "isHighlight": 0,
+      "sourceId": "source-oficial",
+      "confidenceLevel": "verified",
+      "createdAt": 1787799880074,
+      "updatedAt": 1787800602214
+    },
+    {
+      "id": "6cf61bb2-1b34-47fe-84e6-f6ad63138b0f",
+      "title": "Gusttavo Lima",
+      "slug": "gusttavo-lima-2026-02-15-curitiba-pr-pedreira-paulo-leminski",
+      "eventDate": 1771167600000,
+      "venueId": "14add322-509f-4354-a019-534dae7e8f38",
+      "cityId": "de561e3a-112e-4dd7-8d0a-5f53549b3f74",
+      "status": "confirmed",
+      "ticketUrl": null,
+      "ticketMinPrice": null,
+      "isHighlight": 1,
+      "sourceId": null,
+      "confidenceLevel": "unverified",
+      "createdAt": 1788790501452,
+      "updatedAt": 1788916474415
+    },
+    {
+      "id": "6c0e625c-01f5-43f2-b220-cadfac1f62e2",
+      "title": "Maiara & Maraisa",
+      "slug": "maiara-maraisa-2026-03-02-londrina-pr-expolondrina",
+      "eventDate": 1772463600000,
+      "venueId": "6ebbc904-b949-4649-bf15-d2a16d30d72f",
+      "cityId": "6f68a38f-671f-42ae-82ff-b7c364b0c48d",
+      "status": "confirmed",
+      "ticketUrl": null,
+      "ticketMinPrice": null,
+      "isHighlight": 0,
+      "sourceId": null,
+      "confidenceLevel": "unverified",
+      "createdAt": 1788790501468,
+      "updatedAt": 1788916474431
+    }
+  ],
+  "EventArtist": [
+    {
+      "eventId": "76545550-5bf3-4974-aaee-08f61474d9c2",
+      "artistId": "6b5b2d91-6f97-4fe7-ab9c-a7e75c3e5e32",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "6cf61bb2-1b34-47fe-84e6-f6ad63138b0f",
+      "artistId": "86482132-bde4-4b41-9869-6f36346bd9d0",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "6c0e625c-01f5-43f2-b220-cadfac1f62e2",
+      "artistId": "dd5a06f3-2f77-48f3-b351-ee1c94c7703c",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "1d7f8c03-cce4-484f-a7dc-4e078f939d4c",
+      "artistId": "6b5b2d91-6f97-4fe7-ab9c-a7e75c3e5e32",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "59884f39-dfd2-40d4-bfc5-68c97b25509f",
+      "artistId": "312acd6e-f485-4abf-a6ee-809e5835326d",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "59884f39-dfd2-40d4-bfc5-68c97b25509f",
+      "artistId": "915e8303-f6a2-49a6-8705-08666d9589df",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "59884f39-dfd2-40d4-bfc5-68c97b25509f",
+      "artistId": "7d0676a1-2e4e-4cb1-b191-b611a425d1c2",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "59884f39-dfd2-40d4-bfc5-68c97b25509f",
+      "artistId": "73fe2675-df38-4eb8-b4d5-0a914304026a",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "b76ca7c7-ecaf-4c07-b1e0-a065ea729e47",
+      "artistId": "312acd6e-f485-4abf-a6ee-809e5835326d",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "b76ca7c7-ecaf-4c07-b1e0-a065ea729e47",
+      "artistId": "915e8303-f6a2-49a6-8705-08666d9589df",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "b76ca7c7-ecaf-4c07-b1e0-a065ea729e47",
+      "artistId": "7d0676a1-2e4e-4cb1-b191-b611a425d1c2",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "b76ca7c7-ecaf-4c07-b1e0-a065ea729e47",
+      "artistId": "73fe2675-df38-4eb8-b4d5-0a914304026a",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "e285eba7-568a-45ca-928f-38e1817270ca",
+      "artistId": "312acd6e-f485-4abf-a6ee-809e5835326d",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "e285eba7-568a-45ca-928f-38e1817270ca",
+      "artistId": "915e8303-f6a2-49a6-8705-08666d9589df",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "e285eba7-568a-45ca-928f-38e1817270ca",
+      "artistId": "7d0676a1-2e4e-4cb1-b191-b611a425d1c2",
+      "performanceOrder": null,
+      "stageName": null
+    },
+    {
+      "eventId": "e285eba7-568a-45ca-928f-38e1817270ca",
+      "artistId": "73fe2675-df38-4eb8-b4d5-0a914304026a",
+      "performanceOrder": null,
+      "stageName": null
+    }
+  ],
+  "News": [
+    {
+      "id": "1b16ce19-0236-408d-a8e0-23b57d9427c6",
+      "title": "Turnê 'Histórias' reúne lendas do sertanejo em 2026",
+      "slug": "turne-historias-reune-lendas-do-sertanejo-em-2026",
+      "summary": "Chitãozinho & Xororó, Zezé Di Camargo & Luciano, Leonardo e Bruno & Marrone anunciam novas datas pelo Brasil...",
+      "contentJson": "[\"A turnê 'Histórias', que reúne alguns dos maiores nomes da história da música sertaneja, confirmou novas datas para o primeiro semestre de 2026. O projeto, que já atraiu centenas de milhares de fãs em edições anteriores, promete um espetáculo de mais de 4 horas de duração com os maiores clássicos dos anos 90 e 2000.\",\"Entre as cidades confirmadas no itinerário oficial estão Brasília, São Paulo e Belo Horizonte. A organização informou que a venda de ingressos começará no próximo mês através dos canais oficiais.\",\"Os artistas envolvidos destacam a emoção de compartilhar o mesmo palco e celebrar a trajetória da música sertaneja em grandes arenas pelo país.\"]",
+      "coverUrl": null,
+      "category": "news",
+      "trustType": "confirmed",
+      "authorId": null,
+      "publishedAt": 1787799880082,
+      "isFeatured": 1,
+      "createdAt": 1787799880082,
+      "updatedAt": 1788916474454
+    },
+    {
+      "id": "9710da1e-1c5c-4112-a30b-1cb33dae2417",
+      "title": "Ana Castela domina o 'Agronejo' e atinge topo das paradas",
+      "slug": "ana-castela-domina-o-agronejo-e-atinge-topo-das-paradas",
+      "summary": "A 'Boiadeira' continua sua ascensão meteórica com novos lançamentos e recordes no streaming...",
+      "contentJson": "[\"Ana Castela, carinhosamente chamada de 'Boiadeira', consolidou-se como a maior referência do agronejo em 2026. Seus lançamentos recentes dominam as playlists de 'Top 100 Sertanejo' nas plataformas digitais.\",\"O estilo, que mistura o sertanejo com elementos do country pop e batidas modernas, caiu no gosto do público jovem e das grandes feiras agropecuárias do país.\",\"A artista já é presença confirmada nos principais rodeios do ano, incluindo o Pedro Leopoldo Rodeio Show em junho.\"]",
+      "coverUrl": null,
+      "category": "news",
+      "trustType": "confirmed",
+      "authorId": null,
+      "publishedAt": 1787799880084,
+      "isFeatured": 0,
+      "createdAt": 1787799880084,
+      "updatedAt": 1788916474468
+    },
+    {
+      "id": "57ccd2c6-a2b9-4a87-8265-b4509c516d47",
+      "title": "Gusttavo Lima anuncia novos projetos para o segundo semestre",
+      "slug": "gusttavo-lima-anuncia-novos-projetos-para-o-segundo-semestre",
+      "summary": "O 'Embaixador' prepara gravação de novo DVD com participações especiais internacionais...",
+      "contentJson": "[\"Gusttavo Lima não para. O cantor anunciou que gravará um novo projeto audiovisual no segundo semestre de 2026, com foco em uma sonoridade mais voltada para o mercado latino.\",\"Fontes próximas ao artista indicam que parcerias com nomes do reggaeton e da bachata estão sendo negociadas para este novo trabalho.\",\"Enquanto isso, o cantor segue lotando estádios com sua turnê atual, mantendo-se como um dos cachês mais valorizados do mercado nacional.\"]",
+      "coverUrl": "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+      "category": "news",
+      "trustType": "confirmed",
+      "authorId": null,
+      "publishedAt": 1787799880087,
+      "isFeatured": 0,
+      "createdAt": 1787799880087,
+      "updatedAt": 1788916474477
+    },
+    {
+      "id": "7e1d7371-bc92-471e-891c-47e6ff0c1932",
+      "title": "\"O Agronejo é a nova cara do Brasil\"",
+      "slug": "o-agronejo-e-a-nova-cara-do-brasil",
+      "summary": "Conversamos com Ana Castela sobre a explosão do gênero e como ela lida com o sucesso estrondoso aos 22 anos.",
+      "contentJson": "[\"Conversamos com Ana Castela sobre a explosão do gênero e como ela lida com o sucesso estrondoso aos 22 anos.\"]",
+      "coverUrl": "https://images.unsplash.com/photo-1598387993441-a364f854c3e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+      "category": "interview",
+      "trustType": "confirmed",
+      "authorId": null,
+      "publishedAt": 1787799880090,
+      "isFeatured": 1,
+      "createdAt": 1787799880090,
+      "updatedAt": 1788916474482
+    }
+  ],
+  "NewsArtist": [
+    {
+      "newsId": "9710da1e-1c5c-4112-a30b-1cb33dae2417",
+      "artistId": "6b5b2d91-6f97-4fe7-ab9c-a7e75c3e5e32"
+    },
+    {
+      "newsId": "57ccd2c6-a2b9-4a87-8265-b4509c516d47",
+      "artistId": "86482132-bde4-4b41-9869-6f36346bd9d0"
+    },
+    {
+      "newsId": "7e1d7371-bc92-471e-891c-47e6ff0c1932",
+      "artistId": "6b5b2d91-6f97-4fe7-ab9c-a7e75c3e5e32"
+    },
+    {
+      "newsId": "1b16ce19-0236-408d-a8e0-23b57d9427c6",
+      "artistId": "312acd6e-f485-4abf-a6ee-809e5835326d"
+    },
+    {
+      "newsId": "1b16ce19-0236-408d-a8e0-23b57d9427c6",
+      "artistId": "915e8303-f6a2-49a6-8705-08666d9589df"
+    },
+    {
+      "newsId": "1b16ce19-0236-408d-a8e0-23b57d9427c6",
+      "artistId": "7d0676a1-2e4e-4cb1-b191-b611a425d1c2"
+    },
+    {
+      "newsId": "1b16ce19-0236-408d-a8e0-23b57d9427c6",
+      "artistId": "73fe2675-df38-4eb8-b4d5-0a914304026a"
+    }
+  ],
+  "NewsEvent": [
+    {
+      "newsId": "1b16ce19-0236-408d-a8e0-23b57d9427c6",
+      "eventId": "59884f39-dfd2-40d4-bfc5-68c97b25509f"
+    },
+    {
+      "newsId": "1b16ce19-0236-408d-a8e0-23b57d9427c6",
+      "eventId": "b76ca7c7-ecaf-4c07-b1e0-a065ea729e47"
+    },
+    {
+      "newsId": "9710da1e-1c5c-4112-a30b-1cb33dae2417",
+      "eventId": "1d7f8c03-cce4-484f-a7dc-4e078f939d4c"
+    }
+  ],
+  "NewsCity": [
+    {
+      "newsId": "1b16ce19-0236-408d-a8e0-23b57d9427c6",
+      "cityId": "6105d1e1-07da-4ab0-b03f-657a59da027f"
+    },
+    {
+      "newsId": "1b16ce19-0236-408d-a8e0-23b57d9427c6",
+      "cityId": "32835325-3aca-4eb7-93ab-89c585e69c2f"
+    },
+    {
+      "newsId": "9710da1e-1c5c-4112-a30b-1cb33dae2417",
+      "cityId": "2f56c3f9-a655-4db4-8b59-0ce7cf845c7a"
+    }
+  ],
+  "ChartEntry": [
+    {
+      "id": "63fe169b-6609-4492-8fd7-1ecd1e48d86a",
+      "period": "semana",
+      "position": 1,
+      "artistName": "Ana Castela",
+      "songTitle": "Nosso Quadro",
+      "artistId": "6b5b2d91-6f97-4fe7-ab9c-a7e75c3e5e32",
+      "musicId": null,
+      "createdAt": 1788798081195,
+      "updatedAt": 1788916474491
+    },
+    {
+      "id": "8545ee41-4b32-45d1-957d-3791ac92372f",
+      "period": "semana",
+      "position": 2,
+      "artistName": "Henrique & Juliano",
+      "songTitle": "Traumatizei",
+      "artistId": "56c36984-cceb-4971-9c89-15dbafd25dc6",
+      "musicId": "e3d6aac4-df4b-4052-afc5-aa6eb405be95",
+      "createdAt": 1788798081200,
+      "updatedAt": 1788916474496
+    },
+    {
+      "id": "cbb51b81-f177-432a-adc2-eb76eac2033e",
+      "period": "semana",
+      "position": 3,
+      "artistName": "Jorge & Mateus",
+      "songTitle": "5 Regras",
+      "artistId": "a23c5440-2d73-43dc-be96-a521a2c39986",
+      "musicId": "7e994724-e459-45b6-be3f-3c7949b42025",
+      "createdAt": 1788798081206,
+      "updatedAt": 1788916474500
+    },
+    {
+      "id": "8a123d78-fb7d-4775-9dc5-8eb0f49df6bb",
+      "period": "ano",
+      "position": 1,
+      "artistName": "Gusttavo Lima",
+      "songTitle": "Bloqueado",
+      "artistId": "86482132-bde4-4b41-9869-6f36346bd9d0",
+      "musicId": null,
+      "createdAt": 1788798081211,
+      "updatedAt": 1788916474504
+    },
+    {
+      "id": "2131d755-bba6-44b1-b738-f57eeb18eada",
+      "period": "ano",
+      "position": 2,
+      "artistName": "Maiara & Maraisa",
+      "songTitle": "Medo Bobo",
+      "artistId": "dd5a06f3-2f77-48f3-b351-ee1c94c7703c",
+      "musicId": null,
+      "createdAt": 1788798081215,
+      "updatedAt": 1788916474508
+    },
+    {
+      "id": "a31a7f62-72f0-4cda-a8a4-68abefeaaa87",
+      "period": "ano",
+      "position": 3,
+      "artistName": "Zé Neto & Cristiano",
+      "songTitle": "Largado às Traças",
+      "artistId": "71dbafa1-ce32-4d97-9964-7f3f7e99f31b",
+      "musicId": null,
+      "createdAt": 1788798081220,
+      "updatedAt": 1788916474512
+    }
+  ]
+}
