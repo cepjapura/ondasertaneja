@@ -1,12 +1,10 @@
-import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
     const semana = await prisma.chartEntry.findMany({
-      where: { period: 'semana' },
+      where: { period: 'semana', isPublished: true },
       orderBy: { position: 'asc' },
       include: {
         artist: { select: { name: true, slug: true, avatarUrl: true } },
@@ -15,7 +13,7 @@ export async function GET() {
     });
 
     const ano = await prisma.chartEntry.findMany({
-      where: { period: 'ano' },
+      where: { period: 'ano', isPublished: true },
       orderBy: { position: 'asc' },
       include: {
         artist: { select: { name: true, slug: true, avatarUrl: true } },

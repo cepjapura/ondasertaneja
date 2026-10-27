@@ -68,6 +68,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
     include: {
       members: true,
       events: {
+        where: { event: { isPublished: true } },
         include: {
           event: {
             include: {
@@ -79,6 +80,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
         orderBy: { event: { eventDate: 'asc' } },
       },
       musics: {
+        where: { music: { isPublished: true } },
         include: {
           music: {
             include: { album: true },
@@ -86,6 +88,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
         },
       },
       news: {
+        where: { news: { isPublished: true } },
         include: { news: true },
         take: 4,
       },

@@ -97,6 +97,7 @@ model Event {
   isHighlight     Boolean  @default(false)
   sourceId        String?
   confidenceLevel String   @default("verified") // verified, unverified, rumor
+  isPublished     Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -107,6 +108,7 @@ model Event {
   news            NewsEvent[]
   statusHistories EventStatusHistory[]
 
+  @@index([isPublished, eventDate])
   @@index([eventDate])
   @@index([cityId])
   @@index([status])
@@ -139,6 +141,7 @@ model News {
   authorId    String?
   publishedAt DateTime @default(now())
   isFeatured  Boolean  @default(false)
+  isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -147,6 +150,7 @@ model News {
   events  NewsEvent[]
   cities  NewsCity[]
 
+  @@index([isPublished, publishedAt])
   @@index([publishedAt])
   @@index([category])
   @@index([trustType])
@@ -191,6 +195,7 @@ model Music {
   spotifyTrackId  String?
   youtubeVideoId  String?
   isHit           Boolean   @default(false)
+  isPublished     Boolean   @default(false)
   albumId         String?
   createdAt       DateTime  @default(now())
 
@@ -198,6 +203,8 @@ model Music {
   artists      MusicArtist[]
   chartEntries ChartEntry[]
 
+  @@index([isPublished, createdAt])
+  @@index([isPublished, isHit])
   @@index([title])
   @@index([isHit])
 }
@@ -319,6 +326,7 @@ model ChartEntry {
   songTitle  String
   artistId   String?
   musicId    String?
+  isPublished Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -326,5 +334,6 @@ model ChartEntry {
   music  Music?  @relation(fields: [musicId], references: [id], onDelete: SetNull)
 
   @@unique([period, position])
+  @@index([isPublished, period, position])
   @@index([period])
 }

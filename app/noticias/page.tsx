@@ -33,6 +33,7 @@ export const revalidate = 3600; // ISR 1 hora
 
 export default async function NoticiasPage() {
   const newsList = await prisma.news.findMany({
+    where: { isPublished: true },
     orderBy: { publishedAt: 'desc' },
     include: {
       artists: {
@@ -91,10 +92,10 @@ export default async function NoticiasPage() {
             >
               <i className="fa-solid fa-newspaper" style={{ fontSize: '2.5rem', color: 'var(--primary)', marginBottom: '10px' }}></i>
               <p style={{ color: 'var(--text-main)', fontWeight: 600, margin: 0, fontSize: '1.1rem' }}>
-                Nenhuma notícia publicada no momento.
+                Em breve novas notícias
               </p>
               <p style={{ color: 'var(--text-muted)', margin: '6px 0 0', fontSize: '0.9rem' }}>
-                Fique atento! Novas matérias serão publicadas em breve.
+                Estamos preparando matérias e novidades exclusivas. Fique ligado!
               </p>
             </div>
           ) : (
@@ -122,9 +123,7 @@ export default async function NoticiasPage() {
                           height: '220px',
                         }}
                       >
-                        <span className={`tag ${noticia.trustType === 'confirmed' ? 'tag-hot' : 'tag-release'}`}>
-                          {noticia.trustType === 'confirmed' ? '🟢 Confirmado' : 'Notícia'}
-                        </span>
+                        <span className="tag tag-release">Notícia</span>
                         {noticia.category === 'interview' && (
                           <span
                             className="tag"

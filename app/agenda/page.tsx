@@ -15,7 +15,10 @@ export default async function AgendaPage() {
 
   const [upcomingEvents, pastEvents, featuredArtists] = await Promise.all([
     prisma.event.findMany({
-      where: { eventDate: { gte: startOfToday } },
+      where: {
+        isPublished: true,
+        eventDate: { gte: startOfToday },
+      },
       orderBy: { eventDate: 'asc' },
       include: {
         city: true,
@@ -28,7 +31,10 @@ export default async function AgendaPage() {
       },
     }),
     prisma.event.findMany({
-      where: { eventDate: { lt: startOfToday } },
+      where: {
+        isPublished: true,
+        eventDate: { lt: startOfToday },
+      },
       orderBy: { eventDate: 'desc' },
       include: {
         city: true,

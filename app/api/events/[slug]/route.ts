@@ -8,8 +8,8 @@ export async function GET(
   const { slug } = params;
 
   try {
-    const event = await prisma.event.findUnique({
-      where: { slug },
+    const event = await prisma.event.findFirst({
+      where: { slug, isPublished: true },
       include: {
         city: true,
         venue: true,

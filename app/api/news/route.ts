@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const category = searchParams.get('category');
 
   try {
-    const where: any = {};
+    const where: any = { isPublished: true };
     if (featuredOnly) where.isFeatured = true;
     if (category) where.category = category;
 

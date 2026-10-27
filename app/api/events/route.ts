@@ -18,6 +18,7 @@ export async function GET(request: Request) {
       // Nível 1: Cidade Selecionada
       const localEvents = await prisma.event.findMany({
         where: {
+          isPublished: true,
           cityId: selectedCity?.id,
           eventDate: { gte: now },
         },
@@ -34,6 +35,7 @@ export async function GET(request: Request) {
       const stateEvents = selectedCity
         ? await prisma.event.findMany({
             where: {
+              isPublished: true,
               city: { stateCode: selectedCity.stateCode },
               cityId: { not: selectedCity.id },
               eventDate: { gte: now },
@@ -51,6 +53,7 @@ export async function GET(request: Request) {
       // Nível 3: Destaques Nacionais
       const nationalHighlights = await prisma.event.findMany({
         where: {
+          isPublished: true,
           isHighlight: true,
           eventDate: { gte: now },
         },
@@ -75,6 +78,7 @@ export async function GET(request: Request) {
 
     // Caso de listagem geral sem filtro de cidade
     const whereCondition: any = {
+      isPublished: true,
       eventDate: { gte: now },
     };
 

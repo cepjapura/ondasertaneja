@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             article.className = 'news-card';
 
             const tagClass = noticia.trustType === 'confirmed' ? 'tag-hot' : 'tag-release';
-            const tagLabel = noticia.trustType === 'confirmed' ? 'Confirmado' : (noticia.category || 'Notícia');
+            const tagLabel = noticia.category || 'Notícia';
 
             article.innerHTML = `
         <a href="noticia.html?id=${noticia.slug}" style="text-decoration: none; color: inherit; display: block; height: 100%;">

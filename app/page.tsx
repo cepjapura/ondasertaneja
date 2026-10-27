@@ -7,6 +7,7 @@ export const revalidate = 60; // ISR 60 segundos
 
 export default async function HomePage() {
   const newsList = await prisma.news.findMany({
+    where: { isPublished: true },
     take: 3,
     orderBy: { publishedAt: 'desc' },
   });
@@ -20,6 +21,7 @@ export default async function HomePage() {
 
   const upcomingEvents = await prisma.event.findMany({
     where: {
+      isPublished: true,
       eventDate: { gte: startOfToday },
     },
     take: 4,
@@ -33,7 +35,7 @@ export default async function HomePage() {
 
   const hits = await prisma.music.findMany({
     take: 3,
-    where: { isHit: true },
+    where: { isPublished: true, isHit: true },
     include: { artists: { include: { artist: true } } },
   });
 
@@ -62,24 +64,48 @@ export default async function HomePage() {
             <Link href="/noticias" className="view-all">Ver todas <i className="fa-solid fa-arrow-right"></i></Link>
           </div>
 
-          <div className="news-grid" id="noticiasGrid">
-            {newsList.map(noticia => (
-              <article key={noticia.id} className="news-card">
-                <Link href={`/noticia/${noticia.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
-                  <div className="news-img" style={{ backgroundImage: `url('${noticia.coverUrl || ''}')` }}>
-                    <span className={`tag ${noticia.trustType === 'confirmed' ? 'tag-hot' : 'tag-release'}`}>
-                      {noticia.trustType === 'confirmed' ? '🟢 Confirmado' : 'Notícia'}
-                    </span>
-                  </div>
-                  <div className="news-content">
-                    <span className="news-date">{new Date(noticia.publishedAt).toLocaleDateString('pt-BR')}</span>
-                    <h3>{noticia.title}</h3>
-                    <p>{noticia.summary}</p>
-                  </div>
-                </Link>
-              </article>
-            ))}
-          </div>
+          {newsList.length === 0 ? (
+            <div
+              className="agenda-item"
+              style={{
+                padding: '30px 20px',
+                textAlign: 'center',
+                background: 'var(--bg-card)',
+                border: '1px dashed var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+              }}
+            >
+              <i className="fa-solid fa-newspaper" style={{ fontSize: '1.8rem', color: 'var(--primary)' }}></i>
+              <p style={{ color: 'var(--text-main)', fontWeight: 600, margin: 0, fontSize: '1rem' }}>
+                Em breve novas notícias
+              </p>
+              <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.85rem' }}>
+                Estamos preparando novidades e coberturas exclusivas do mundo sertanejo. Fique ligado!
+              </p>
+            </div>
+          ) : (
+            <div className="news-grid" id="noticiasGrid">
+              {newsList.map(noticia => (
+                <article key={noticia.id} className="news-card">
+                  <Link href={`/noticia/${noticia.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
+                    <div className="news-img" style={{ backgroundImage: `url('${noticia.coverUrl || ''}')` }}>
+                      <span className="tag tag-release">Notícia</span>
+                    </div>
+                    <div className="news-content">
+                      <span className="news-date">{new Date(noticia.publishedAt).toLocaleDateString('pt-BR')}</span>
+                      <h3>{noticia.title}</h3>
+                      <p>{noticia.summary}</p>
+                    </div>
+                  </Link>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* AGENDA DE SHOWS */}
