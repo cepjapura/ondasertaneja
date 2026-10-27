@@ -1,21 +1,22 @@
-// Prisma Schema — Onda Sertaneja V1.2
+// Prisma Schema — Onda Sertaneja V1.2 (MySQL)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model Artist {
   id              String   @id @default(uuid())
   name            String
   slug            String   @unique
-  bio             String?
-  avatarUrl       String?
-  coverUrl        String?
+  bio             String?  @db.Text
+  avatarUrl       String?  @db.VarChar(2048)
+  coverUrl        String?  @db.VarChar(2048)
   isDuoOrGroup    Boolean  @default(false)
   genreTags       String?  // JSON string ou tags separadas por virgula
   spotifyId       String?
@@ -43,8 +44,8 @@ model ArtistMember {
   artistId String
   name     String
   role     String?
-  bio      String?
-  photoUrl String?
+  bio      String? @db.Text
+  photoUrl String? @db.VarChar(2048)
 
   artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
 
@@ -69,9 +70,9 @@ model City {
 }
 
 model Venue {
-  id        String @id @default(uuid())
+  id        String  @id @default(uuid())
   name      String
-  slug      String @unique
+  slug      String  @unique
   cityId    String
   address   String?
   latitude  Float?
@@ -91,7 +92,7 @@ model Event {
   venueId         String?
   cityId          String
   status          String   @default("confirmed") // confirmed, postponed, canceled, ended, pending
-  ticketUrl       String?
+  ticketUrl       String?  @db.VarChar(2048)
   ticketMinPrice  Float?
   isHighlight     Boolean  @default(false)
   sourceId        String?
@@ -130,9 +131,9 @@ model News {
   id          String   @id @default(uuid())
   title       String
   slug        String   @unique
-  summary     String
-  contentJson String   // Stored as JSON string or text
-  coverUrl    String?
+  summary     String   @db.Text
+  contentJson String   @db.Text // Stored as JSON string or text
+  coverUrl    String?  @db.VarChar(2048)
   category    String   @default("news") // news, interview, release, gossip
   trustType   String   @default("confirmed") // confirmed, rumor, opinion, sponsored
   authorId    String?
@@ -216,7 +217,7 @@ model Album {
   id             String    @id @default(uuid())
   title          String
   slug           String    @unique
-  coverUrl       String?
+  coverUrl       String?   @db.VarChar(2048)
   releaseDate    DateTime?
   albumType      String    @default("album") // album, ep, dvd, single
   spotifyAlbumId String?
@@ -235,7 +236,7 @@ model Video {
 model Source {
   id               String    @id @default(uuid())
   name             String
-  url              String?
+  url              String?   @db.VarChar(2048)
   sourceType       String    @default("official_artist") // official_artist, press_advisory, official_organizer, official_ticket_seller, specialized_media, unverified_third_party
   trustLevel       String    @default("high") // high, medium, low
   lastVerifiedAt   DateTime?
@@ -269,20 +270,20 @@ model AdminUser {
   avatarUrl    String?
   createdAt    DateTime @default(now())
 
-  news           News[]
-  statusChanges  EventStatusHistory[]
-  auditLogs      AuditLog[]
+  news          News[]
+  statusChanges EventStatusHistory[]
+  auditLogs     AuditLog[]
 }
 
 model EventStatusHistory {
-  id                     String   @id @default(uuid())
-  eventId                String
-  previousStatus         String
-  newStatus              String
-  changedByUserId        String?
+  id                    String   @id @default(uuid())
+  eventId               String
+  previousStatus        String
+  newStatus             String
+  changedByUserId       String?
   justificationSourceId String?
-  notes                  String?
-  createdAt              DateTime @default(now())
+  notes                 String?  @db.Text
+  createdAt             DateTime @default(now())
 
   event               Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
   changedByUser       AdminUser? @relation(fields: [changedByUserId], references: [id])
@@ -296,7 +297,7 @@ model AuditLog {
   entityName  String
   entityId    String
   action      String   // create, update, delete
-  changesJson String
+  changesJson String   @db.Text
   userId      String?
   createdAt   DateTime @default(now())
 
@@ -307,7 +308,7 @@ model AuditLog {
 
 model SystemConfig {
   key   String @id
-  value String
+  value String @db.Text
 }
 
 model ChartEntry {
