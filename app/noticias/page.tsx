@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 60; // ISR 60s
+export const revalidate = 3600; // ISR 1 hora
 
 export default async function NoticiasPage() {
   const newsList = await prisma.news.findMany({

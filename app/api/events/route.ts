@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getStartOfDaySaoPaulo } from '@/lib/dates';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -8,8 +9,7 @@ export async function GET(request: Request) {
   const highlightOnly = searchParams.get('highlight') === 'true';
 
   try {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
+    const now = getStartOfDaySaoPaulo();
 
     // Se houver busca por cidade específica, aplica a cascata de localização V1.2
     if (citySlug) {

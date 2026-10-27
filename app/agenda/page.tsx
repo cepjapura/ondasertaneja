@@ -1,21 +1,21 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { getStartOfDaySaoPaulo } from '@/lib/dates';
 
 export const metadata: Metadata = {
   title: 'Agenda Oficial de Shows Sertanejos | Onda Sertaneja',
   description: 'Confira os próximos shows, festivais e apresentações de música sertaneja em todo o Brasil. Encontre eventos por cidade, estado e artista favorito.',
 };
 
-export const revalidate = 60; // ISR 60 segundos
+export const revalidate = 3600; // ISR 1 hora
 
 export default async function AgendaPage() {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
+  const startOfToday = getStartOfDaySaoPaulo();
 
   const [upcomingEvents, pastEvents, featuredArtists] = await Promise.all([
     prisma.event.findMany({
-      where: { eventDate: { gte: now } },
+      where: { eventDate: { gte: startOfToday } },
       orderBy: { eventDate: 'asc' },
       include: {
         city: true,
@@ -28,7 +28,7 @@ export default async function AgendaPage() {
       },
     }),
     prisma.event.findMany({
-      where: { eventDate: { lt: now } },
+      where: { eventDate: { lt: startOfToday } },
       orderBy: { eventDate: 'desc' },
       include: {
         city: true,

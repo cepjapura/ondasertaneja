@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { getStartOfDaySaoPaulo } from '@/lib/dates';
 
 export const revalidate = 60; // ISR 60 segundos
 
@@ -15,12 +16,11 @@ export default async function HomePage() {
     orderBy: [{ isFeatured: 'desc' }, { name: 'asc' }],
   });
 
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
+  const startOfToday = getStartOfDaySaoPaulo();
 
   const upcomingEvents = await prisma.event.findMany({
     where: {
-      eventDate: { gte: now },
+      eventDate: { gte: startOfToday },
     },
     take: 4,
     orderBy: { eventDate: 'asc' },
