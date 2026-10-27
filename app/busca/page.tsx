@@ -45,6 +45,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       }),
       prisma.event.findMany({
         where: {
+          isPublished: true,
           OR: [
             { title: { contains: query } },
             { slug: { contains: query } },
@@ -70,6 +71,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       }),
       prisma.news.findMany({
         where: {
+          isPublished: true,
           OR: [
             { title: { contains: query } },
             { summary: { contains: query } },
@@ -80,6 +82,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       }),
       prisma.music.findMany({
         where: {
+          isPublished: true,
           title: { contains: query },
         },
         take: 10,

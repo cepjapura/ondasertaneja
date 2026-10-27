@@ -12,8 +12,8 @@ interface EventPageProps {
 
 export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
   const { slug } = params;
-  const event = await prisma.event.findUnique({
-    where: { slug },
+  const event = await prisma.event.findFirst({
+    where: { slug, isPublished: true },
     include: {
       city: true,
       venue: true,
@@ -60,8 +60,8 @@ export const revalidate = 60; // ISR 60s
 export default async function EventDetailPage({ params }: EventPageProps) {
   const { slug } = params;
 
-  const event = await prisma.event.findUnique({
-    where: { slug },
+  const event = await prisma.event.findFirst({
+    where: { slug, isPublished: true },
     include: {
       city: true,
       venue: true,
@@ -155,11 +155,6 @@ export default async function EventDetailPage({ params }: EventPageProps) {
               <span className="hero-tag" style={{ margin: 0, padding: '4px 12px', fontSize: '0.75rem' }}>
                 <i className="fa-solid fa-calendar-days"></i> SHOW / EVENTO
               </span>
-              {event.status === 'confirmed' && (
-                <span className="tag tag-hot" style={{ fontSize: '0.75rem', padding: '3px 10px' }}>
-                  Evento Confirmado
-                </span>
-              )}
             </div>
 
             {/* Título Principal do Evento */}

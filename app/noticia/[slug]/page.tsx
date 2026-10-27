@@ -11,8 +11,8 @@ interface NewsPageProps {
 
 export async function generateMetadata({ params }: NewsPageProps): Promise<Metadata> {
   const { slug } = params;
-  const noticia = await prisma.news.findUnique({
-    where: { slug },
+  const noticia = await prisma.news.findFirst({
+    where: { slug, isPublished: true },
   });
 
   if (!noticia) {
@@ -76,8 +76,8 @@ function parseContentParagraphs(contentJson: string): string[] {
 export default async function NewsDetailPage({ params }: NewsPageProps) {
   const { slug } = params;
 
-  const noticia = await prisma.news.findUnique({
-    where: { slug },
+  const noticia = await prisma.news.findFirst({
+    where: { slug, isPublished: true },
     include: {
       author: true,
       artists: {
@@ -107,10 +107,11 @@ export default async function NewsDetailPage({ params }: NewsPageProps) {
     notFound();
   }
 
-  // Notícias recomendadas (outras notícias recentes)
+  // Notícias recomendadas (outras notícias recentes publicadas)
   const recommendedNews = await prisma.news.findMany({
     where: {
       id: { not: noticia.id },
+      isPublished: true,
     },
     take: 3,
     orderBy: { publishedAt: 'desc' },
@@ -125,16 +126,14 @@ export default async function NewsDetailPage({ params }: NewsPageProps) {
         <nav style={{ marginBottom: '20px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
           <Link href="/" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Início</Link>
           {' / '}
-          <Link href="/#noticias" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Notícias</Link>
+          <Link href="/noticias" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Notícias</Link>
           {' / '}
           <span style={{ color: 'var(--text-main)' }}>{noticia.title}</span>
         </nav>
 
-        {/* Categoria e Tag de Confiança */}
+        {/* Categoria e Tag */}
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
-          <span className={`tag ${noticia.trustType === 'confirmed' ? 'tag-hot' : 'tag-release'}`}>
-            {noticia.trustType === 'confirmed' ? '🟢 Notícia Confirmada' : 'Notícia'}
-          </span>
+          <span className="tag tag-release">Notícia</span>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
             <i className="fa-regular fa-clock"></i> Publicado em {new Date(noticia.publishedAt).toLocaleDateString('pt-BR')}
           </span>

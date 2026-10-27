@@ -7,10 +7,11 @@ export const metadata: Metadata = {
   description: 'Fique por dentro das últimas músicas, clipes e lançamentos das grandes estrelas e promessas da música sertaneja.',
 };
 
-export const revalidate = 60; // ISR 60s
+export const revalidate = 3600; // ISR 1h
 
 export default async function LancamentosPage() {
   const musics = await prisma.music.findMany({
+    where: { isPublished: true },
     orderBy: { createdAt: 'desc' },
     include: {
       album: true,
@@ -47,6 +48,29 @@ export default async function LancamentosPage() {
             Ouça em primeira mão as novas faixas, hits estourados no Spotify e novidades dos seus artistas favoritos.
           </p>
         </section>
+
+        {/* EMPTY STATE */}
+        {musics.length === 0 && (
+          <div
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px dashed var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              padding: '48px 30px',
+              textAlign: 'center',
+              color: 'var(--text-muted)',
+              marginBottom: '40px',
+            }}
+          >
+            <i className="fa-solid fa-compact-disc" style={{ fontSize: '2.5rem', marginBottom: '16px', color: 'var(--primary)' }}></i>
+            <h3 style={{ fontSize: '1.25rem', color: 'var(--text-main)', margin: '0 0 8px', fontWeight: 700 }}>
+              Em breve novos lançamentos
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.95rem' }}>
+              Estamos selecionando as melhores faixas e novidades do sertanejo. Fique ligado!
+            </p>
+          </div>
+        )}
 
         {/* SEÇÃO HITS EM DESTAQUE */}
         {hits.length > 0 && (

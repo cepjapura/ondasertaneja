@@ -1,11 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { getStartOfDaySaoPaulo } from '@/lib/dates';
 
 export const revalidate = 60; // ISR 60 segundos
 
 export default async function HomePage() {
   const newsList = await prisma.news.findMany({
+    where: { isPublished: true },
     take: 3,
     orderBy: { publishedAt: 'desc' },
   });
@@ -15,7 +17,13 @@ export default async function HomePage() {
     orderBy: [{ isFeatured: 'desc' }, { name: 'asc' }],
   });
 
+  const startOfToday = getStartOfDaySaoPaulo();
+
   const upcomingEvents = await prisma.event.findMany({
+    where: {
+      isPublished: true,
+      eventDate: { gte: startOfToday },
+    },
     take: 4,
     orderBy: { eventDate: 'asc' },
     include: {
@@ -27,7 +35,7 @@ export default async function HomePage() {
 
   const hits = await prisma.music.findMany({
     take: 3,
-    where: { isHit: true },
+    where: { isPublished: true, isHit: true },
     include: { artists: { include: { artist: true } } },
   });
 
@@ -53,27 +61,51 @@ export default async function HomePage() {
         <section className="section" id="noticias">
           <div className="section-header">
             <h2>🔥 Últimas Notícias</h2>
-            <Link href="#noticias" className="view-all">Ver todas <i className="fa-solid fa-arrow-right"></i></Link>
+            <Link href="/noticias" className="view-all">Ver todas <i className="fa-solid fa-arrow-right"></i></Link>
           </div>
 
-          <div className="news-grid" id="noticiasGrid">
-            {newsList.map(noticia => (
-              <article key={noticia.id} className="news-card">
-                <Link href={`/noticia/${noticia.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
-                  <div className="news-img" style={{ backgroundImage: `url('${noticia.coverUrl || ''}')` }}>
-                    <span className={`tag ${noticia.trustType === 'confirmed' ? 'tag-hot' : 'tag-release'}`}>
-                      {noticia.trustType === 'confirmed' ? '🟢 Confirmado' : 'Notícia'}
-                    </span>
-                  </div>
-                  <div className="news-content">
-                    <span className="news-date">{new Date(noticia.publishedAt).toLocaleDateString('pt-BR')}</span>
-                    <h3>{noticia.title}</h3>
-                    <p>{noticia.summary}</p>
-                  </div>
-                </Link>
-              </article>
-            ))}
-          </div>
+          {newsList.length === 0 ? (
+            <div
+              className="agenda-item"
+              style={{
+                padding: '30px 20px',
+                textAlign: 'center',
+                background: 'var(--bg-card)',
+                border: '1px dashed var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+              }}
+            >
+              <i className="fa-solid fa-newspaper" style={{ fontSize: '1.8rem', color: 'var(--primary)' }}></i>
+              <p style={{ color: 'var(--text-main)', fontWeight: 600, margin: 0, fontSize: '1rem' }}>
+                Em breve novas notícias
+              </p>
+              <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.85rem' }}>
+                Estamos preparando novidades e coberturas exclusivas do mundo sertanejo. Fique ligado!
+              </p>
+            </div>
+          ) : (
+            <div className="news-grid" id="noticiasGrid">
+              {newsList.map(noticia => (
+                <article key={noticia.id} className="news-card">
+                  <Link href={`/noticia/${noticia.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
+                    <div className="news-img" style={{ backgroundImage: `url('${noticia.coverUrl || ''}')` }}>
+                      <span className="tag tag-release">Notícia</span>
+                    </div>
+                    <div className="news-content">
+                      <span className="news-date">{new Date(noticia.publishedAt).toLocaleDateString('pt-BR')}</span>
+                      <h3>{noticia.title}</h3>
+                      <p>{noticia.summary}</p>
+                    </div>
+                  </Link>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* AGENDA DE SHOWS */}
@@ -86,52 +118,79 @@ export default async function HomePage() {
               </Link>
             </div>
             <div className="agenda-list">
-              {upcomingEvents.map(event => {
-                const dateObj = new Date(event.eventDate);
-                const dia = dateObj.getDate().toString().padStart(2, '0');
-                const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
-                const mesStr = meses[dateObj.getMonth()];
-                const primaryArtist = event.artists[0]?.artist;
+              {upcomingEvents.length === 0 ? (
+                <div
+                  className="agenda-item"
+                  style={{
+                    padding: '24px 20px',
+                    textAlign: 'center',
+                    background: 'var(--bg-card)',
+                    border: '1px dashed var(--border-color)',
+                    borderRadius: 'var(--radius-md)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    width: '100%',
+                  }}
+                >
+                  <i className="fa-solid fa-calendar-check" style={{ fontSize: '1.8rem', color: 'var(--primary)' }}></i>
+                  <p style={{ color: 'var(--text-main)', fontWeight: 600, margin: 0, fontSize: '1rem' }}>
+                    Em breve novos shows na agenda
+                  </p>
+                  <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.85rem' }}>
+                    As próximas datas e turnês pelo Brasil serão divulgadas aqui. Fique ligado!
+                  </p>
+                </div>
+              ) : (
+                upcomingEvents.map(event => {
+                  const dateObj = new Date(event.eventDate);
+                  const dia = dateObj.getDate().toString().padStart(2, '0');
+                  const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+                  const mesStr = meses[dateObj.getMonth()];
+                  const primaryArtist = event.artists[0]?.artist;
 
-                return (
-                  <div key={event.id} className="agenda-item" style={{ borderColor: event.isHighlight ? 'var(--primary)' : 'var(--border-color)' }}>
-                    <div className="agenda-date-box">
-                      <span className="agd-day">{dia}</span>
-                      <span className="agd-month">{mesStr}</span>
-                    </div>
-                    <div className="agenda-info">
-                      <h4>
-                        {primaryArtist ? (
-                          <Link href={`/artista/${primaryArtist.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                            {event.title}
-                          </Link>
-                        ) : (
-                          <span>{event.title}</span>
-                        )}
-                      </h4>
-                      {(event.venue || event.city) && (
-                        <p>
-                          <i className="fa-solid fa-location-dot"></i>{' '}
-                          {event.venue?.name}
-                          {event.venue?.name && event.city ? ' • ' : ''}
-                          {event.city && (
-                            <Link href={`/cidade/${event.city.slug}`} style={{ color: 'inherit', textDecoration: 'none', fontWeight: 600 }}>
-                              {event.city.name} - {event.city.stateCode}
+                  return (
+                    <div key={event.id} className="agenda-item" style={{ borderColor: event.isHighlight ? 'var(--primary)' : 'var(--border-color)' }}>
+                      <div className="agenda-date-box">
+                        <span className="agd-day">{dia}</span>
+                        <span className="agd-month">{mesStr}</span>
+                      </div>
+                      <div className="agenda-info">
+                        <h4>
+                          {primaryArtist ? (
+                            <Link href={`/artista/${primaryArtist.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                              {event.title}
                             </Link>
+                          ) : (
+                            <span>{event.title}</span>
                           )}
-                        </p>
+                        </h4>
+                        {(event.venue || event.city) && (
+                          <p>
+                            <i className="fa-solid fa-location-dot"></i>{' '}
+                            {event.venue?.name}
+                            {event.venue?.name && event.city ? ' • ' : ''}
+                            {event.city && (
+                              <Link href={`/cidade/${event.city.slug}`} style={{ color: 'inherit', textDecoration: 'none', fontWeight: 600 }}>
+                                {event.city.name} - {event.city.stateCode}
+                              </Link>
+                            )}
+                          </p>
+                        )}
+                      </div>
+                      {primaryArtist && (
+                        <div className="agenda-action">
+                          <Link href={`/artista/${primaryArtist.slug}`} className="btn-outline-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}>
+                            Ver Artista
+                          </Link>
+                        </div>
                       )}
                     </div>
-                    {primaryArtist && (
-                      <div className="agenda-action">
-                        <Link href={`/artista/${primaryArtist.slug}`} className="btn-outline-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', textDecoration: 'none' }}>
-                          Ver Artista
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
 

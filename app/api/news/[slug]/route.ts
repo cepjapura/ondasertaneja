@@ -9,8 +9,8 @@ export async function GET(
 
   try {
     // Buscar primeiro por slug exato, ou por ID numérico (caso legado noticias.json?id=1)
-    let article = await prisma.news.findUnique({
-      where: { slug },
+    let article = await prisma.news.findFirst({
+      where: { slug, isPublished: true },
       include: {
         author: { select: { name: true, avatarUrl: true } },
         artists: { include: { artist: true } },
@@ -21,11 +21,14 @@ export async function GET(
 
     if (!article && /^\d+$/.test(slug)) {
       // Procura noticiario legado por ID
-      const allNews = await prisma.news.findMany({ orderBy: { publishedAt: 'desc' } });
+      const allNews = await prisma.news.findMany({
+        where: { isPublished: true },
+        orderBy: { publishedAt: 'desc' },
+      });
       const idx = parseInt(slug, 10) - 1;
       if (allNews[idx]) {
-        article = await prisma.news.findUnique({
-          where: { id: allNews[idx].id },
+        article = await prisma.news.findFirst({
+          where: { id: allNews[idx].id, isPublished: true },
           include: {
             author: { select: { name: true, avatarUrl: true } },
             artists: { include: { artist: true } },

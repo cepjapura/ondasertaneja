@@ -7,11 +7,11 @@ export const metadata: Metadata = {
   description: 'Confira as músicas sertanejas mais tocadas da semana e do ano no rádio e no streaming.',
 };
 
-export const revalidate = 60; // ISR 60s
+export const revalidate = 3600; // ISR 1h
 
 export default async function MaisTocadasPage() {
   const semana = await prisma.chartEntry.findMany({
-    where: { period: 'semana' },
+    where: { period: 'semana', isPublished: true },
     orderBy: { position: 'asc' },
     include: {
       artist: { select: { name: true, slug: true } },
@@ -20,7 +20,7 @@ export default async function MaisTocadasPage() {
   });
 
   const ano = await prisma.chartEntry.findMany({
-    where: { period: 'ano' },
+    where: { period: 'ano', isPublished: true },
     orderBy: { position: 'asc' },
     include: {
       artist: { select: { name: true, slug: true } },
@@ -51,6 +51,29 @@ export default async function MaisTocadasPage() {
             Acompanhe o ranking oficial das músicas sertanejas mais executadas nas rádios e plataformas digitais.
           </p>
         </section>
+
+        {/* EMPTY STATE CASO NÃO HAJA PARADA PUBLICADA */}
+        {semana.length === 0 && ano.length === 0 && (
+          <div
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px dashed var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              padding: '48px 30px',
+              textAlign: 'center',
+              color: 'var(--text-muted)',
+              marginBottom: '40px',
+            }}
+          >
+            <i className="fa-solid fa-chart-line" style={{ fontSize: '2.5rem', marginBottom: '16px', color: 'var(--primary)' }}></i>
+            <h3 style={{ fontSize: '1.25rem', color: 'var(--text-main)', margin: '0 0 8px', fontWeight: 700 }}>
+              Parada de sucessos em atualização
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.95rem' }}>
+              Estamos computando os números e execuções oficiais da semana. Em breve o ranking estará no ar!
+            </p>
+          </div>
+        )}
 
         {/* RANKING SEMANAL */}
         {semana.length > 0 && (

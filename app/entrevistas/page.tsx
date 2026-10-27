@@ -14,12 +14,13 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 60; // ISR 60s
+export const revalidate = 3600; // ISR 1h
 
 export default async function EntrevistasPage() {
   const interviews = await prisma.news.findMany({
     where: {
       category: 'interview',
+      isPublished: true,
     },
     orderBy: {
       publishedAt: 'desc',

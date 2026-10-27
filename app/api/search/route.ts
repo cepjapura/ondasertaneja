@@ -44,6 +44,7 @@ export async function GET(request: Request) {
     // 2. Events / Shows
     const events = await prisma.event.findMany({
       where: {
+        isPublished: true,
         OR: [
           { title: { contains: q } },
           { slug: { contains: q } },
@@ -81,6 +82,7 @@ export async function GET(request: Request) {
     // 4. Notícias
     const news = await prisma.news.findMany({
       where: {
+        isPublished: true,
         OR: [
           { title: { contains: q } },
           { summary: { contains: q } },
@@ -101,6 +103,7 @@ export async function GET(request: Request) {
     // 5. Músicas
     const musics = await prisma.music.findMany({
       where: {
+        isPublished: true,
         title: { contains: q },
       },
       take: 4,

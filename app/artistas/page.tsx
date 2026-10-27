@@ -34,9 +34,11 @@ export default async function ArtistasPage() {
     orderBy: { name: 'asc' },
     include: {
       musics: {
+        where: { music: { isPublished: true } },
         include: { music: true },
       },
       events: {
+        where: { event: { isPublished: true } },
         include: {
           event: {
             include: { city: true },
@@ -44,6 +46,7 @@ export default async function ArtistasPage() {
         },
       },
       news: {
+        where: { news: { isPublished: true } },
         include: { news: true },
       },
     },

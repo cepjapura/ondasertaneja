@@ -20,7 +20,7 @@ export default function Footer() {
           <h4>Navegação</h4>
           <ul>
             <li><Link href="/">Início</Link></li>
-            <li><Link href="/#noticias">Notícias</Link></li>
+            <li><Link href="/noticias">Notícias</Link></li>
             <li><Link href="/agenda">Agenda de Shows</Link></li>
             <li><Link href="/lancamentos">Lançamentos</Link></li>
             <li><Link href="/contato">Contato & Anuncie</Link></li>

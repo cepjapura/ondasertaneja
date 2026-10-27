@@ -402,7 +402,8 @@
       "youtubeVideoId": null,
       "isHit": 1,
       "albumId": null,
-      "createdAt": 1787799880095
+      "createdAt": 1787799880095,
+      "isPublished": false
     },
     {
       "id": "4aedfbca-7cd1-4945-8c79-afbdf263ba4a",
@@ -414,7 +415,8 @@
       "youtubeVideoId": null,
       "isHit": 1,
       "albumId": null,
-      "createdAt": 1787799880102
+      "createdAt": 1787799880102,
+      "isPublished": false
     },
     {
       "id": "1bb860fc-51a8-479f-a751-93ee6b50d777",
@@ -426,7 +428,8 @@
       "youtubeVideoId": null,
       "isHit": 1,
       "albumId": null,
-      "createdAt": 1787799880108
+      "createdAt": 1787799880108,
+      "isPublished": false
     },
     {
       "id": "7e994724-e459-45b6-be3f-3c7949b42025",
@@ -438,7 +441,8 @@
       "youtubeVideoId": null,
       "isHit": 1,
       "albumId": "6b0c55aa-aeba-4090-9949-a723cd321474",
-      "createdAt": 1788790905204
+      "createdAt": 1788790905204,
+      "isPublished": false
     },
     {
       "id": "e3d6aac4-df4b-4052-afc5-aa6eb405be95",
@@ -450,7 +454,8 @@
       "youtubeVideoId": null,
       "isHit": 0,
       "albumId": "b4df39df-5de8-40bd-bb31-f782d52daa4b",
-      "createdAt": 1788790905213
+      "createdAt": 1788790905213,
+      "isPublished": false
     }
   ],
   "MusicArtist": [
@@ -495,7 +500,8 @@
       "sourceId": "source-oficial",
       "confidenceLevel": "verified",
       "createdAt": 1787799880021,
-      "updatedAt": 1787800602181
+      "updatedAt": 1787800602181,
+      "isPublished": false
     },
     {
       "id": "1d7f8c03-cce4-484f-a7dc-4e078f939d4c",
@@ -511,7 +517,8 @@
       "sourceId": "source-oficial",
       "confidenceLevel": "verified",
       "createdAt": 1787799880035,
-      "updatedAt": 1787800602189
+      "updatedAt": 1787800602189,
+      "isPublished": false
     },
     {
       "id": "b76ca7c7-ecaf-4c07-b1e0-a065ea729e47",
@@ -527,7 +534,8 @@
       "sourceId": "source-oficial",
       "confidenceLevel": "verified",
       "createdAt": 1787799880049,
-      "updatedAt": 1787800602199
+      "updatedAt": 1787800602199,
+      "isPublished": false
     },
     {
       "id": "e285eba7-568a-45ca-928f-38e1817270ca",
@@ -543,7 +551,8 @@
       "sourceId": "source-oficial",
       "confidenceLevel": "verified",
       "createdAt": 1787799880064,
-      "updatedAt": 1787800602208
+      "updatedAt": 1787800602208,
+      "isPublished": false
     },
     {
       "id": "76545550-5bf3-4974-aaee-08f61474d9c2",
@@ -559,7 +568,8 @@
       "sourceId": "source-oficial",
       "confidenceLevel": "verified",
       "createdAt": 1787799880074,
-      "updatedAt": 1787800602214
+      "updatedAt": 1787800602214,
+      "isPublished": false
     },
     {
       "id": "6cf61bb2-1b34-47fe-84e6-f6ad63138b0f",
@@ -575,7 +585,8 @@
       "sourceId": null,
       "confidenceLevel": "unverified",
       "createdAt": 1788790501452,
-      "updatedAt": 1788916474415
+      "updatedAt": 1788916474415,
+      "isPublished": false
     },
     {
       "id": "6c0e625c-01f5-43f2-b220-cadfac1f62e2",
@@ -591,7 +602,8 @@
       "sourceId": null,
       "confidenceLevel": "unverified",
       "createdAt": 1788790501468,
-      "updatedAt": 1788916474431
+      "updatedAt": 1788916474431,
+      "isPublished": false
     }
   ],
   "EventArtist": [
@@ -706,7 +718,8 @@
       "publishedAt": 1787799880082,
       "isFeatured": 1,
       "createdAt": 1787799880082,
-      "updatedAt": 1788916474454
+      "updatedAt": 1788916474454,
+      "isPublished": false
     },
     {
       "id": "9710da1e-1c5c-4112-a30b-1cb33dae2417",
@@ -721,7 +734,8 @@
       "publishedAt": 1787799880084,
       "isFeatured": 0,
       "createdAt": 1787799880084,
-      "updatedAt": 1788916474468
+      "updatedAt": 1788916474468,
+      "isPublished": false
     },
     {
       "id": "57ccd2c6-a2b9-4a87-8265-b4509c516d47",
@@ -736,7 +750,8 @@
       "publishedAt": 1787799880087,
       "isFeatured": 0,
       "createdAt": 1787799880087,
-      "updatedAt": 1788916474477
+      "updatedAt": 1788916474477,
+      "isPublished": false
     },
     {
       "id": "7e1d7371-bc92-471e-891c-47e6ff0c1932",
@@ -751,7 +766,8 @@
       "publishedAt": 1787799880090,
       "isFeatured": 1,
       "createdAt": 1787799880090,
-      "updatedAt": 1788916474482
+      "updatedAt": 1788916474482,
+      "isPublished": false
     }
   ],
   "NewsArtist": [
@@ -822,7 +838,8 @@
       "artistId": "6b5b2d91-6f97-4fe7-ab9c-a7e75c3e5e32",
       "musicId": null,
       "createdAt": 1788798081195,
-      "updatedAt": 1788916474491
+      "updatedAt": 1788916474491,
+      "isPublished": false
     },
     {
       "id": "8545ee41-4b32-45d1-957d-3791ac92372f",
@@ -833,7 +850,8 @@
       "artistId": "56c36984-cceb-4971-9c89-15dbafd25dc6",
       "musicId": "e3d6aac4-df4b-4052-afc5-aa6eb405be95",
       "createdAt": 1788798081200,
-      "updatedAt": 1788916474496
+      "updatedAt": 1788916474496,
+      "isPublished": false
     },
     {
       "id": "cbb51b81-f177-432a-adc2-eb76eac2033e",
@@ -844,7 +862,8 @@
       "artistId": "a23c5440-2d73-43dc-be96-a521a2c39986",
       "musicId": "7e994724-e459-45b6-be3f-3c7949b42025",
       "createdAt": 1788798081206,
-      "updatedAt": 1788916474500
+      "updatedAt": 1788916474500,
+      "isPublished": false
     },
     {
       "id": "8a123d78-fb7d-4775-9dc5-8eb0f49df6bb",
@@ -855,7 +874,8 @@
       "artistId": "86482132-bde4-4b41-9869-6f36346bd9d0",
       "musicId": null,
       "createdAt": 1788798081211,
-      "updatedAt": 1788916474504
+      "updatedAt": 1788916474504,
+      "isPublished": false
     },
     {
       "id": "2131d755-bba6-44b1-b738-f57eeb18eada",
@@ -866,7 +886,8 @@
       "artistId": "dd5a06f3-2f77-48f3-b351-ee1c94c7703c",
       "musicId": null,
       "createdAt": 1788798081215,
-      "updatedAt": 1788916474508
+      "updatedAt": 1788916474508,
+      "isPublished": false
     },
     {
       "id": "a31a7f62-72f0-4cda-a8a4-68abefeaaa87",
@@ -877,7 +898,8 @@
       "artistId": "71dbafa1-ce32-4d97-9964-7f3f7e99f31b",
       "musicId": null,
       "createdAt": 1788798081220,
-      "updatedAt": 1788916474512
+      "updatedAt": 1788916474512,
+      "isPublished": false
     }
   ]
 }
