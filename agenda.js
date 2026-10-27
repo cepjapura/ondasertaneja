@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(err => {
       console.error(err);
       document.getElementById('agendaShows').innerHTML =
-        '<div class="agenda-item"><p style="color: var(--text-muted);">Não foi possível carregar a agenda no momento.</p></div>';
+        '<div class="agenda-item" style="padding: 24px; text-align: center;"><p style="color: var(--text-main); font-weight: 600; margin-bottom: 4px;"><i class="fa-solid fa-calendar-check" style="margin-right: 8px; color: var(--primary);"></i>Em breve novos shows na agenda</p><p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Fique ligado nas próximas datas!</p></div>';
     });
 });
 
@@ -39,7 +39,7 @@ function renderAgenda(shows) {
   container.innerHTML = '';
 
   if (!shows || shows.length === 0) {
-    container.innerHTML = '<div class="agenda-item"><p style="color: var(--text-muted);">Nenhum show cadastrado.</p></div>';
+    container.innerHTML = '<div class="agenda-item" style="padding: 24px; text-align: center;"><p style="color: var(--text-main); font-weight: 600; margin-bottom: 4px;"><i class="fa-solid fa-calendar-check" style="margin-right: 8px; color: var(--primary);"></i>Em breve novos shows na agenda</p><p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Fique ligado nas próximas datas!</p></div>';
     return;
   }
 
@@ -53,7 +53,7 @@ function renderAgenda(shows) {
   });
 
   if (showsFuturos.length === 0) {
-    container.innerHTML = '<div class="agenda-item"><p style="color: var(--text-muted);">Nenhum show próximo na agenda. Fique ligado!</p></div>';
+    container.innerHTML = '<div class="agenda-item" style="padding: 24px; text-align: center;"><p style="color: var(--text-main); font-weight: 600; margin-bottom: 4px;"><i class="fa-solid fa-calendar-check" style="margin-right: 8px; color: var(--primary);"></i>Em breve novos shows na agenda</p><p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Fique ligado nas próximas datas!</p></div>';
     return;
   }
 
