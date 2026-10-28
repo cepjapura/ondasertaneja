@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Header() {
   const router = useRouter();
@@ -87,14 +88,6 @@ export default function Header() {
           ONDA<span>SERTANEJA</span>
         </Link>
 
-        <button
-          className="mobile-menu-btn"
-          id="mobileMenuBtn"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          <i className="fa-solid fa-bars"></i>
-        </button>
-
         <nav className={`nav-menu ${mobileMenuOpen ? 'active' : ''} ${isSearchExpanded ? 'search-active' : ''}`} id="navMenu">
           <Link href="/" onClick={() => setMobileMenuOpen(false)}>Início</Link>
           <Link href="/artistas" onClick={() => setMobileMenuOpen(false)}>Artistas</Link>
@@ -106,18 +99,19 @@ export default function Header() {
           <Link href="/contato" onClick={() => setMobileMenuOpen(false)}>Contato</Link>
         </nav>
 
-        <div className={`search-container ${isSearchExpanded ? 'expanded' : ''}`} ref={dropdownRef}>
-          {!isSearchExpanded ? (
-            <button
-              type="button"
-              className="search-toggle-btn"
-              aria-label="Abrir busca"
-              title="Abrir busca"
-              onClick={openSearch}
-            >
-              <i className="fa-solid fa-magnifying-glass"></i>
-              <span className="search-toggle-label">Buscar...</span>
-            </button>
+        <div className="header-right">
+          <div className={`search-container ${isSearchExpanded ? 'expanded' : ''}`} ref={dropdownRef}>
+            {!isSearchExpanded ? (
+              <button
+                type="button"
+                className="search-toggle-btn"
+                aria-label="Buscar"
+                title="Buscar"
+                onClick={openSearch}
+              >
+                <i className="fa-solid fa-magnifying-glass"></i>
+                <span className="search-toggle-label">Buscar...</span>
+              </button>
           ) : (
             <form onSubmit={handleSearchSubmit} className="search-input-wrapper">
               <button
@@ -172,7 +166,7 @@ export default function Header() {
                   {/* Artistas */}
                   {searchResults.artists?.length > 0 && (
                     <>
-                      <div className="search-category-title">👤 Artistas</div>
+                      <div className="search-category-title"><i className="fa-solid fa-user" style={{ marginRight: '6px' }}></i> Artistas</div>
                       {searchResults.artists.map((art: any) => (
                         <Link
                           key={art.id}
@@ -201,7 +195,7 @@ export default function Header() {
                   {/* Shows */}
                   {searchResults.events?.length > 0 && (
                     <>
-                      <div className="search-category-title">📅 Shows & Eventos</div>
+                      <div className="search-category-title"><i className="fa-solid fa-calendar-days" style={{ marginRight: '6px' }}></i> Shows & Eventos</div>
                       {searchResults.events.map((ev: any) => (
                         <Link
                           key={ev.id}
@@ -224,7 +218,7 @@ export default function Header() {
                   {/* Cidades */}
                   {searchResults.cities?.length > 0 && (
                     <>
-                      <div className="search-category-title">📍 Cidades</div>
+                      <div className="search-category-title"><i className="fa-solid fa-location-dot" style={{ marginRight: '6px' }}></i> Cidades</div>
                       {searchResults.cities.map((c: any) => (
                         <Link
                           key={c.id}
@@ -245,7 +239,7 @@ export default function Header() {
                   {/* Músicas */}
                   {searchResults.musics?.length > 0 && (
                     <>
-                      <div className="search-category-title">🎵 Músicas</div>
+                      <div className="search-category-title"><i className="fa-solid fa-music" style={{ marginRight: '6px' }}></i> Músicas</div>
                       {searchResults.musics.map((m: any) => {
                         const primaryArtist = m.artists?.[0]?.artist;
                         const artistLink = primaryArtist ? `/artista/${primaryArtist.slug}` : '/lancamentos';
@@ -272,7 +266,7 @@ export default function Header() {
                   {/* Notícias */}
                   {searchResults.news?.length > 0 && (
                     <>
-                      <div className="search-category-title">📰 Notícias</div>
+                      <div className="search-category-title"><i className="fa-solid fa-newspaper" style={{ marginRight: '6px' }}></i> Notícias</div>
                       {searchResults.news.map((n: any) => (
                         <Link
                           key={n.id}
@@ -299,7 +293,7 @@ export default function Header() {
                       textAlign: 'center',
                       fontSize: '0.85rem',
                       fontWeight: 600,
-                      color: 'var(--primary)',
+                      color: 'var(--primary-text)',
                       borderTop: '1px solid var(--border-color)',
                       background: 'rgba(255, 85, 0, 0.08)',
                       textDecoration: 'none',
@@ -314,8 +308,28 @@ export default function Header() {
           )}
         </div>
 
-        <div className="header-actions">
-          <button className="btn-outline-primary"><i className="fa-solid fa-music"></i> Enviar Música</button>
+          <ThemeToggle />
+
+          <div className="header-actions">
+            <button
+              className="btn-outline-primary btn-enviar-musica"
+              aria-label="Enviar música"
+              title="Enviar música"
+            >
+              <i className="fa-solid fa-music"></i>
+              <span className="btn-enviar-text">Enviar Música</span>
+            </button>
+          </div>
+
+          <button
+            className="mobile-menu-btn"
+            id="mobileMenuBtn"
+            aria-label="Menu"
+            title="Menu"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <i className={`fa-solid ${mobileMenuOpen ? 'fa-xmark' : 'fa-bars'}`}></i>
+          </button>
         </div>
       </div>
     </header>

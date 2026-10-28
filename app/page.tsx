@@ -60,7 +60,7 @@ export default async function HomePage() {
         {/* NOTÍCIAS */}
         <section className="section" id="noticias">
           <div className="section-header">
-            <h2>🔥 Últimas Notícias</h2>
+            <h2>Últimas Notícias</h2>
             <Link href="/noticias" className="view-all">Ver todas <i className="fa-solid fa-arrow-right"></i></Link>
           </div>
 
@@ -80,7 +80,7 @@ export default async function HomePage() {
                 gap: '8px',
               }}
             >
-              <i className="fa-solid fa-newspaper" style={{ fontSize: '1.8rem', color: 'var(--primary)' }}></i>
+              <i className="fa-solid fa-newspaper" style={{ fontSize: '1.8rem', color: 'var(--primary-text)' }}></i>
               <p style={{ color: 'var(--text-main)', fontWeight: 600, margin: 0, fontSize: '1rem' }}>
                 Em breve novas notícias
               </p>
@@ -112,8 +112,8 @@ export default async function HomePage() {
         <section className="section grid-layout" id="agenda">
           <div className="col-main">
             <div className="section-header">
-              <h2>📅 Agenda de Shows</h2>
-              <Link href="/agenda" className="view-all" style={{ fontSize: '0.9rem', textDecoration: 'none', color: 'var(--primary)' }}>
+              <h2>Agenda de Shows</h2>
+              <Link href="/agenda" className="view-all" style={{ fontSize: '0.9rem', textDecoration: 'none' }}>
                 Ver Agenda Completa <i className="fa-solid fa-arrow-right"></i>
               </Link>
             </div>
@@ -135,7 +135,7 @@ export default async function HomePage() {
                     width: '100%',
                   }}
                 >
-                  <i className="fa-solid fa-calendar-check" style={{ fontSize: '1.8rem', color: 'var(--primary)' }}></i>
+                  <i className="fa-solid fa-calendar-check" style={{ fontSize: '1.8rem', color: 'var(--primary-text)' }}></i>
                   <p style={{ color: 'var(--text-main)', fontWeight: 600, margin: 0, fontSize: '1rem' }}>
                     Em breve novos shows na agenda
                   </p>
@@ -217,7 +217,7 @@ export default async function HomePage() {
         {/* ARTISTAS EM DESTAQUE */}
         <section className="section" id="artistas">
           <div className="section-header">
-            <h2>⭐ Artistas em Destaque</h2>
+            <h2>Artistas em Destaque</h2>
           </div>
           <div className="grid artists-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
             {featuredArtists.map(artista => (

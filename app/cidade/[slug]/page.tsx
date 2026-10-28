@@ -164,9 +164,9 @@ export default async function CityDetailPage({ params }: CityPageProps) {
           <div className="col-main">
             {/* PRÓXIMOS SHOWS NA CIDADE */}
             <div className="section-header">
-              <h2>📅 Próximos Shows em {city.name} ({upcomingEvents.length})</h2>
+              <h2>Próximos Shows em {city.name} ({upcomingEvents.length})</h2>
               {upcomingEvents.length === 6 && (
-                <Link href="/agenda" style={{ fontSize: '0.85rem', color: 'var(--primary)', textDecoration: 'none' }}>
+                <Link href="/agenda" style={{ fontSize: '0.85rem', color: 'var(--primary-text)', textDecoration: 'none' }}>
                   Ver agenda completa &rarr;
                 </Link>
               )}
@@ -290,7 +290,7 @@ export default async function CityDetailPage({ params }: CityPageProps) {
             {cityNews.length > 0 && (
               <div style={{ marginBottom: '40px' }}>
                 <div className="section-header">
-                  <h2>📰 Notícias de {city.name}</h2>
+                  <h2>Notícias de {city.name}</h2>
                 </div>
                 <div className="news-grid">
                   {cityNews.map(news => (

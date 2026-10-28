@@ -125,7 +125,7 @@ export default function ContatoPage() {
           <h2 style={{ fontSize: '1.6rem', marginBottom: '20px', fontFamily: 'var(--font-title)' }}>
             Envie uma mensagem direta
           </h2>
-          <form style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+          <form className="form-grid" style={{ gap: '20px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label style={{ fontSize: '0.9rem', fontWeight: 600 }}>Seu Nome *</label>
               <input
@@ -135,9 +135,9 @@ export default function ContatoPage() {
                 style={{
                   padding: '12px 16px',
                   borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(255,255,255,0.05)',
+                  background: 'var(--bg-card)',
                   border: '1px solid var(--border-color)',
-                  color: '#fff',
+                  color: 'var(--text-main)',
                   fontSize: '0.95rem',
                 }}
               />
@@ -152,9 +152,9 @@ export default function ContatoPage() {
                 style={{
                   padding: '12px 16px',
                   borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(255,255,255,0.05)',
+                  background: 'var(--bg-card)',
                   border: '1px solid var(--border-color)',
-                  color: '#fff',
+                  color: 'var(--text-main)',
                   fontSize: '0.95rem',
                 }}
               />
@@ -166,9 +166,9 @@ export default function ContatoPage() {
                 style={{
                   padding: '12px 16px',
                   borderRadius: 'var(--radius-sm)',
-                  background: '#181a20',
+                  background: 'var(--bg-card)',
                   border: '1px solid var(--border-color)',
-                  color: '#fff',
+                  color: 'var(--text-main)',
                   fontSize: '0.95rem',
                 }}
               >
@@ -188,9 +188,9 @@ export default function ContatoPage() {
                 style={{
                   padding: '12px 16px',
                   borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(255,255,255,0.05)',
+                  background: 'var(--bg-card)',
                   border: '1px solid var(--border-color)',
-                  color: '#fff',
+                  color: 'var(--text-main)',
                   fontSize: '0.95rem',
                   resize: 'vertical',
                 }}

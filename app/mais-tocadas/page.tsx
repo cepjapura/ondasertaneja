@@ -79,7 +79,7 @@ export default async function MaisTocadasPage() {
         {semana.length > 0 && (
           <section className="section" style={{ marginBottom: '50px' }}>
             <div className="section-header" style={{ marginBottom: '24px' }}>
-              <h2>🔥 Top Tocadas da Semana</h2>
+              <h2>Top Tocadas da Semana</h2>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {semana.map(item => (
@@ -100,7 +100,7 @@ export default async function MaisTocadasPage() {
                       style={{
                         fontSize: '1.5rem',
                         fontWeight: 'bold',
-                        color: item.position === 1 ? 'var(--primary)' : 'var(--text-muted)',
+                        color: item.position === 1 ? 'var(--primary-text)' : 'var(--text-muted)',
                         minWidth: '32px',
                         textAlign: 'center',
                       }}
@@ -115,7 +115,7 @@ export default async function MaisTocadasPage() {
                         {item.artist ? (
                           <Link
                             href={`/artista/${item.artist.slug}`}
-                            style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: '500' }}
+                            style={{ color: 'var(--primary-text)', textDecoration: 'none', fontWeight: '500' }}
                           >
                             {item.artistName}
                           </Link>
@@ -135,7 +135,7 @@ export default async function MaisTocadasPage() {
         {ano.length > 0 && (
           <section className="section" style={{ marginBottom: '50px' }}>
             <div className="section-header" style={{ marginBottom: '24px' }}>
-              <h2>🏆 As Mais Tocadas do Ano</h2>
+              <h2>As Mais Tocadas do Ano</h2>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {ano.map(item => (
@@ -156,7 +156,7 @@ export default async function MaisTocadasPage() {
                       style={{
                         fontSize: '1.5rem',
                         fontWeight: 'bold',
-                        color: item.position === 1 ? 'var(--primary)' : 'var(--text-muted)',
+                        color: item.position === 1 ? 'var(--primary-text)' : 'var(--text-muted)',
                         minWidth: '32px',
                         textAlign: 'center',
                       }}
@@ -171,7 +171,7 @@ export default async function MaisTocadasPage() {
                         {item.artist ? (
                           <Link
                             href={`/artista/${item.artist.slug}`}
-                            style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: '500' }}
+                            style={{ color: 'var(--primary-text)', textDecoration: 'none', fontWeight: '500' }}
                           >
                             {item.artistName}
                           </Link>
