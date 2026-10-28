@@ -350,3 +350,13 @@ model ShortVideo {
 
   @@index([isPublished, sortOrder])
 }
+
+model LoginAttempt {
+  id        String   @id @default(uuid())
+  ip        String
+  email     String
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+  @@index([email, createdAt])
+}
