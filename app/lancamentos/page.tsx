@@ -76,7 +76,7 @@ export default async function LancamentosPage() {
         {hits.length > 0 && (
           <section className="section" style={{ marginBottom: '40px' }}>
             <div className="section-header">
-              <h2>🔥 Tocando Demais (Hits da Semana)</h2>
+              <h2>Tocando Demais (Hits da Semana)</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
               {hits.map(music => {
@@ -121,7 +121,7 @@ export default async function LancamentosPage() {
                         {music.title}
                       </h3>
                       {primaryArtist && (
-                        <Link href={`/artista/${primaryArtist.slug}`} style={{ fontSize: '0.9rem', color: 'var(--primary)', textDecoration: 'none' }}>
+                        <Link href={`/artista/${primaryArtist.slug}`} style={{ fontSize: '0.9rem', color: 'var(--primary-text)', textDecoration: 'none' }}>
                           {primaryArtist.name} &rarr;
                         </Link>
                       )}
@@ -147,7 +147,7 @@ export default async function LancamentosPage() {
         {/* LISTAGEM DE TODAS AS MÚSICAS */}
         <section className="section">
           <div className="section-header">
-            <h2>🎧 Todos os Lançamentos ({musics.length})</h2>
+            <h2>Todos os Lançamentos ({musics.length})</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '15px' }}>
             {musics.map(music => {

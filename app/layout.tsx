@@ -1,8 +1,24 @@
 import type { Metadata } from 'next';
+import { Bricolage_Grotesque, Inter } from 'next/font/google';
 import Header from '@/components/Header';
 import PlayerBar from '@/components/PlayerBar';
 import Footer from '@/components/Footer';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import '@/style.css';
+
+const bricolageGrotesque = Bricolage_Grotesque({
+  subsets: ['latin'],
+  weight: ['600', '800'],
+  variable: '--font-bricolage',
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Onda Sertaneja - A Rádio que Vive o Sertão',
@@ -24,53 +40,49 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className={`${bricolageGrotesque.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎸</text></svg>" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
       </head>
       <body style={{ paddingBottom: '75px' }}>
-        <Header />
-        {children}
-        <Footer />
-        <PlayerBar />
+        <ThemeProvider>
+          <Header />
+          {children}
+          <Footer />
+          <PlayerBar />
 
-        {/* Botão Flutuante do WhatsApp */}
-        <a
-          id="btnWhatsappFloat"
-          href="https://wa.me/5544999999999"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            position: 'fixed',
-            bottom: '85px',
-            right: '24px',
-            zIndex: 9999,
-            background: '#25D366',
-            color: 'white',
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.7rem',
-            boxShadow: '0 4px 20px rgba(37,211,102,0.5)',
-            textDecoration: 'none',
-          }}
-          title="Fale com a Onda Sertaneja no WhatsApp"
-        >
-          <i className="fa-brands fa-whatsapp"></i>
-        </a>
+          {/* Botão Flutuante do WhatsApp */}
+          <a
+            id="btnWhatsappFloat"
+            href="https://wa.me/5544999999999"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              position: 'fixed',
+              bottom: '85px',
+              right: '24px',
+              zIndex: 9999,
+              background: '#25D366',
+              color: 'white',
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.7rem',
+              boxShadow: '0 4px 20px rgba(37,211,102,0.5)',
+              textDecoration: 'none',
+            }}
+            title="Fale com a Onda Sertaneja no WhatsApp"
+          >
+            <i className="fa-brands fa-whatsapp"></i>
+          </a>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -81,7 +81,7 @@ export default async function AgendaPage() {
           <div className="col-main">
             {/* SEÇÃO 1: PRÓXIMOS SHOWS */}
             <div className="section-header">
-              <h2>📅 Próximos Shows {upcomingEvents.length > 0 ? `(${upcomingEvents.length})` : ''}</h2>
+              <h2>Próximos Shows {upcomingEvents.length > 0 ? `(${upcomingEvents.length})` : ''}</h2>
             </div>
 
             <div className="agenda-list" style={{ marginBottom: '45px' }}>
@@ -102,7 +102,7 @@ export default async function AgendaPage() {
                     width: '100%',
                   }}
                 >
-                  <i className="fa-solid fa-calendar-check" style={{ fontSize: '2.2rem', color: 'var(--primary)' }}></i>
+                  <i className="fa-solid fa-calendar-check" style={{ fontSize: '2.2rem', color: 'var(--primary-text)' }}></i>
                   <h4 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)' }}>
                     Em breve novos shows na agenda
                   </h4>
@@ -179,7 +179,7 @@ export default async function AgendaPage() {
             {/* SEÇÃO 2: SHOWS REALIZADOS */}
             <div className="section-header" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '30px' }}>
               <div>
-                <h2>🏁 Shows Realizados ({pastEvents.length})</h2>
+                <h2>Shows Realizados ({pastEvents.length})</h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: '6px 0 0' }}>
                   Apresentações marcantes que já agitaram o público pelo Brasil.
                 </p>

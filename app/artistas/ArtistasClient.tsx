@@ -84,7 +84,7 @@ export default function ArtistasClient({ initialArtists }: ArtistasClientProps) 
         >
           <i className="fa-solid fa-users"></i> Catálogo Oficial
         </span>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: '#fff', margin: '0 0 10px 0' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--text-main)', margin: '0 0 10px 0' }}>
           Artistas Sertanejos
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', maxWidth: '700px', margin: 0, lineHeight: 1.6 }}>
@@ -101,7 +101,7 @@ export default function ArtistasClient({ initialArtists }: ArtistasClientProps) 
           justifyContent: 'space-between',
           alignItems: 'center',
           marginBottom: '30px',
-          background: '#181a20',
+          background: 'var(--bg-card)',
           padding: '18px 20px',
           borderRadius: 'var(--radius-md)',
           border: '1px solid var(--border-color)',
@@ -128,10 +128,10 @@ export default function ArtistasClient({ initialArtists }: ArtistasClientProps) 
             style={{
               width: '100%',
               padding: '10px 15px 10px 38px',
-              background: 'rgba(255, 255, 255, 0.07)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              background: 'var(--bg-hover)',
+              border: '1px solid var(--border-color)',
               borderRadius: 'var(--radius-full)',
-              color: '#fff',
+              color: 'var(--text-main)',
               fontSize: '0.9rem',
               outline: 'none',
               transition: 'var(--transition)',
@@ -232,13 +232,13 @@ export default function ArtistasClient({ initialArtists }: ArtistasClientProps) 
           style={{
             textAlign: 'center',
             padding: '60px 20px',
-            background: '#181a20',
+            background: 'var(--bg-card)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-color)',
           }}
         >
           <i className="fa-solid fa-user-slash" style={{ fontSize: '2.5rem', color: 'var(--text-muted)', marginBottom: '15px' }}></i>
-          <h3 style={{ fontSize: '1.2rem', color: '#fff', margin: '0 0 10px 0' }}>Nenhum artista encontrado</h3>
+          <h3 style={{ fontSize: '1.2rem', color: 'var(--text-main)', margin: '0 0 10px 0' }}>Nenhum artista encontrado</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', maxWidth: '400px', margin: '0 auto 20px' }}>
             Não encontramos nenhum artista correspondente aos filtros aplicados.
           </p>
@@ -264,7 +264,7 @@ export default function ArtistasClient({ initialArtists }: ArtistasClientProps) 
             <div
               key={artist.id}
               style={{
-                background: '#181a20',
+                background: 'var(--bg-card)',
                 border: '1px solid var(--border-color)',
                 borderRadius: 'var(--radius-md)',
                 overflow: 'hidden',
@@ -328,13 +328,13 @@ export default function ArtistasClient({ initialArtists }: ArtistasClientProps) 
                         justifyContent: 'center',
                         fontSize: '1.8rem',
                         fontWeight: 900,
-                        color: '#fff',
+                        color: 'var(--primary-text)',
                         boxShadow: '0 0 20px rgba(255, 85, 0, 0.3)',
                       }}
                     >
                       {getInitials(artist.name)}
                     </div>
-                    <i className="fa-solid fa-microphone-lines" style={{ color: 'var(--primary)', fontSize: '0.9rem' }}></i>
+                    <i className="fa-solid fa-microphone-lines" style={{ color: 'var(--primary-text)', fontSize: '0.9rem' }}></i>
                   </div>
                 )}
 
@@ -348,7 +348,7 @@ export default function ArtistasClient({ initialArtists }: ArtistasClientProps) 
                       background: 'rgba(18, 20, 26, 0.85)',
                       backdropFilter: 'blur(6px)',
                       border: '1px solid rgba(255, 85, 0, 0.4)',
-                      color: 'var(--primary)',
+                      color: 'var(--primary-text)',
                       fontSize: '0.72rem',
                       fontWeight: 700,
                       padding: '4px 10px',
@@ -368,7 +368,7 @@ export default function ArtistasClient({ initialArtists }: ArtistasClientProps) 
                   style={{
                     fontSize: '1.2rem',
                     fontWeight: 700,
-                    color: '#fff',
+                    color: 'var(--text-main)',
                     margin: '0 0 12px 0',
                     lineHeight: 1.3,
                   }}

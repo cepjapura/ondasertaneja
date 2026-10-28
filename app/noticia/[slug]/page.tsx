@@ -293,7 +293,7 @@ export default async function NewsDetailPage({ params }: NewsPageProps) {
         {recommendedNews.length > 0 && (
           <section style={{ marginTop: '50px', marginBottom: '50px' }}>
             <div className="section-header">
-              <h2>🔥 Leia Também</h2>
+              <h2>Leia Também</h2>
             </div>
             <div className="news-grid">
               {recommendedNews.map(rec => (

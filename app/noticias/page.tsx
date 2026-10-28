@@ -76,7 +76,7 @@ export default async function NoticiasPage() {
         {/* Grade de Notícias */}
         <section className="section" style={{ padding: 0 }}>
           <div className="section-header">
-            <h2>🔥 Todas as Matérias ({newsList.length})</h2>
+            <h2>Todas as Matérias ({newsList.length})</h2>
           </div>
 
           {newsList.length === 0 ? (

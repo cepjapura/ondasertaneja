@@ -221,7 +221,7 @@ export default async function EventDetailPage({ params }: EventPageProps) {
         {event.artists.length > 0 && (
           <section style={{ marginBottom: '45px' }}>
             <div className="section-header" style={{ marginBottom: '20px' }}>
-              <h2>🎤 Programação de Artistas ({event.artists.length})</h2>
+              <h2>Programação de Artistas ({event.artists.length})</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
               {event.artists.map(({ artist, stageName }) => (
@@ -275,7 +275,7 @@ export default async function EventDetailPage({ params }: EventPageProps) {
         {event.news.length > 0 && (
           <section style={{ marginBottom: '45px' }}>
             <div className="section-header" style={{ marginBottom: '20px' }}>
-              <h2>📰 Matérias Relacionadas a este Evento</h2>
+              <h2>Matérias Relacionadas a este Evento</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
               {event.news.map(({ news }) => (

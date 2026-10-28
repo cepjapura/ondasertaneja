@@ -69,9 +69,8 @@ export default function PlayerBar() {
           left: 0,
           right: 0,
           zIndex: 9990,
-          background: 'rgba(18, 20, 26, 0.95)',
-          backdropFilter: 'blur(12px)',
-          borderTop: '1px solid rgba(255, 85, 0, 0.3)',
+          background: '#17140F',
+          borderTop: '1px solid #2E2920',
           boxShadow: '0 -4px 25px rgba(0, 0, 0, 0.6)',
           padding: '10px 24px',
           display: 'flex',
@@ -110,12 +109,12 @@ export default function PlayerBar() {
               >
                 {isPlaying ? 'NO AR' : 'AO VIVO'}
               </span>
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#F4EFE6' }}>
                 Rádio Onda Sertaneja 24h
               </span>
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '2px' }}>
-              {hasError ? '⚠️ Transmissão indisponível no momento' : 'A batida que move o Brasil'}
+            <span style={{ fontSize: '0.75rem', color: '#B8AF9F', display: 'block', marginTop: '2px' }}>
+              {hasError ? 'Transmissão indisponível no momento' : 'A batida que move o Brasil'}
             </span>
           </div>
         </div>
@@ -125,7 +124,7 @@ export default function PlayerBar() {
           <button
             onClick={togglePlay}
             style={{
-              background: 'linear-gradient(135deg, var(--primary) 0%, #ff7700 100%)',
+              background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)',
               color: '#fff',
               border: 'none',
               borderRadius: '30px',
@@ -136,7 +135,7 @@ export default function PlayerBar() {
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
-              boxShadow: '0 4px 15px rgba(255, 85, 0, 0.4)',
+              boxShadow: '0 4px 15px rgba(194, 70, 26, 0.4)',
               transition: 'transform 0.2s ease, box-shadow 0.2s ease',
             }}
           >
@@ -152,7 +151,7 @@ export default function PlayerBar() {
             style={{
               background: 'transparent',
               border: 'none',
-              color: isMuted ? 'var(--primary)' : 'var(--text-muted)',
+              color: isMuted ? 'var(--primary-text)' : '#B8AF9F',
               fontSize: '1rem',
               cursor: 'pointer',
               padding: '4px',

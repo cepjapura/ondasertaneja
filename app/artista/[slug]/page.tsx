@@ -158,7 +158,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
           {/* COLUNA PRINCIPAL: Agenda de Shows */}
           <div className="col-main">
             <div className="section-header">
-              <h2>📅 Próximos Shows ({artist.events.length})</h2>
+              <h2>Próximos Shows ({artist.events.length})</h2>
             </div>
 
             <div className="agenda-list">
@@ -185,7 +185,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                         {cidadeStr && (
                           <h4>
                             <Link href={`/evento/${event.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                              <i className="fa-solid fa-location-dot" style={{ color: 'var(--primary)' }}></i> {cidadeStr}
+                              <i className="fa-solid fa-location-dot" style={{ color: 'var(--primary-text)' }}></i> {cidadeStr}
                             </Link>
                           </h4>
                         )}
@@ -206,7 +206,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
             {artist.musics.length > 0 && (
               <div style={{ marginTop: '40px' }}>
                 <div className="section-header">
-                  <h2>🎧 Som na Caixa (Músicas)</h2>
+                  <h2>Som na Caixa (Músicas)</h2>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '15px' }}>
                   {artist.musics.map(({ music }) => (

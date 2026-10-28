@@ -99,7 +99,7 @@ export default async function EntrevistasPage() {
         {featuredInterview && (
           <section style={{ marginBottom: '50px' }}>
             <div className="section-header" style={{ marginBottom: '20px' }}>
-              <h2>🌟 Entrevista em Destaque</h2>
+              <h2>Entrevista em Destaque</h2>
             </div>
             <article
               style={{
@@ -108,14 +108,14 @@ export default async function EntrevistasPage() {
                 borderRadius: 'var(--radius-md)',
                 overflow: 'hidden',
                 display: 'grid',
-                gridTemplateColumns: featuredInterview.coverUrl ? 'repeat(auto-fit, minmax(340px, 1fr))' : '1fr',
+                gridTemplateColumns: featuredInterview.coverUrl ? 'repeat(auto-fit, minmax(280px, 1fr))' : '1fr',
                 gap: '0',
                 boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
               }}
             >
               {/* IMAGEM GRANDE */}
               {featuredInterview.coverUrl && (
-                <div style={{ height: '100%', minHeight: '360px', overflow: 'hidden', position: 'relative', background: '#0a0c10' }}>
+                <div style={{ height: '100%', minHeight: '360px', overflow: 'hidden', position: 'relative', background: 'var(--bg-hover)' }}>
                   <img
                     src={featuredInterview.coverUrl}
                     alt={featuredInterview.title}
@@ -224,7 +224,7 @@ export default async function EntrevistasPage() {
         {otherInterviews.length > 0 && (
           <section>
             <div className="section-header" style={{ marginBottom: '20px' }}>
-              <h2>🎙️ Mais Entrevistas</h2>
+              <h2>Mais Entrevistas</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
               {otherInterviews.map((interview) => (
@@ -242,7 +242,7 @@ export default async function EntrevistasPage() {
                 >
                   <div>
                     {interview.coverUrl && (
-                      <div style={{ height: '200px', width: '100%', overflow: 'hidden', background: '#0a0c10' }}>
+                      <div style={{ height: '200px', width: '100%', overflow: 'hidden', background: 'var(--bg-hover)' }}>
                         <img
                           src={interview.coverUrl}
                           alt={interview.title}

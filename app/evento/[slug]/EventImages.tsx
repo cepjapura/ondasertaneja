@@ -39,7 +39,7 @@ export function EventHeroCover({ src, alt }: EventHeroCoverProps) {
   }
 
   return (
-    <div style={{ width: '100%', height: '280px', overflow: 'hidden', position: 'relative', background: '#0a0c10' }}>
+    <div style={{ width: '100%', height: '280px', overflow: 'hidden', position: 'relative', background: 'var(--bg-hover)' }}>
       <img
         src={src}
         alt={alt}
@@ -154,7 +154,7 @@ export function NewsCardCover({ src, alt }: NewsCardCoverProps) {
   }
 
   return (
-    <div style={{ height: '180px', width: '100%', overflow: 'hidden', background: '#0a0c10' }}>
+    <div style={{ height: '180px', width: '100%', overflow: 'hidden', background: 'var(--bg-hover)' }}>
       <img
         src={src}
         alt={alt}
