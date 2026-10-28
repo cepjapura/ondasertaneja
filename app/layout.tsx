@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import PlayerBar from '@/components/PlayerBar';
 import Footer from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { AudioProvider } from '@/contexts/AudioContext';
 import '@/style.css';
 
 const bricolageGrotesque = Bricolage_Grotesque({
@@ -50,10 +51,12 @@ export default function RootLayout({
       </head>
       <body style={{ paddingBottom: '75px' }}>
         <ThemeProvider>
+          <AudioProvider>
           <Header />
           {children}
           <Footer />
           <PlayerBar />
+          </AudioProvider>
 
           {/* Botão Flutuante do WhatsApp */}
           <a

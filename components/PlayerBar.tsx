@@ -1,187 +1,118 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
+import { useAudio } from '@/contexts/AudioContext';
 
 export default function PlayerBar() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [streamUrl, setStreamUrl] = useState('https://stream.ondasertaneja.com.br/live');
-  const [volume, setVolume] = useState(0.8);
-  const [isMuted, setIsMuted] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const {
+    isAvailable,
+    isPlaying,
+    togglePlay,
+    volume,
+    isMuted,
+    hasError,
+    handleVolumeChange,
+    toggleMute,
+    trackInfo,
+  } = useAudio();
 
-  useEffect(() => {
-    fetch('/api/config')
-      .then(res => res.json())
-      .then(data => {
-        if (data.streamAudioUrl && data.streamAudioUrl !== 'https://SEU_STREAM_AQUI') {
-          setStreamUrl(data.streamAudioUrl);
-        }
-      })
-      .catch(err => console.error('Erro ao carregar URL do player:', err));
-  }, []);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
-    }
-  }, [volume, isMuted]);
-
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-
-    if (!isPlaying) {
-      setHasError(false);
-      audioRef.current
-        .play()
-        .then(() => setIsPlaying(true))
-        .catch(err => {
-          console.error('Erro de reprodução de áudio:', err);
-          setHasError(true);
-          setIsPlaying(false);
-        });
-    } else {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-  };
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVol = parseFloat(e.target.value);
-    setVolume(newVol);
-    if (newVol > 0 && isMuted) {
-      setIsMuted(false);
-    }
-  };
-
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-  };
+  // Se a rádio não estiver disponível (URL vazia ou placeholder), o PlayerBar fixo NÃO aparece em nenhuma página
+  if (!isAvailable) {
+    return null;
+  }
 
   return (
-    <>
-      {/* Player Sticky Fixo no Rodapé */}
-      <aside
-        aria-label="Player de Rádio ao Vivo"
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 9990,
-          background: '#17140F',
-          borderTop: '1px solid #2E2920',
-          boxShadow: '0 -4px 25px rgba(0, 0, 0, 0.6)',
-          padding: '10px 24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '16px',
-          flexWrap: 'wrap',
-          transition: 'all 0.3s ease',
-        }}
-      >
-        {/* Esquerda: Indicador AO VIVO & Informações */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: '220px' }}>
-          <div
-            style={{
-              width: '12px',
-              height: '12px',
-              borderRadius: '50%',
-              background: isPlaying ? '#25D366' : 'var(--primary)',
-              boxShadow: isPlaying ? '0 0 12px #25D366' : '0 0 8px var(--primary)',
-              animation: isPlaying ? 'pulse 1.5s infinite' : 'none',
-            }}
-          />
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span
-                style={{
-                  fontSize: '0.7rem',
-                  fontWeight: 800,
-                  letterSpacing: '1px',
-                  background: 'var(--primary)',
-                  color: '#fff',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {isPlaying ? 'NO AR' : 'AO VIVO'}
-              </span>
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#F4EFE6' }}>
-                Rádio Onda Sertaneja 24h
-              </span>
-            </div>
-            <span style={{ fontSize: '0.75rem', color: '#B8AF9F', display: 'block', marginTop: '2px' }}>
-              {hasError ? 'Transmissão indisponível no momento' : 'A batida que move o Brasil'}
+    <aside className="player-bar" aria-label="Player de Rádio ao Vivo">
+      {/* Esquerda: Indicador AO VIVO & Informações da Faixa */}
+      <div className="player-bar-left">
+        <div
+          className="player-bar-dot"
+          style={{
+            backgroundColor: isPlaying ? '#25D366' : '#FF5A4F',
+            boxShadow: isPlaying ? '0 0 12px #25D366' : '0 0 8px #FF5A4F',
+          }}
+        />
+        <div className="player-bar-info">
+          <div className="player-bar-header">
+            <span className="player-bar-badge">
+              {isPlaying ? 'NO AR' : 'AO VIVO'}
+            </span>
+            <span className="player-bar-title">
+              {trackInfo.title || 'Rádio Onda Sertaneja 24h'}
             </span>
           </div>
+          <span className="player-bar-artist">
+            {hasError ? 'Transmissão indisponível no momento' : trackInfo.artist || 'A batida que move o Brasil'}
+          </span>
         </div>
+      </div>
 
-        {/* Centro: Controles de Reprodução */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <button
-            onClick={togglePlay}
-            style={{
-              background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '30px',
-              padding: '10px 24px',
-              fontSize: '0.95rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              boxShadow: '0 4px 15px rgba(194, 70, 26, 0.4)',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-            }}
-          >
-            <i className={`fa-solid ${isPlaying ? 'fa-pause' : 'fa-play'}`}></i>
-            <span>{isPlaying ? 'Pausar Rádio' : 'Ouvir Rádio ao Vivo'}</span>
-          </button>
-        </div>
+      {/* Centro: Botão de Reprodução */}
+      <div className="player-bar-center">
+        <button
+          type="button"
+          className="player-bar-play-btn"
+          onClick={togglePlay}
+          aria-label={isPlaying ? 'Pausar rádio' : 'Tocar rádio ao vivo'}
+          title={isPlaying ? 'Pausar Rádio' : 'Ouvir Rádio ao Vivo'}
+        >
+          {isPlaying ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <rect x="6" y="4" width="4" height="16" rx="1" />
+              <rect x="14" y="4" width="4" height="16" rx="1" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ marginLeft: '2px' }}>
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+          )}
+          <span className="player-bar-play-text">
+            {isPlaying ? 'Pausar Rádio' : 'Ouvir Rádio ao Vivo'}
+          </span>
+        </button>
+      </div>
 
-        {/* Direita: Controles de Volume */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: '160px', justifyContent: 'flex-end' }}>
-          <button
-            onClick={toggleMute}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: isMuted ? 'var(--primary-text)' : '#B8AF9F',
-              fontSize: '1rem',
-              cursor: 'pointer',
-              padding: '4px',
-            }}
-            title={isMuted ? 'Desmutar' : 'Mutar'}
-          >
-            <i className={`fa-solid ${isMuted || volume === 0 ? 'fa-volume-xmark' : volume < 0.5 ? 'fa-volume-low' : 'fa-volume-high'}`}></i>
-          </button>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.05"
-            value={isMuted ? 0 : volume}
-            onChange={handleVolumeChange}
-            style={{
-              width: '90px',
-              accentColor: 'var(--primary)',
-              cursor: 'pointer',
-            }}
-          />
-        </div>
-      </aside>
-
-      <audio
-        ref={audioRef}
-        src={streamUrl}
-        preload="none"
-        onError={() => setHasError(true)}
-      />
-    </>
+      {/* Direita: Controles de Volume (Apenas no computador) */}
+      <div className="player-bar-right">
+        <button
+          type="button"
+          onClick={toggleMute}
+          className="player-bar-mute-btn"
+          aria-label={isMuted ? 'Ativar som' : 'Desativar som'}
+          title={isMuted ? 'Desmutar' : 'Mutar'}
+        >
+          {isMuted || volume === 0 ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="1" y1="1" x2="23" y2="23" />
+              <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6" />
+              <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23" />
+              <line x1="12" y1="19" x2="12" y2="23" />
+              <line x1="8" y1="23" x2="16" y2="23" />
+            </svg>
+          ) : volume < 0.5 ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            </svg>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+            </svg>
+          )}
+        </button>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.05"
+          value={isMuted ? 0 : volume}
+          onChange={handleVolumeChange}
+          aria-label="Controle de volume da rádio"
+          className="player-bar-slider"
+        />
+      </div>
+    </aside>
   );
 }

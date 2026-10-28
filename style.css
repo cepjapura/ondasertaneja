@@ -1651,4 +1651,910 @@ textarea:focus {
     max-width: 100%;
   }
 }
-
+
+/* =========================================
+   NOVA HOME PAGE (REDESIGN)
+========================================= */
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 120px 20px;
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    padding: 20px 16px 120px 16px;
+  }
+}
+
+/* 1. TOPO / HERO & CARD DA RÁDIO */
+.home-radio-wrapper {
+  margin-bottom: 32px;
+}
+
+.home-title {
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 8px;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+}
+
+.home-title-accent {
+  color: var(--primary-text);
+}
+
+.home-subtitle {
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  font-weight: 400;
+}
+
+/* Card da Rádio (Fundo escuro fixo #17140F nos dois modos) */
+.home-radio-card {
+  background: #17140F !important;
+  border: 1px solid #2E2920;
+  border-radius: 16px;
+  padding: 20px 24px;
+  color: #F4EFE6;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.2s ease;
+}
+
+.home-radio-card:hover {
+  border-color: rgba(194, 70, 26, 0.5);
+}
+
+.home-radio-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.home-radio-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.home-radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.home-radio-badge-text {
+  color: #F4EFE6;
+  text-transform: uppercase;
+}
+
+.home-radio-eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 18px;
+}
+
+.eq-bar {
+  width: 3px;
+  height: 4px;
+  background-color: var(--primary);
+  border-radius: 2px;
+  transition: height 0.2s ease;
+}
+
+@keyframes eqAnimation {
+  0% { height: 4px; }
+  100% { height: 18px; }
+}
+
+.eq-bar.playing:nth-child(1) { animation: eqAnimation 0.6s ease-in-out infinite alternate; animation-delay: 0.1s; }
+.eq-bar.playing:nth-child(2) { animation: eqAnimation 0.8s ease-in-out infinite alternate; animation-delay: 0.3s; }
+.eq-bar.playing:nth-child(3) { animation: eqAnimation 0.5s ease-in-out infinite alternate; animation-delay: 0.2s; }
+.eq-bar.playing:nth-child(4) { animation: eqAnimation 0.9s ease-in-out infinite alternate; animation-delay: 0.4s; }
+.eq-bar.playing:nth-child(5) { animation: eqAnimation 0.7s ease-in-out infinite alternate; animation-delay: 0.15s; }
+
+.home-radio-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.home-radio-cover {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #24201A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #2E2920;
+}
+
+.home-radio-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-radio-cover-placeholder {
+  color: var(--primary-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-radio-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-radio-track-title {
+  font-family: var(--font-title);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #F4EFE6 !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.25;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.home-radio-track-artist {
+  font-size: 0.88rem;
+  color: #B8AF9F !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+  margin: 0;
+  word-break: break-word;
+}
+
+.home-radio-play-btn {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  min-height: 56px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #FFFFFF !important;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(194, 70, 26, 0.45);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.home-radio-play-btn:hover {
+  background: var(--primary-hover);
+  transform: scale(1.06);
+}
+
+.home-radio-play-btn:active {
+  transform: scale(0.96);
+}
+
+/* 2. ATALHOS EM FORMATO DE PÍLULA */
+.home-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 28px 0 36px 0;
+}
+
+.home-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 22px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.home-pill-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--primary);
+  color: var(--primary-text);
+  transform: translateY(-2px);
+}
+
+.home-pill-btn svg {
+  color: var(--primary-text);
+  flex-shrink: 0;
+}
+
+/* 3. ASSISTA EM 30 SEGUNDOS (VÍDEOS VERTICAIS 9:16) */
+.short-videos-section {
+  margin: 36px 0;
+}
+
+.section-header-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.section-title-clean {
+  font-family: var(--font-title);
+  font-size: clamp(1.25rem, 3vw, 1.6rem);
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.view-all-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary-text);
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 4px;
+  transition: var(--transition);
+}
+
+.view-all-link:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.short-videos-carousel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 4px 4px 14px 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.short-videos-carousel::-webkit-scrollbar {
+  height: 6px;
+}
+
+.short-videos-carousel::-webkit-scrollbar-track {
+  background: var(--bg-hover);
+  border-radius: 3px;
+}
+
+.short-videos-carousel::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.short-video-card {
+  flex: 0 0 190px;
+  width: 190px;
+  height: 338px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  scroll-snap-align: start;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.short-video-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+}
+
+.short-video-trigger {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  display: block;
+}
+
+.short-video-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.short-video-fallback-thumb {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.short-video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 100%);
+  pointer-events: none;
+}
+
+.short-video-play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  border: 2px solid #fff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  pointer-events: none;
+}
+
+.short-video-trigger:hover .short-video-play-btn {
+  transform: translate(-50%, -50%) scale(1.12);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.short-video-platform-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.short-video-title {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+}
+
+.short-video-iframe-wrapper {
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+.short-video-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* 4. ÚLTIMAS (NOTÍCIAS EM LISTA COM FOTO 84x84) */
+.home-news-section {
+  margin: 36px 0;
+}
+
+.home-news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.home-news-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  min-height: 108px;
+  transition: var(--transition);
+  text-decoration: none;
+  color: inherit;
+}
+
+.home-news-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--primary);
+  transform: translateX(3px);
+}
+
+.home-news-thumb {
+  width: 84px;
+  height: 84px;
+  min-width: 84px;
+  min-height: 84px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.home-news-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-news-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-news-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary-text);
+  margin-bottom: 4px;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+.home-news-title {
+  font-family: var(--font-title);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+}
+
+.home-news-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* 5. AGENDA COMPACTA (ATÉ 3 PRÓXIMOS SHOWS) */
+.home-agenda-section {
+  margin: 36px 0;
+}
+
+.home-agenda-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.home-agenda-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  min-height: 72px;
+  transition: var(--transition);
+}
+
+.home-agenda-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--primary);
+}
+
+.home-agenda-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.home-agenda-day {
+  font-family: var(--font-title);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--primary-text);
+  line-height: 1;
+}
+
+.home-agenda-month {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.home-agenda-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-agenda-title {
+  font-family: var(--font-title);
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.home-agenda-location {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.home-agenda-action {
+  flex-shrink: 0;
+}
+
+/* 6. PATROCINADOR ALESSANDRO MIOTO */
+.home-sponsor-section {
+  margin: 36px 0;
+}
+
+.home-sponsor-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.home-sponsor-badge {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.home-sponsor-img {
+  max-height: 90px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* 7. BLOCO DA MARCA */
+.home-brand-block {
+  background: var(--primary);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px;
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 40px 0 20px 0;
+  box-shadow: 0 10px 25px rgba(194, 70, 26, 0.25);
+}
+
+.home-brand-text {
+  font-family: var(--font-title);
+  font-size: clamp(1.25rem, 3vw, 1.65rem);
+  font-weight: 800;
+  line-height: 1.25;
+  color: #FFFFFF;
+  max-width: 620px;
+  margin: 0;
+}
+
+.home-brand-btn {
+  background: #17140F;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 12px 28px;
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.home-brand-btn:hover {
+  background: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+  .home-brand-block {
+    flex-direction: column;
+    text-align: center;
+    padding: 28px 20px;
+  }
+
+  .home-brand-btn {
+    width: 100%;
+  }
+}
+
+/* =========================================
+   AJUSTE DE CABEÇALHO EM TELAS LARGAS (>= 1400px)
+   Garante pelo menos 16px de folga entre "Contato" e "Buscar"
+========================================= */
+@media (min-width: 1400px) {
+  .header-container {
+    max-width: 1320px;
+  }
+  .nav-menu {
+    gap: 12px;
+    margin-right: 24px;
+  }
+}
+
+/* =========================================
+   PLAYER BAR FIXO (COMPACTO & RESPONSIVO)
+========================================= */
+.player-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9990;
+  background: #17140F;
+  border-top: 1px solid #2E2920;
+  box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.6);
+  padding: 0 24px;
+  height: 72px;
+  max-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.player-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.player-bar-dot {
+  width: 10px;
+  height: 10px;
+  min-width: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background-color 0.3s ease;
+}
+
+.player-bar-info {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.player-bar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.player-bar-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: var(--primary);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.player-bar-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #F4EFE6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-bar-artist {
+  font-size: 0.75rem;
+  color: #B8AF9F;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  margin-top: 2px;
+}
+
+.player-bar-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.player-bar-play-btn {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 10px 22px;
+  min-height: 44px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(194, 70, 26, 0.4);
+  transition: var(--transition);
+}
+
+.player-bar-play-btn:hover {
+  transform: scale(1.04);
+}
+
+.player-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 150px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.player-bar-mute-btn {
+  background: transparent;
+  border: none;
+  color: #B8AF9F;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: var(--transition);
+}
+
+.player-bar-mute-btn:hover {
+  color: var(--primary-text);
+}
+
+.player-bar-slider {
+  width: 90px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* Responsividade PlayerBar no Celular: linha única <= 72px */
+@media (max-width: 768px) {
+  .player-bar {
+    padding: 0 16px;
+    height: 72px;
+    max-height: 72px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+
+  .player-bar-right {
+    display: none !important;
+  }
+
+  .player-bar-play-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  .player-bar-play-text {
+    display: none !important;
+  }
+
+  /* Ajustes do card da rádio no mobile para acomodar 2 linhas de texto com folga */
+  .home-radio-card {
+    padding: 16px;
+  }
+  .home-radio-body {
+    gap: 12px;
+  }
+  .home-radio-cover {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+  }
+  .home-radio-track-title {
+    font-size: 1.05rem;
+  }
+  .home-radio-track-artist {
+    font-size: 0.84rem;
+  }
+}

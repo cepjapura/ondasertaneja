@@ -337,3 +337,16 @@ model ChartEntry {
   @@index([isPublished, period, position])
   @@index([period])
 }
+
+model ShortVideo {
+  id           String   @id @default(uuid())
+  title        String
+  url          String   @db.VarChar(2048)
+  platform     String   // tiktok | instagram | youtube
+  thumbnailUrl String?  @db.VarChar(2048)
+  isPublished  Boolean  @default(false)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@index([isPublished, sortOrder])
+}
