@@ -4,11 +4,14 @@
   "main": "agenda.js",
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "prisma generate && prisma migrate deploy && tsx scripts/seed-if-empty.ts && next build",
+    "build": "prisma generate && prisma migrate deploy && tsx scripts/seed-if-empty.ts && tsx scripts/bootstrap-admin.ts && next build",
     "start": "next start",
     "seed": "tsx scripts/seed-from-json.ts",
     "seed:if-empty": "tsx scripts/seed-if-empty.ts",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "admin:hash": "tsx scripts/admin-hash.ts",
+    "admin:secret": "tsx scripts/admin-secret.ts",
+    "admin:bootstrap": "tsx scripts/bootstrap-admin.ts"
   },
   "repository": {
     "type": "git",
@@ -23,6 +26,7 @@
   "homepage": "https://github.com/cepjapura/ondasertaneja#readme",
   "description": "",
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.12.7",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
@@ -32,6 +36,8 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "bcryptjs": "^3.0.3",
+    "iron-session": "^9.0.1",
     "next": "^14.2.35",
     "next-themes": "^0.4.6",
     "puppeteer": "^25.10.0",
