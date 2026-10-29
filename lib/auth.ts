@@ -2,6 +2,7 @@ import { getIronSession, SessionOptions } from 'iron-session';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 import { prisma } from './prisma';
+import { cleanEnv, cleanEmail } from './env';
 
 export interface AdminSessionData {
   userId: string;
@@ -19,8 +20,8 @@ export const defaultSession: AdminSessionData = {
   isLoggedIn: false,
 };
 
-// Segredo da sessão: em produção, exige SESSION_SECRET definido com pelo menos 32 caracteres
-const sessionSecret = process.env.SESSION_SECRET || 'fallback_development_session_secret_at_least_32_chars_long';
+// Segredo da sessão: limpa espaços e aspas literais coladas em painéis
+const sessionSecret = cleanEnv(process.env.SESSION_SECRET) || 'fallback_development_session_secret_at_least_32_chars_long';
 
 export const sessionOptions: SessionOptions = {
   password: sessionSecret,
@@ -104,7 +105,7 @@ const DUMMY_BCRYPT_HASH = '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4L5
  * Validação de tentativa de login contra o banco com prevenção de timing attacks.
  */
 export async function authenticateAdmin(email: string, passwordPlain: string) {
-  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedEmail = cleanEmail(email);
 
   const user = await prisma.adminUser.findUnique({
     where: { email: normalizedEmail },
@@ -125,7 +126,7 @@ export async function authenticateAdmin(email: string, passwordPlain: string) {
  * Verificação de Rate Limit: 5 tentativas incorretas a cada 15 minutos (por IP ou por e-mail).
  */
 export async function checkRateLimit(ip: string, email: string): Promise<{ blocked: boolean; remainingAttempts: number }> {
-  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedEmail = cleanEmail(email);
   const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
 
   const [ipFailures, emailFailures] = await Promise.all([
@@ -155,7 +156,7 @@ export async function checkRateLimit(ip: string, email: string): Promise<{ block
  * Registra tentativa falha no banco de dados.
  */
 export async function recordFailedLogin(ip: string, email: string) {
-  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedEmail = cleanEmail(email);
   await prisma.loginAttempt.create({
     data: {
       ip,
@@ -168,7 +169,7 @@ export async function recordFailedLogin(ip: string, email: string) {
  * Limpa o histórico de tentativas após login bem-sucedido.
  */
 export async function clearLoginAttempts(ip: string, email: string) {
-  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedEmail = cleanEmail(email);
   await prisma.loginAttempt.deleteMany({
     where: {
       OR: [{ ip }, { email: normalizedEmail }],
