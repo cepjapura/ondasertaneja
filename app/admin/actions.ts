@@ -13,6 +13,7 @@ import {
   clearLoginAttempts,
   getClientIp,
 } from '@/lib/auth';
+import { cleanEmail } from '@/lib/env';
 import { parseAndValidateVideoUrl } from '@/lib/videos';
 import { logAuditEvent } from '@/lib/audit';
 
@@ -22,7 +23,8 @@ import { logAuditEvent } from '@/lib/audit';
 export async function loginAction(prevState: any, formData: FormData) {
   const reqHeaders = headers();
   const ip = getClientIp(reqHeaders);
-  const email = (formData.get('email') as string) || '';
+  const rawEmail = (formData.get('email') as string) || '';
+  const email = cleanEmail(rawEmail);
   const password = (formData.get('password') as string) || '';
 
   if (!email || !password) {

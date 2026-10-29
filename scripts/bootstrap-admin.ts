@@ -1,56 +1,70 @@
 import { prisma } from '../lib/prisma';
+import { cleanEnv, cleanEmail } from '../lib/env';
 
 async function bootstrapAdmin() {
-  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-  const hashB64 = process.env.ADMIN_PASSWORD_HASH_B64?.trim();
-  const name = process.env.ADMIN_NAME?.trim() || 'Administrador';
-  const shouldReset = process.env.ADMIN_RESET_PASSWORD === 'true';
+  const email = cleanEmail(process.env.ADMIN_EMAIL);
+  const hashB64 = cleanEnv(process.env.ADMIN_PASSWORD_HASH_B64);
+  const name = cleanEnv(process.env.ADMIN_NAME) || 'Administrador';
+  const shouldReset = cleanEnv(process.env.ADMIN_RESET_PASSWORD) === 'true';
 
   if (!email || !hashB64) {
-    console.log('[Bootstrap Admin] ADMIN_EMAIL ou ADMIN_PASSWORD_HASH_B64 não informados. Pulando bootstrap.');
+    console.log('[Bootstrap Admin] Pulado: ADMIN_EMAIL ou ADMIN_PASSWORD_HASH_B64 não informados nas variáveis de ambiente.');
     return;
   }
 
-  // Decodifica o hash de Base64 para UTF-8 (protegendo contra a expansão de '$' do dotenv-expand)
+  // 1. Decodifica o hash de Base64 para UTF-8 (protegendo contra a expansão de '$' do dotenv-expand)
   let passwordHash = '';
   try {
     passwordHash = Buffer.from(hashB64, 'base64').toString('utf8');
   } catch (err) {
-    console.error('[Bootstrap Admin] Erro: ADMIN_PASSWORD_HASH_B64 inválido (falha ao decodificar base64).');
-    return;
+    throw new Error('[Bootstrap Admin] Falha: ADMIN_PASSWORD_HASH_B64 inválido (falha ao decodificar Base64).');
   }
 
-  if (!passwordHash.startsWith('$2')) {
-    console.error('[Bootstrap Admin] Erro: O hash decodificado não é um hash bcrypt válido ($2a$... ou $2b$...).');
-    return;
+  // 2. Validação estrita do hash bcrypt: deve começar com $2a$ ou $2b$ e ter exatamente 60 caracteres
+  const isValidBcrypt =
+    (passwordHash.startsWith('$2a$') || passwordHash.startsWith('$2b$')) &&
+    passwordHash.length === 60;
+
+  if (!isValidBcrypt) {
+    throw new Error(
+      '[Bootstrap Admin] Falha: O hash decodificado não é um hash bcrypt válido (deve iniciar com $2a$ ou $2b$ e conter exatamente 60 caracteres). Verifique o valor de ADMIN_PASSWORD_HASH_B64.'
+    );
   }
 
-  // MODO RECUPERAÇÃO DE SENHA (ADMIN_RESET_PASSWORD=true)
+  // 3. MODO RECUPERAÇÃO DE SENHA / CREDENCIAIS (ADMIN_RESET_PASSWORD=true)
   if (shouldReset) {
-    console.log(`[Bootstrap Admin] ADMIN_RESET_PASSWORD=true detectado. Atualizando senha de ${email}...`);
-    const existing = await prisma.adminUser.findUnique({ where: { email } });
+    const admins = await prisma.adminUser.findMany();
 
-    if (existing) {
+    if (admins.length === 1) {
+      const targetAdmin = admins[0];
+      const previousEmail = targetAdmin.email;
+
       await prisma.adminUser.update({
-        where: { id: existing.id },
-        data: { passwordHash },
+        where: { id: targetAdmin.id },
+        data: {
+          email,
+          passwordHash,
+        },
       });
 
       await prisma.auditLog.create({
         data: {
           entityName: 'AdminUser',
-          entityId: existing.id,
+          entityId: targetAdmin.id,
           action: 'reset_password',
-          changesJson: JSON.stringify({ message: 'Senha redefinida via flag ADMIN_RESET_PASSWORD no deploy' }),
-          userId: existing.id,
+          changesJson: JSON.stringify({
+            message: 'E-mail e senha redefinidos via flag ADMIN_RESET_PASSWORD no build/deploy',
+            previousEmail,
+            updatedEmail: email,
+          }),
+          userId: targetAdmin.id,
         },
       });
 
-      console.log(`[Bootstrap Admin] Senha do admin ${email} atualizada com sucesso!`);
-      console.log('⚠️  IMPORTANTE: Remova a variável ADMIN_RESET_PASSWORD do hPanel para evitar redefinições indesejadas.');
+      console.log(`[Bootstrap Admin] Redefinido: administrador único atualizado com sucesso (e-mail e senha redefinidos para ${email}).`);
+      console.log('⚠️  IMPORTANTE: Remova a variável ADMIN_RESET_PASSWORD do hPanel para evitar redefinições em deploys futuros.');
       return;
-    } else {
-      console.log(`[Bootstrap Admin] Admin ${email} não existia; criando novo superadmin no modo reset...`);
+    } else if (admins.length === 0) {
       const created = await prisma.adminUser.create({
         data: {
           name,
@@ -64,26 +78,30 @@ async function bootstrapAdmin() {
         data: {
           entityName: 'AdminUser',
           entityId: created.id,
-          action: 'bootstrap_superadmin_reset_mode',
+          action: 'bootstrap_superadmin',
           changesJson: JSON.stringify({ email: created.email, role: created.role }),
           userId: created.id,
         },
       });
 
-      console.log(`[Bootstrap Admin] Superadministrador ${email} criado com sucesso!`);
-      console.log('⚠️  IMPORTANTE: Remova a variável ADMIN_RESET_PASSWORD do hPanel.');
+      console.log(`[Bootstrap Admin] Criado: nenhum administrador encontrado; primeiro superadministrador (${email}) criado com sucesso no modo de recuperação.`);
+      console.log('⚠️  IMPORTANTE: Remova a variável ADMIN_RESET_PASSWORD do hPanel para evitar redefinições em deploys futuros.');
+      return;
+    } else {
+      console.log(
+        `[Bootstrap Admin] Pulado: existem ${admins.length} administradores no banco de dados. Por segurança, a redefinição automática via ADMIN_RESET_PASSWORD só é permitida quando existe exatamente 1 administrador.`
+      );
       return;
     }
   }
 
-  // MODO BOOTSTRAP PADRÃO: Executa apenas se não existir nenhum administrador cadastrado
+  // 4. MODO BOOTSTRAP PADRÃO: Executa apenas se não existir nenhum administrador cadastrado
   const count = await prisma.adminUser.count();
   if (count > 0) {
-    console.log(`[Bootstrap Admin] Já existem ${count} usuário(s) administrador(es) cadastrado(s). Pulando bootstrap.`);
+    console.log(`[Bootstrap Admin] Pulado: já existe(m) ${count} administrador(es) cadastrado(s) no banco de dados e ADMIN_RESET_PASSWORD não está ativo.`);
     return;
   }
 
-  console.log(`[Bootstrap Admin] Nenhum administrador encontrado. Criando primeiro superadministrador (${email})...`);
   const created = await prisma.adminUser.create({
     data: {
       name,
@@ -103,12 +121,12 @@ async function bootstrapAdmin() {
     },
   });
 
-  console.log(`[Bootstrap Admin] Primeiro superadministrador (${email}) criado com sucesso!`);
+  console.log(`[Bootstrap Admin] Criado: primeiro superadministrador (${email}) cadastrado com sucesso.`);
 }
 
 bootstrapAdmin()
   .catch((err) => {
-    console.error('[Bootstrap Admin] Erro fatal durante bootstrap:', err);
+    console.error('[Bootstrap Admin] Erro fatal durante bootstrap:', err.message || err);
     process.exit(1);
   })
   .finally(async () => {
