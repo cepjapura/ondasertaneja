@@ -69,8 +69,20 @@ export default function HomeRadioCard({
     setShowIframe(false);
   };
 
+  // Garante que o body receba classe quando a playlist estiver aberta para ajuste de botões flutuantes (ex: WhatsApp no celular)
+  useEffect(() => {
+    if (showIframe) {
+      document.body.classList.add('playlist-open');
+    } else {
+      document.body.classList.remove('playlist-open');
+    }
+    return () => {
+      document.body.classList.remove('playlist-open');
+    };
+  }, [showIframe]);
+
   return (
-    <div className="home-radio-wrapper">
+    <div className={`home-radio-wrapper ${showIframe ? 'is-playlist-open' : ''}`}>
       {/* Título Principal */}
       <h1 className="home-title">
         A batida que move o <span className="home-title-accent">Brasil.</span>
@@ -80,7 +92,10 @@ export default function HomeRadioCard({
       </p>
 
       {/* Card da Rádio / Playlist (Fundo escuro fixo #17140F em ambos os modos) */}
-      <div className="home-radio-card" aria-label="Player de Rádio ao Vivo ou Playlist da Onda">
+      <div
+        className={`home-radio-card ${showIframe ? 'has-open-playlist' : ''}`}
+        aria-label="Player de Rádio ao Vivo ou Playlist da Onda"
+      >
         {/* Topo do Card: Selo e Controles */}
         <div className="home-radio-top">
           {isAvailable ? (

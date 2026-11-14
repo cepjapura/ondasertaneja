@@ -251,9 +251,153 @@ export async function reorderVideoAction(videoId: string, direction: 'up' | 'dow
   revalidatePath('/admin/videos');
 }
 
+/**
+ * Salva a configuração da Playlist da Onda no SystemConfig (Formulário independente).
+ * Campo vazio significa desativar/limpar a playlist sem erro.
+ */
+export async function savePlaylistConfigAction(prevState: any, formData: FormData) {
+  const admin = await verifyAdminSession();
+
+  const playlistUrlRaw = (formData.get('playlistUrl') as string) || '';
+  const trimmed = playlistUrlRaw.trim();
+
+  // Campo vazio significa desativar/limpar a playlist sem erro
+  if (!trimmed) {
+    await prisma.systemConfig.upsert({
+      where: { key: 'playlistUrl' },
+      update: { value: '' },
+      create: { key: 'playlistUrl', value: '' },
+    });
+    await prisma.systemConfig.upsert({
+      where: { key: 'wavePlaylistUrl' },
+      update: { value: '' },
+      create: { key: 'wavePlaylistUrl', value: '' },
+    });
+    await prisma.systemConfig.upsert({
+      where: { key: 'playlistEmbedUrl' },
+      update: { value: '' },
+      create: { key: 'playlistEmbedUrl', value: '' },
+    });
+
+    await logAuditEvent({
+      entityName: 'SystemConfig',
+      entityId: 'playlistUrl',
+      action: 'clear',
+      changesJson: { cleared: true, field: 'playlistUrl' },
+      userId: admin.id,
+    });
+
+    revalidatePath('/');
+    revalidatePath('/admin/configuracoes');
+
+    return { success: true, message: 'Playlist da Onda desativada com sucesso.' };
+  }
+
+  // Validação estrita de formatos aceitos (Spotify / YouTube / YouTube Music)
+  let parsed: PlaylistInfo;
+  try {
+    parsed = parseAndValidatePlaylistUrl(trimmed);
+  } catch (err: any) {
+    return { error: err.message || 'Link de playlist inválido.' };
+  }
+
+  await prisma.systemConfig.upsert({
+    where: { key: 'playlistUrl' },
+    update: { value: parsed.originalUrl },
+    create: { key: 'playlistUrl', value: parsed.originalUrl },
+  });
+  await prisma.systemConfig.upsert({
+    where: { key: 'wavePlaylistUrl' },
+    update: { value: parsed.originalUrl },
+    create: { key: 'wavePlaylistUrl', value: parsed.originalUrl },
+  });
+  await prisma.systemConfig.upsert({
+    where: { key: 'playlistEmbedUrl' },
+    update: { value: parsed.embedUrl },
+    create: { key: 'playlistEmbedUrl', value: parsed.embedUrl },
+  });
+
+  await logAuditEvent({
+    entityName: 'SystemConfig',
+    entityId: 'playlistUrl',
+    action: 'update',
+    changesJson: { playlistUrl: parsed.originalUrl, playlistEmbedUrl: parsed.embedUrl },
+    userId: admin.id,
+  });
+
+  revalidatePath('/');
+  revalidatePath('/admin/configuracoes');
+
+  return { success: true, message: 'Playlist da Onda salva com sucesso!' };
+}
+
+/**
+ * Salva a configuração do Link da Rádio ao Vivo no SystemConfig (Formulário independente).
+ * Campo vazio significa "sem rádio" e deve salvar sem erro.
+ */
+export async function saveRadioConfigAction(prevState: any, formData: FormData) {
+  const admin = await verifyAdminSession();
+
+  const streamAudioUrlRaw = (formData.get('streamAudioUrl') as string) || '';
+  const trimmed = streamAudioUrlRaw.trim();
+
+  // Campo vazio significa "sem rádio" e deve salvar sem erro
+  if (!trimmed) {
+    await prisma.systemConfig.upsert({
+      where: { key: 'streamAudioUrl' },
+      update: { value: '' },
+      create: { key: 'streamAudioUrl', value: '' },
+    });
+
+    await logAuditEvent({
+      entityName: 'SystemConfig',
+      entityId: 'streamAudioUrl',
+      action: 'clear',
+      changesJson: { cleared: true, field: 'streamAudioUrl' },
+      userId: admin.id,
+    });
+
+    revalidatePath('/');
+    revalidatePath('/admin/configuracoes');
+
+    return { success: true, message: 'Rádio desativada com sucesso (sem rádio).' };
+  }
+
+  // Se preenchido, valida se é HTTPS e se não é placeholder
+  if (!trimmed.startsWith('https://')) {
+    return { error: 'O link da rádio ao vivo deve começar estritamente com "https://".' };
+  }
+
+  if (!isRadioAvailable(trimmed)) {
+    return {
+      error:
+        'O link da rádio ao vivo é inválido ou contém valores de exemplo/placeholder (ex.: localhost, SEU_STREAM).',
+    };
+  }
+
+  await prisma.systemConfig.upsert({
+    where: { key: 'streamAudioUrl' },
+    update: { value: trimmed },
+    create: { key: 'streamAudioUrl', value: trimmed },
+  });
+
+  await logAuditEvent({
+    entityName: 'SystemConfig',
+    entityId: 'streamAudioUrl',
+    action: 'update',
+    changesJson: { streamAudioUrl: trimmed },
+    userId: admin.id,
+  });
+
+  revalidatePath('/');
+  revalidatePath('/admin/configuracoes');
+
+  return { success: true, message: 'Link da rádio ao vivo salvo com sucesso!' };
+}
 
 /**
  * Salva as configurações de Playlist da Onda e Link da Rádio ao Vivo no SystemConfig.
+ * Mantida para retrocompatibilidade.
  */
 export async function saveConfigAction(prevState: any, formData: FormData) {
   const admin = await verifyAdminSession();
@@ -264,7 +408,7 @@ export async function saveConfigAction(prevState: any, formData: FormData) {
   const trimmedPlaylist = playlistUrlRaw.trim();
   const trimmedStream = streamAudioUrlRaw.trim();
 
-  // 1. Validação do Link da Rádio ao Vivo (se preenchido)
+  // 1. Validação do Link da Rádio ao Vivo (se preenchido e não vazio)
   if (trimmedStream) {
     if (!trimmedStream.startsWith('https://')) {
       return { error: 'O link da rádio ao vivo deve começar estritamente com "https://".' };
@@ -290,14 +434,12 @@ export async function saveConfigAction(prevState: any, formData: FormData) {
   // 3. Persistência no SystemConfig
   const changes: Record<string, any> = {};
 
-  if (trimmedStream) {
-    await prisma.systemConfig.upsert({
-      where: { key: 'streamAudioUrl' },
-      update: { value: trimmedStream },
-      create: { key: 'streamAudioUrl', value: trimmedStream },
-    });
-    changes.streamAudioUrl = trimmedStream;
-  }
+  await prisma.systemConfig.upsert({
+    where: { key: 'streamAudioUrl' },
+    update: { value: trimmedStream },
+    create: { key: 'streamAudioUrl', value: trimmedStream },
+  });
+  changes.streamAudioUrl = trimmedStream;
 
   if (trimmedPlaylist && parsedPlaylist) {
     await prisma.systemConfig.upsert({

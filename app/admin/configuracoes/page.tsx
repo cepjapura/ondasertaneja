@@ -1,6 +1,7 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminSession } from '@/lib/auth';
+import { isRadioAvailable } from '@/lib/radio';
 import ConfigForm from './ConfigForm';
 
 export const dynamic = 'force-dynamic';
@@ -18,7 +19,9 @@ export default async function AdminConfiguracoesPage() {
 
   const configMap = Object.fromEntries(configs.map((c) => [c.key, c.value]));
 
-  const streamAudioUrl = configMap.streamAudioUrl || '';
+  const rawStream = configMap.streamAudioUrl || '';
+  // Se o valor salvo for um placeholder (isRadioAvailable falso), o campo da rádio aparece VAZIO no painel
+  const streamAudioUrl = isRadioAvailable(rawStream) ? rawStream : '';
   const playlistUrl = configMap.playlistUrl || configMap.wavePlaylistUrl || '';
   const playlistEmbedUrl = configMap.playlistEmbedUrl || '';
 

@@ -1939,6 +1939,29 @@ textarea:focus {
   }
 }
 
+/* Quando a playlist estiver aberta, protege o player no celular contra sobreposição do botão flutuante do WhatsApp */
+@media (max-width: 768px) {
+  body.playlist-open #btnWhatsappFloat {
+    bottom: 115px !important;
+    right: 16px !important;
+    transform: scale(0.9);
+    transition: all 0.3s ease;
+  }
+
+  .home-radio-wrapper.is-playlist-open {
+    margin-bottom: 60px;
+  }
+
+  .home-radio-card.has-open-playlist {
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+  }
+
+  .home-playlist-iframe-container {
+    margin-bottom: 16px;
+  }
+}
+
 /* 2. ATALHOS EM FORMATO DE PÍLULA */
 .home-shortcuts {
   display: flex;
