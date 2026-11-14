@@ -99,6 +99,7 @@ export async function createVideoAction(prevState: any, formData: FormData) {
 
   const title = (formData.get('title') as string) || '';
   const url = (formData.get('url') as string) || '';
+  const rawSection = (formData.get('section') as string) || '';
   const customThumbnail = (formData.get('thumbnailUrl') as string) || '';
 
   if (!title.trim()) {
@@ -107,8 +108,10 @@ export async function createVideoAction(prevState: any, formData: FormData) {
 
   try {
     const parsed = await parseAndValidateVideoUrl(url, customThumbnail);
+    const section = rawSection === 'TOP_VIDEOS' || rawSection === 'SHORTS' ? rawSection : parsed.suggestedSection;
 
     const maxOrder = await prisma.shortVideo.aggregate({
+      where: { section },
       _max: { sortOrder: true },
     });
     const nextOrder = (maxOrder._max.sortOrder ?? 0) + 1;
@@ -121,6 +124,7 @@ export async function createVideoAction(prevState: any, formData: FormData) {
         thumbnailUrl: parsed.thumbnailUrl || null,
         isPublished: false, // Inicia como não publicado
         sortOrder: nextOrder,
+        section,
       },
     });
 
@@ -128,7 +132,7 @@ export async function createVideoAction(prevState: any, formData: FormData) {
       entityName: 'ShortVideo',
       entityId: video.id,
       action: 'create',
-      changesJson: { title: video.title, platform: video.platform, url: video.url },
+      changesJson: { title: video.title, platform: video.platform, url: video.url, section: video.section },
       userId: admin.id,
     });
 
@@ -210,7 +214,13 @@ export async function deleteVideoAction(videoId: string) {
 export async function reorderVideoAction(videoId: string, direction: 'up' | 'down') {
   const admin = await verifyAdminSession();
 
+  const currentVideo = await prisma.shortVideo.findUnique({
+    where: { id: videoId },
+  });
+  if (!currentVideo) return;
+
   const videos = await prisma.shortVideo.findMany({
+    where: { section: currentVideo.section },
     orderBy: { sortOrder: 'asc' },
   });
 
@@ -220,7 +230,7 @@ export async function reorderVideoAction(videoId: string, direction: 'up' | 'dow
   const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
   if (targetIndex < 0 || targetIndex >= videos.length) return;
 
-  const currentVideo = videos[currentIndex];
+  // currentVideo ja capturado
   const targetVideo = videos[targetIndex];
 
   // Troca sortOrder entre os dois
@@ -241,6 +251,7 @@ export async function reorderVideoAction(videoId: string, direction: 'up' | 'dow
     action: 'reorder',
     changesJson: {
       direction,
+      section: currentVideo.section,
       previousOrder: currentVideo.sortOrder,
       newOrder: targetVideo.sortOrder,
     },

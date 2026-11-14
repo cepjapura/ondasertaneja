@@ -343,11 +343,13 @@ model ShortVideo {
   title        String
   url          String   @db.VarChar(2048)
   platform     String   // tiktok | instagram | youtube
+  section      String   @default("SHORTS") // TOP_VIDEOS | SHORTS
   thumbnailUrl String?  @db.VarChar(2048)
   isPublished  Boolean  @default(false)
   sortOrder    Int      @default(0)
   createdAt    DateTime @default(now())
 
+  @@index([isPublished, section, sortOrder])
   @@index([isPublished, sortOrder])
 }
 
