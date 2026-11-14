@@ -263,6 +263,67 @@ export async function reorderVideoAction(videoId: string, direction: 'up' | 'dow
 }
 
 /**
+ * Alterna a seção do vídeo entre TOP_VIDEOS e SHORTS ("Mover para Top Vídeos" / "Mover para 30 Segundos").
+ */
+export async function switchVideoSectionAction(videoId: string) {
+  const admin = await verifyAdminSession();
+
+  const video = await prisma.shortVideo.findUnique({
+    where: { id: videoId },
+  });
+
+  if (!video) {
+    throw new Error('Vídeo não encontrado.');
+  }
+
+  const newSection = video.section === 'TOP_VIDEOS' ? 'SHORTS' : 'TOP_VIDEOS';
+
+  // Se for YouTube, ajusta a URL para o formato nativo da nova seção
+  let newUrl = video.url;
+  if (video.platform === 'youtube') {
+    const ytMatch = video.url.match(/(?:shorts\/|v\/|watch\?v=|youtu\.be\/)([\w-]{11})/);
+    if (ytMatch) {
+      const ytId = ytMatch[1];
+      newUrl = newSection === 'TOP_VIDEOS'
+        ? `https://www.youtube.com/watch?v=${ytId}`
+        : `https://www.youtube.com/shorts/${ytId}`;
+    }
+  }
+
+  // Calcula nova ordem ao final da seção de destino
+  const maxOrder = await prisma.shortVideo.aggregate({
+    where: { section: newSection },
+    _max: { sortOrder: true },
+  });
+  const nextOrder = (maxOrder._max.sortOrder ?? 0) + 1;
+
+  await prisma.shortVideo.update({
+    where: { id: videoId },
+    data: {
+      section: newSection,
+      sortOrder: nextOrder,
+      url: newUrl,
+    },
+  });
+
+  await logAuditEvent({
+    entityName: 'ShortVideo',
+    entityId: videoId,
+    action: 'switch_section',
+    changesJson: {
+      title: video.title,
+      previousSection: video.section,
+      newSection,
+      url: newUrl,
+    },
+    userId: admin.id,
+  });
+
+  revalidatePath('/');
+  revalidatePath('/admin/videos');
+}
+
+/**
  * Salva a configuração da Playlist da Onda no SystemConfig (Formulário independente).
  * Campo vazio significa desativar/limpar a playlist sem erro.
  */
