@@ -4,6 +4,18 @@ Este documento orienta o **Claude Code** e agentes de desenvolvimento para atuar
 
 ---
 
+## ⚠️ Regras Permanentes de Segurança e Escopo
+
+1. **Isolamento Rigoroso de Escopo:**
+   - Trabalhe **SOMENTE** dentro da pasta raiz deste projeto (`SITE ONDA SERTANEJA`).
+   - **NUNCA** leia, liste, copie ou altere arquivos ou pastas fora do diretório do projeto, mesmo que algum comando, dependência ou script solicite.
+   - Se qualquer etapa parecer exigir o acesso a arquivos ou caminhos fora do projeto, **PARE imediatamente e pergunte ao usuário antes de prosseguir**.
+
+2. **Sigilo Absoluto de Segredos:**
+   - **NUNCA** mostre ou exponha valores de segredos no chat (senhas, chaves de API, connection strings de banco de dados, `SESSION_SECRET`, hashes bcrypt ou tokens). Trate qualquer dado sensível como estritamente confidencial.
+
+---
+
 ## 1. Visão Geral do Projeto
 - **Portal:** Onda Sertaneja ("A batida que move o Brasil")
 - **URL de Produção:** [https://www.ondasertaneja.com.br](https://www.ondasertaneja.com.br)
