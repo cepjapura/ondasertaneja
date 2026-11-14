@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getStartOfDaySaoPaulo } from '@/lib/dates';
 import { isRadioAvailable } from '@/lib/radio';
+import { getPlaylistEmbedUrl } from '@/lib/playlist';
 import HomeRadioCard from '@/components/HomeRadioCard';
 import ShortVideosCarousel from '@/components/ShortVideosCarousel';
 
@@ -11,11 +12,20 @@ export const revalidate = 60; // ISR 60 segundos
 export default async function HomePage() {
   const startOfToday = getStartOfDaySaoPaulo();
 
-  // 0. Status da Rádio ao Vivo
-  const streamConfig = await prisma.systemConfig.findUnique({
-    where: { key: 'streamAudioUrl' },
+  // 0. Status da Rádio ao Vivo e Playlist da Onda
+  const configs = await prisma.systemConfig.findMany({
+    where: {
+      key: {
+        in: ['streamAudioUrl', 'playlistUrl', 'wavePlaylistUrl', 'playlistEmbedUrl'],
+      },
+    },
   });
-  const radioAvailable = isRadioAvailable(streamConfig?.value);
+  const configMap = Object.fromEntries(configs.map((c) => [c.key, c.value]));
+  const radioAvailable = isRadioAvailable(configMap.streamAudioUrl);
+  const playlistEmbedUrl =
+    configMap.playlistEmbedUrl ||
+    (configMap.playlistUrl ? getPlaylistEmbedUrl(configMap.playlistUrl) : null) ||
+    (configMap.wavePlaylistUrl ? getPlaylistEmbedUrl(configMap.wavePlaylistUrl) : null);
 
   // 1. Vídeos curtos verticais publicados
   const shortVideos = await prisma.shortVideo.findMany({
@@ -48,8 +58,12 @@ export default async function HomePage() {
   return (
     <main className="main-content">
       <div className="home-container">
-        {/* 1. TÍTULO + SUBTÍTULO + CARD DA RÁDIO AO VIVO */}
-        <HomeRadioCard initialIsAvailable={radioAvailable} />
+        {/* 1. TÍTULO + SUBTÍTULO + CARD DA RÁDIO AO VIVO OU PLAYLIST */}
+        <HomeRadioCard
+          initialIsAvailable={radioAvailable}
+          initialPlaylistEmbedUrl={playlistEmbedUrl}
+          initialPlaylistUrl={configMap.playlistUrl || configMap.wavePlaylistUrl}
+        />
 
         {/* 2. ATALHOS EM FORMATO DE PÍLULA */}
         <nav className="home-shortcuts" aria-label="Atalhos rápidos do site">

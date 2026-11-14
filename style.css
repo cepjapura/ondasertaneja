@@ -1856,6 +1856,89 @@ textarea:focus {
   transform: scale(0.96);
 }
 
+/* Playlist da Onda no Card da Home */
+.home-radio-playlist-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  color: #FFFFFF !important;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(194, 70, 26, 0.45);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.home-radio-playlist-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(194, 70, 26, 0.55);
+}
+
+.home-radio-playlist-btn:active {
+  transform: translateY(0);
+}
+
+.home-playlist-iframe-container {
+  width: 100%;
+  height: 390px;
+  margin-top: 14px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #12100C;
+  border: 1px solid #2E2920;
+}
+
+.home-playlist-iframe {
+  width: 100%;
+  height: 390px;
+  border: none;
+  border-radius: 12px;
+  display: block;
+}
+
+.home-playlist-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #F4EFE6;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.home-playlist-close-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #FFFFFF;
+}
+
+@media (max-width: 600px) {
+  .home-radio-body.is-playlist {
+    flex-wrap: wrap;
+  }
+  .home-radio-body.is-playlist .home-radio-playlist-btn {
+    width: 100%;
+    margin-top: 8px;
+    justify-content: center;
+  }
+}
+
 /* 2. ATALHOS EM FORMATO DE PÍLULA */
 .home-shortcuts {
   display: flex;

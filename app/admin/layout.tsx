@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getAdminSession } from '@/lib/auth';
 import { logoutAction } from './actions';
+import AdminNav from '@/components/admin/AdminNav';
 
 export const metadata: Metadata = {
   title: 'Painel Administrativo | Onda Sertaneja',
@@ -26,11 +27,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <Link href="/admin/videos" className="admin-logo">
                 ONDA<span>ADMIN</span>
               </Link>
-              <nav className="admin-nav">
-                <Link href="/admin/videos" className="admin-nav-link active">
-                  Vídeos Curtos
-                </Link>
-              </nav>
+              <AdminNav />
             </div>
 
             <div className="admin-user-menu">
