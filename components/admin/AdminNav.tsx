@@ -21,6 +21,12 @@ export default function AdminNav() {
       >
         Configurações
       </Link>
+      <Link
+        href="/admin/usuarios"
+        className={`admin-nav-link ${pathname.startsWith('/admin/usuarios') ? 'active' : ''}`}
+      >
+        Usuários
+      </Link>
     </nav>
   );
 }

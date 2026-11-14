@@ -599,3 +599,66 @@ export async function clearConfigFieldAction(field: 'streamAudioUrl' | 'playlist
 
   return { success: true };
 }
+
+
+/**
+ * Exclui um administrador (não permite excluir a si mesmo nem o último administrador).
+ */
+export async function deleteAdminUserAction(targetUserId: string) {
+  const currentAdmin = await verifyAdminSession();
+
+  // 1. Proibição de excluir a si mesmo
+  if (targetUserId === currentAdmin.id) {
+    throw new Error('Você não pode excluir sua própria conta de administrador.');
+  }
+
+  // 2. Proibição de excluir o último administrador
+  const totalAdmins = await prisma.adminUser.count();
+  if (totalAdmins <= 1) {
+    throw new Error('Não é possível excluir o único administrador do sistema.');
+  }
+
+  const targetUser = await prisma.adminUser.findUnique({
+    where: { id: targetUserId },
+  });
+
+  if (!targetUser) {
+    throw new Error('Administrador não encontrado.');
+  }
+
+  // 3. Desvincula referências opcionais antes de excluir para garantir integridade referencial
+  await prisma.$transaction(async (tx) => {
+    await tx.news.updateMany({
+      where: { authorId: targetUserId },
+      data: { authorId: null },
+    });
+    await tx.eventStatusHistory.updateMany({
+      where: { changedByUserId: targetUserId },
+      data: { changedByUserId: null },
+    });
+    await tx.auditLog.updateMany({
+      where: { userId: targetUserId },
+      data: { userId: null },
+    });
+
+    await tx.adminUser.delete({
+      where: { id: targetUserId },
+    });
+  });
+
+  // 4. Auditoria
+  await logAuditEvent({
+    entityName: 'AdminUser',
+    entityId: targetUserId,
+    action: 'delete',
+    changesJson: {
+      deletedEmail: targetUser.email,
+      deletedName: targetUser.name,
+      deletedRole: targetUser.role,
+    },
+    userId: currentAdmin.id,
+  });
+
+  revalidatePath('/admin/usuarios');
+  return { success: true };
+}

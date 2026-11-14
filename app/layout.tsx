@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Bricolage_Grotesque, Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import Header from '@/components/Header';
 import PlayerBar from '@/components/PlayerBar';
 import Footer from '@/components/Footer';
@@ -7,20 +7,44 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { AudioProvider } from '@/contexts/AudioContext';
 import '@/style.css';
 
-const bricolageGrotesque = Bricolage_Grotesque({
-  subsets: ['latin'],
-  weight: ['600', '800'],
+const bricolageGrotesque = localFont({
+  src: [
+    {
+      path: './fonts/bricolage-grotesque-latin-600-normal.woff2',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: './fonts/bricolage-grotesque-latin-800-normal.woff2',
+      weight: '800',
+      style: 'normal',
+    },
+  ],
   variable: '--font-bricolage',
   display: 'swap',
 });
 
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
+const inter = localFont({
+  src: [
+    {
+      path: './fonts/inter-latin-400-normal.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: './fonts/inter-latin-500-normal.woff2',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: './fonts/inter-latin-600-normal.woff2',
+      weight: '600',
+      style: 'normal',
+    },
+  ],
   variable: '--font-inter',
   display: 'swap',
 });
-
 export const metadata: Metadata = {
   title: 'Onda Sertaneja - A Rádio que Vive o Sertão',
   description: 'Onda Sertaneja — A plataforma digital da música sertaneja: perfis de artistas, agenda de shows, lançamentos e notícias. A batida que move o Brasil!',
