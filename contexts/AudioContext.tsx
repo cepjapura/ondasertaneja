@@ -14,6 +14,7 @@ interface AudioContextType {
   isAvailable: boolean;
   isPlaying: boolean;
   togglePlay: () => void;
+  pauseAudio: () => void;
   streamUrl: string;
   volume: number;
   isMuted: boolean;
@@ -88,6 +89,13 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const pauseAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    setIsPlaying(false);
+  };
+
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVol = parseFloat(e.target.value);
     setVolume(newVol);
@@ -107,6 +115,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         isAvailable,
         isPlaying,
         togglePlay,
+        pauseAudio,
         streamUrl,
         volume,
         isMuted,
