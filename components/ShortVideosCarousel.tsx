@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { getVideoBadgeLabel } from '@/lib/videos';
 
 export interface ShortVideoItem {
   id: string;
@@ -76,6 +77,7 @@ export default function ShortVideosCarousel({ videos }: Props) {
           const isActive = activeVideoId === video.id;
           const thumbnail = getThumbnail(video);
           const embedUrl = getEmbedUrl(video);
+          const badgeLabel = getVideoBadgeLabel('SHORTS', video.platform);
 
           return (
             <div key={video.id} className="short-video-card">
@@ -87,6 +89,7 @@ export default function ShortVideosCarousel({ videos }: Props) {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     className="short-video-iframe"
+                    loading="lazy"
                   />
                 </div>
               ) : (
@@ -142,7 +145,7 @@ export default function ShortVideosCarousel({ videos }: Props) {
 
                   {/* Platform Badge */}
                   <span className="short-video-platform-badge">
-                    {video.platform === 'youtube' ? 'Shorts' : video.platform === 'instagram' ? 'Reels' : 'TikTok'}
+                    {badgeLabel}
                   </span>
 
                   {/* Title */}

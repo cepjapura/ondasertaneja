@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { createVideoAction } from '../actions';
+import { detectVideoSection, VideoSection } from '@/lib/videos';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -34,19 +35,32 @@ function SubmitButton() {
 export default function VideoForm() {
   const [state, formAction] = useFormState(createVideoAction, null);
   const formRef = useRef<HTMLFormElement>(null);
+  const [url, setUrl] = useState('');
+  const [section, setSection] = useState<VideoSection>('SHORTS');
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newUrl = e.target.value;
+    setUrl(newUrl);
+    const detected = detectVideoSection(newUrl);
+    if (detected) {
+      setSection(detected);
+    }
+  };
 
   useEffect(() => {
     if (state?.success && formRef.current) {
       formRef.current.reset();
+      setUrl('');
+      setSection('SHORTS');
     }
   }, [state]);
 
   return (
-    <section className="admin-card" aria-label="Cadastrar novo vídeo curto">
+    <section className="admin-card" aria-label="Cadastrar novo vídeo">
       <div className="admin-card-header">
-        <h2 className="admin-card-title">Novo Vídeo Curto</h2>
+        <h2 className="admin-card-title">Novo Vídeo</h2>
         <p className="admin-card-subtitle">
-          Cole o link de um vídeo vertical do YouTube Shorts, TikTok ou Instagram Reels.
+          Cadastre clipes completos (16:9) para a seção Top Vídeos ou vídeos verticais (9:16) do YouTube Shorts, TikTok ou Instagram Reels.
         </p>
       </div>
 
@@ -66,7 +80,7 @@ export default function VideoForm() {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polyline points="20 6 9 17 4 12" />
           </svg>
-          <span>Vídeo cadastrado com sucesso! Ele começa como <strong>Rascunho</strong>. Clique em "Publicar" na lista abaixo quando desejar exibi-lo no site.</span>
+          <span>Vídeo cadastrado com sucesso! Ele começa como <strong>Rascunho</strong>. Clique em &quot;Publicar&quot; na lista abaixo quando desejar exibi-lo no site.</span>
         </div>
       )}
 
@@ -81,11 +95,32 @@ export default function VideoForm() {
               name="url"
               type="url"
               required
-              placeholder="https://www.youtube.com/shorts/... ou https://www.tiktok.com/@.../video/..."
+              value={url}
+              onChange={handleUrlChange}
+              placeholder="https://www.youtube.com/watch?v=... ou https://www.youtube.com/shorts/..."
               className="admin-form-input"
             />
             <span className="admin-form-hint">
-              Formatos aceitos: YouTube Shorts (youtube.com/shorts ou youtu.be), TikTok (tiktok.com ou vm.tiktok.com), Instagram Reels (instagram.com/reel).
+              Formatos aceitos: Clipes do YouTube (youtube.com/watch ou youtu.be), YouTube Shorts, TikTok ou Instagram Reels.
+            </span>
+          </div>
+
+          <div className="admin-form-group">
+            <label htmlFor="section" className="admin-form-label">
+              Seção na Home <span className="admin-required">*</span>
+            </label>
+            <select
+              id="section"
+              name="section"
+              value={section}
+              onChange={(e) => setSection(e.target.value as VideoSection)}
+              className="admin-form-input"
+            >
+              <option value="TOP_VIDEOS">Top Vídeos (Clipe 16:9)</option>
+              <option value="SHORTS">Assista em 30 Segundos (Shorts 9:16)</option>
+            </select>
+            <span className="admin-form-hint">
+              Pré-selecionado automaticamente com base no link. Você pode alterar manualmente.
             </span>
           </div>
 
@@ -98,7 +133,7 @@ export default function VideoForm() {
               name="title"
               type="text"
               required
-              placeholder="Ex.: Bastidores do show em Maringá"
+              placeholder="Ex.: Clipe Oficial - Rádio Onda Sertaneja"
               className="admin-form-input"
             />
           </div>

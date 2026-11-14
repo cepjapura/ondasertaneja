@@ -5,6 +5,7 @@ import { getStartOfDaySaoPaulo } from '@/lib/dates';
 import { isRadioAvailable } from '@/lib/radio';
 import { getPlaylistEmbedUrl } from '@/lib/playlist';
 import HomeRadioCard from '@/components/HomeRadioCard';
+import TopVideosCarousel from '@/components/TopVideosCarousel';
 import ShortVideosCarousel from '@/components/ShortVideosCarousel';
 
 export const revalidate = 60; // ISR 60 segundos
@@ -27,9 +28,15 @@ export default async function HomePage() {
     (configMap.playlistUrl ? getPlaylistEmbedUrl(configMap.playlistUrl) : null) ||
     (configMap.wavePlaylistUrl ? getPlaylistEmbedUrl(configMap.wavePlaylistUrl) : null);
 
-  // 1. Vídeos curtos verticais publicados
+
+  // 1. Top Vídeos (clipes 16:9) e Shorts (vídeos verticais 9:16)
+  const topVideos = await prisma.shortVideo.findMany({
+    where: { isPublished: true, section: 'TOP_VIDEOS' },
+    orderBy: { sortOrder: 'asc' },
+  });
+
   const shortVideos = await prisma.shortVideo.findMany({
-    where: { isPublished: true },
+    where: { isPublished: true, section: 'SHORTS' },
     orderBy: { sortOrder: 'asc' },
   });
 
@@ -107,7 +114,10 @@ export default async function HomePage() {
           </Link>
         </nav>
 
-        {/* 3. ASSISTA EM 30 SEGUNDOS (VÍDEOS VERTICAIS 9:16) */}
+        {/* 3. TOP VÍDEOS (CLIPES 16:9) */}
+        {topVideos.length > 0 && <TopVideosCarousel videos={topVideos} />}
+
+        {/* 4. ASSISTA EM 30 SEGUNDOS (VÍDEOS VERTICAIS 9:16) */}
         {shortVideos.length > 0 && <ShortVideosCarousel videos={shortVideos} />}
 
         {/* 4. ÚLTIMAS (NOTÍCIAS) */}
