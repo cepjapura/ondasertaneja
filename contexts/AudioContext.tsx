@@ -70,10 +70,29 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
   }, [volume, isMuted]);
 
+  useEffect(() => {
+    const handleStopMedia = (e: any) => {
+      if (e?.detail?.origin !== 'radio') {
+        pauseAudio();
+      }
+    };
+    window.addEventListener('onda-stop-media', handleStopMedia);
+    return () => {
+      window.removeEventListener('onda-stop-media', handleStopMedia);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted]);
+
   const togglePlay = () => {
     if (!isAvailable || !audioRef.current) return;
 
     if (!isPlaying) {
+      window.dispatchEvent(new CustomEvent('onda-stop-media', { detail: { origin: 'radio' } }));
       setHasError(false);
       audioRef.current
         .play()

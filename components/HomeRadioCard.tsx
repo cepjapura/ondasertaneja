@@ -62,8 +62,23 @@ export default function HomeRadioCard({
   const handleOpenPlaylist = () => {
     // Garante que a rádio seja pausada: nunca dois áudios ao mesmo tempo
     pauseAudio();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('onda-stop-media', { detail: { origin: 'playlist' } }));
+    }
     setShowIframe(true);
   };
+
+  useEffect(() => {
+    const handleStopMedia = (e: any) => {
+      if (e?.detail?.origin !== 'playlist') {
+        setShowIframe(false);
+      }
+    };
+    window.addEventListener('onda-stop-media', handleStopMedia);
+    return () => {
+      window.removeEventListener('onda-stop-media', handleStopMedia);
+    };
+  }, []);
 
   const handleClosePlaylist = () => {
     setShowIframe(false);
