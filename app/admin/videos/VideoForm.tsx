@@ -2,8 +2,8 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
-import { createVideoAction } from '../actions';
-import { detectVideoSection, VideoSection } from '@/lib/videos';
+import { createVideoAction, suggestVideoSectionAction } from '../actions';
+import { VideoSection } from '@/lib/videos';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -36,14 +36,40 @@ export default function VideoForm() {
   const [state, formAction] = useFormState(createVideoAction, null);
   const formRef = useRef<HTMLFormElement>(null);
   const [url, setUrl] = useState('');
-  const [section, setSection] = useState<VideoSection>('SHORTS');
+  const [section, setSection] = useState<VideoSection>('TOP_VIDEOS');
+  const [isDetecting, setIsDetecting] = useState(false);
+  const latestUrlRef = useRef('');
+
+  const checkSuggestedSection = async (candidateUrl: string) => {
+    const trimmed = candidateUrl.trim();
+    if (!trimmed || !trimmed.startsWith('http')) return;
+
+    latestUrlRef.current = trimmed;
+    setIsDetecting(true);
+    try {
+      const suggested = await suggestVideoSectionAction(trimmed);
+      if (latestUrlRef.current === trimmed) {
+        setSection(suggested);
+      }
+    } catch {
+      if (latestUrlRef.current === trimmed) {
+        setSection('TOP_VIDEOS');
+      }
+    } finally {
+      setIsDetecting(false);
+    }
+  };
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUrl = e.target.value;
     setUrl(newUrl);
-    const detected = detectVideoSection(newUrl);
-    if (detected) {
-      setSection(detected);
+    checkSuggestedSection(newUrl);
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData('text');
+    if (pasted) {
+      checkSuggestedSection(pasted);
     }
   };
 
@@ -51,7 +77,7 @@ export default function VideoForm() {
     if (state?.success && formRef.current) {
       formRef.current.reset();
       setUrl('');
-      setSection('SHORTS');
+      setSection('TOP_VIDEOS');
     }
   }, [state]);
 
@@ -60,7 +86,7 @@ export default function VideoForm() {
       <div className="admin-card-header">
         <h2 className="admin-card-title">Novo Vídeo</h2>
         <p className="admin-card-subtitle">
-          Cadastre clipes completos (16:9) para a seção Top Vídeos ou vídeos verticais (9:16) do YouTube Shorts, TikTok ou Instagram Reels.
+          Cadastre vídeos para as seções Top Vídeos e Shorts da Onda.
         </p>
       </div>
 
@@ -97,11 +123,12 @@ export default function VideoForm() {
               required
               value={url}
               onChange={handleUrlChange}
+              onPaste={handlePaste}
               placeholder="https://www.youtube.com/watch?v=... ou https://www.youtube.com/shorts/..."
               className="admin-form-input"
             />
             <span className="admin-form-hint">
-              Formatos aceitos: Clipes do YouTube (youtube.com/watch ou youtu.be), YouTube Shorts, TikTok ou Instagram Reels.
+              Formatos aceitos: YouTube (watch ou shorts), TikTok ou Instagram Reels.
             </span>
           </div>
 
@@ -116,11 +143,13 @@ export default function VideoForm() {
               onChange={(e) => setSection(e.target.value as VideoSection)}
               className="admin-form-input"
             >
-              <option value="TOP_VIDEOS">Top Vídeos (Clipe 16:9)</option>
-              <option value="SHORTS">Assista em 30 Segundos (Shorts 9:16)</option>
+              <option value="TOP_VIDEOS">Top Vídeos</option>
+              <option value="SHORTS">Shorts da Onda</option>
             </select>
             <span className="admin-form-hint">
-              Pré-selecionado automaticamente com base no link. Você pode alterar manualmente.
+              {isDetecting
+                ? 'Consultando canal do YouTube...'
+                : 'Sugerido automaticamente com base no canal (canal Onda Sertaneja → Shorts da Onda; outros canais → Top Vídeos). Você pode alterar a qualquer momento.'}
             </span>
           </div>
 
@@ -150,7 +179,7 @@ export default function VideoForm() {
               className="admin-form-input"
             />
             <span className="admin-form-hint">
-              Para YouTube, a capa é gerada automaticamente. Para Instagram Reels, insira a URL de uma foto caso deseje uma capa específica.
+              Para o YouTube a capa é obtida automaticamente. Para Instagram e TikTok é altamente recomendável informar uma imagem.
             </span>
           </div>
         </div>

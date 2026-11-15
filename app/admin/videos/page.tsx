@@ -22,7 +22,7 @@ export default async function AdminVideosPage() {
         <div>
           <h1 className="admin-page-title">Gestão de Vídeos</h1>
           <p className="admin-page-description">
-            Cadastre e ordene os clipes e shorts exibidos nas seções &quot;Top Vídeos&quot; e &quot;Assista em 30 Segundos&quot; da página inicial.
+            Cadastre e ordene os clipes e shorts exibidos nas seções &quot;Top Vídeos&quot; e &quot;Shorts da Onda&quot; da página inicial.
           </p>
         </div>
       </div>

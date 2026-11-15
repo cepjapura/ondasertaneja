@@ -127,7 +127,7 @@ export default function VideoList({ videos }: Props) {
             className={`admin-filter-tab ${sectionFilter === 'SHORTS' ? 'active' : ''}`}
             onClick={() => setSectionFilter('SHORTS')}
           >
-            Shorts ({shortsCount})
+            Shorts da Onda ({shortsCount})
           </button>
         </div>
       </div>
@@ -144,7 +144,7 @@ export default function VideoList({ videos }: Props) {
                 <th style={{ width: '80px' }}>Ordem</th>
                 <th style={{ width: '90px' }}>Capa</th>
                 <th>Título</th>
-                <th style={{ width: '220px' }}>Seção / Tipo</th>
+                <th style={{ width: '240px' }}>Seção / Tipo</th>
                 <th style={{ width: '130px' }}>Status</th>
                 <th style={{ width: '220px', textAlign: 'right' }}>Ações</th>
               </tr>
@@ -202,7 +202,7 @@ export default function VideoList({ videos }: Props) {
 
                     {/* Capa */}
                     <td>
-                      <div className={`admin-video-thumb ${video.section === 'TOP_VIDEOS' ? 'wide' : ''}`}>
+                      <div className="admin-video-thumb">
                         {thumb ? (
                           <img
                             src={thumb}
@@ -248,7 +248,7 @@ export default function VideoList({ videos }: Props) {
                       <div className="admin-badges-cell">
                         <div className="admin-badges">
                           <span className={`admin-section-badge ${video.section === 'TOP_VIDEOS' ? 'top-videos' : 'shorts'}`}>
-                            {video.section === 'TOP_VIDEOS' ? 'Top Vídeos' : 'Shorts'}
+                            {video.section === 'TOP_VIDEOS' ? 'Top Vídeos' : 'Shorts da Onda'}
                           </span>
                           <span className={`admin-platform-badge ${video.platform}`}>
                             {badgeLabel}
@@ -260,8 +260,8 @@ export default function VideoList({ videos }: Props) {
                           disabled={isPending}
                           onClick={() => handleSwitchSection(video.id)}
                           className="admin-btn-switch-section"
-                          aria-label={`Mover "${video.title}" para ${video.section === 'TOP_VIDEOS' ? '30 Segundos' : 'Top Vídeos'}`}
-                          title={`Mover para ${video.section === 'TOP_VIDEOS' ? 'Assista em 30 Segundos' : 'Top Vídeos'}`}
+                          aria-label={`Mover "${video.title}" para ${video.section === 'TOP_VIDEOS' ? 'Shorts da Onda' : 'Top Vídeos'}`}
+                          title={`Mover para ${video.section === 'TOP_VIDEOS' ? 'Shorts da Onda' : 'Top Vídeos'}`}
                         >
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                             <polyline points="17 1 21 5 17 9" />
@@ -269,7 +269,7 @@ export default function VideoList({ videos }: Props) {
                             <polyline points="7 23 3 19 7 15" />
                             <path d="M21 13v2a4 4 0 0 1-4 4H3" />
                           </svg>
-                          <span>{video.section === 'TOP_VIDEOS' ? 'Mover para 30 Segundos' : 'Mover para Top Vídeos'}</span>
+                          <span>{video.section === 'TOP_VIDEOS' ? 'Mover para Shorts da Onda' : 'Mover para Top Vídeos'}</span>
                         </button>
                       </div>
                     </td>
