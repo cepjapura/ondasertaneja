@@ -12,7 +12,7 @@ export interface TopVideoItem {
   id: string;
   title: string;
   url: string;
-  platform: string;
+  platform: string; // 'youtube' | 'tiktok' | 'instagram'
   thumbnailUrl?: string | null;
   sortOrder: number;
 }
@@ -23,6 +23,16 @@ interface Props {
 
 function extractYouTubeId(url: string): string | null {
   const match = url.match(/(?:shorts\/|v\/|watch\?v=|youtu\.be\/)([\w-]{11})/);
+  return match ? match[1] : null;
+}
+
+function extractInstagramId(url: string): string | null {
+  const match = url.match(/instagram\.com\/(?:reel|p)\/([A-Za-z0-9_-]+)/);
+  return match ? match[1] : null;
+}
+
+function extractTikTokId(url: string): string | null {
+  const match = url.match(/video\/(\d+)/);
   return match ? match[1] : null;
 }
 
@@ -153,8 +163,10 @@ export default function TopVideosCarousel({ videos }: Props) {
     const currentVideo = videos.find((v) => v.id === activeVideoId);
     if (!currentVideo) return;
 
+    // Se for YouTube, usa a YouTube IFrame API
+    const isYt = currentVideo.platform === 'youtube' || !currentVideo.platform;
     const ytId = extractYouTubeId(currentVideo.url);
-    if (!ytId) return;
+    if (!isYt || !ytId) return;
 
     const containerId = `yt-player-top-${currentVideo.id}`;
 
@@ -243,9 +255,26 @@ export default function TopVideosCarousel({ videos }: Props) {
 
   const getThumbnail = (video: TopVideoItem) => {
     if (video.thumbnailUrl) return video.thumbnailUrl;
-    const ytId = extractYouTubeId(video.url);
-    if (ytId) return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+    if (video.platform === 'youtube' || !video.platform) {
+      const ytId = extractYouTubeId(video.url);
+      if (ytId) return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+    }
+    if (video.platform === 'tiktok') {
+      return `/api/proxy-thumbnail?id=${video.id}`;
+    }
     return null;
+  };
+
+  const getEmbedUrl = (video: TopVideoItem) => {
+    if (video.platform === 'instagram') {
+      const igId = extractInstagramId(video.url);
+      return igId ? `https://www.instagram.com/reel/${igId}/embed/` : null;
+    }
+    if (video.platform === 'tiktok') {
+      const ttId = extractTikTokId(video.url);
+      return ttId ? `https://www.tiktok.com/embed/v2/${ttId}` : null;
+    }
+    return video.url;
   };
 
   const handleManualResume = (e: React.MouseEvent) => {
@@ -270,12 +299,14 @@ export default function TopVideosCarousel({ videos }: Props) {
         ref={carouselRef}
         className="top-videos-carousel"
         role="region"
-        aria-label="Carrossel de clipes musicais"
+        aria-label="Carrossel Top Vídeos"
       >
         {videos.map((video, index) => {
           const isActive = activeVideoId === video.id;
           const isLast = index === videos.length - 1;
           const thumbnail = getThumbnail(video);
+          const isYt = video.platform === 'youtube' || !video.platform;
+          const embedUrl = !isYt ? getEmbedUrl(video) : null;
 
           return (
             <div
@@ -288,10 +319,20 @@ export default function TopVideosCarousel({ videos }: Props) {
               {isActive ? (
                 <div className="top-video-iframe-wrapper">
                   {/* Container do Player */}
-                  <div
-                    id={`yt-player-top-${video.id}`}
-                    className="top-video-iframe"
-                  />
+                  {isYt ? (
+                    <div
+                      id={`yt-player-top-${video.id}`}
+                      className="top-video-iframe"
+                    />
+                  ) : embedUrl ? (
+                    <iframe
+                      src={embedUrl}
+                      title={video.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="top-video-iframe"
+                    />
+                  ) : null}
 
                   {/* Barra de Controles Superiores no Card Ativo */}
                   <div className="video-card-top-controls">
@@ -365,7 +406,7 @@ export default function TopVideosCarousel({ videos }: Props) {
                   type="button"
                   className="top-video-trigger"
                   onClick={() => playVideo(video, false)}
-                  aria-label={`Assistir clipe: ${video.title}`}
+                  aria-label={`Reproduzir vídeo: ${video.title}`}
                 >
                   {/* Thumbnail do vídeo */}
                   {thumbnail ? (
@@ -382,7 +423,7 @@ export default function TopVideosCarousel({ videos }: Props) {
 
                   {/* Fallback de ícone caso thumbnail falhe */}
                   <div className="top-video-fallback-thumb" aria-hidden="true">
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="currentColor">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9c1.68.49 7.68.49 7.68.49s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81zM9.75 15.02V8.98l5.5 3.02-5.5 3.02z" />
                     </svg>
                   </div>
@@ -392,13 +433,15 @@ export default function TopVideosCarousel({ videos }: Props) {
 
                   {/* Botão de Play central */}
                   <div className="top-video-play-btn" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                       <polygon points="6 3 20 12 6 21 6 3" />
                     </svg>
                   </div>
 
-                  {/* Etiqueta CLIPE */}
-                  <span className="top-video-badge">CLIPE</span>
+                  {/* Número de ranking grande no canto (1, 2, 3...) */}
+                  <span className="top-video-rank" aria-label={`Posição ${index + 1}`}>
+                    {index + 1}
+                  </span>
 
                   {/* Título do vídeo */}
                   <p className="top-video-title">{video.title}</p>

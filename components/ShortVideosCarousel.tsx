@@ -157,15 +157,18 @@ export default function ShortVideosCarousel({ videos }: Props) {
     [videos, playVideo, closePlayer]
   );
 
-  // Inicializa o YouTube Player quando um vídeo do YouTube for selecionado
+  // Inicializa o YouTube Player quando um vídeo for ativado
   useEffect(() => {
     if (!activeVideoId) return;
 
     const currentVideo = videos.find((v) => v.id === activeVideoId);
     if (!currentVideo) return;
 
+    // Apenas vídeos do YouTube usam a Iframe Player API
+    if (currentVideo.platform !== 'youtube') return;
+
     const ytId = extractYouTubeId(currentVideo.url);
-    if (!ytId || currentVideo.platform !== 'youtube') return;
+    if (!ytId) return;
 
     const containerId = `yt-player-shorts-${currentVideo.id}`;
 
@@ -289,16 +292,16 @@ export default function ShortVideosCarousel({ videos }: Props) {
   };
 
   return (
-    <section className="short-videos-section" aria-label="Assista em 30 segundos">
+    <section className="short-videos-section" aria-label="Shorts da Onda">
       <div className="section-header-compact">
-        <h2 className="section-title-clean">Assista em 30 Segundos</h2>
+        <h2 className="section-title-clean">Shorts da Onda</h2>
       </div>
 
       <div
         ref={carouselRef}
         className="short-videos-carousel"
         role="region"
-        aria-label="Carrossel de vídeos verticais"
+        aria-label="Carrossel Shorts da Onda"
       >
         {videos.map((video, index) => {
           const isActive = activeVideoId === video.id;

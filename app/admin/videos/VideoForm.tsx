@@ -36,7 +36,7 @@ export default function VideoForm() {
   const [state, formAction] = useFormState(createVideoAction, null);
   const formRef = useRef<HTMLFormElement>(null);
   const [url, setUrl] = useState('');
-  const [section, setSection] = useState<VideoSection>('SHORTS');
+  const [section, setSection] = useState<VideoSection>('TOP_VIDEOS');
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUrl = e.target.value;
@@ -51,7 +51,7 @@ export default function VideoForm() {
     if (state?.success && formRef.current) {
       formRef.current.reset();
       setUrl('');
-      setSection('SHORTS');
+      setSection('TOP_VIDEOS');
     }
   }, [state]);
 
@@ -60,7 +60,7 @@ export default function VideoForm() {
       <div className="admin-card-header">
         <h2 className="admin-card-title">Novo Vídeo</h2>
         <p className="admin-card-subtitle">
-          Cadastre clipes completos (16:9) para a seção Top Vídeos ou vídeos verticais (9:16) do YouTube Shorts, TikTok ou Instagram Reels.
+          Cadastre vídeos para as seções Top Vídeos e Shorts da Onda.
         </p>
       </div>
 
@@ -101,7 +101,7 @@ export default function VideoForm() {
               className="admin-form-input"
             />
             <span className="admin-form-hint">
-              Formatos aceitos: Clipes do YouTube (youtube.com/watch ou youtu.be), YouTube Shorts, TikTok ou Instagram Reels.
+              Formatos aceitos: YouTube (watch ou shorts), TikTok ou Instagram Reels.
             </span>
           </div>
 
@@ -116,11 +116,11 @@ export default function VideoForm() {
               onChange={(e) => setSection(e.target.value as VideoSection)}
               className="admin-form-input"
             >
-              <option value="TOP_VIDEOS">Top Vídeos (Clipe 16:9)</option>
-              <option value="SHORTS">Assista em 30 Segundos (Shorts 9:16)</option>
+              <option value="TOP_VIDEOS">Top Vídeos</option>
+              <option value="SHORTS">Shorts da Onda</option>
             </select>
             <span className="admin-form-hint">
-              Pré-selecionado automaticamente com base no link. Você pode alterar manualmente.
+              Seção padrão: Top Vídeos. Sugestão automática ao colar o link, com opção de trocar.
             </span>
           </div>
 
@@ -150,7 +150,7 @@ export default function VideoForm() {
               className="admin-form-input"
             />
             <span className="admin-form-hint">
-              Para YouTube, a capa é gerada automaticamente. Para Instagram Reels, insira a URL de uma foto caso deseje uma capa específica.
+              Para o YouTube a capa é obtida automaticamente. Para Instagram e TikTok é altamente recomendável informar uma imagem.
             </span>
           </div>
         </div>

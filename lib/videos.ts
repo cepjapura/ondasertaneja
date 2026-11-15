@@ -1,5 +1,5 @@
 /**
- * Utilitários de validação e sanitização de vídeos (Top Vídeos 16:9 e Shorts 9:16).
+ * Utilitários de validação e sanitização de vídeos (Top Vídeos e Shorts da Onda).
  * Proteção rigorosa contra SSRF e injeção de links arbitrários.
  */
 
@@ -23,9 +23,10 @@ const TIKTOK_SHORT_REGEX = /^(?:https?:\/\/)?(?:vm|vt)\.tiktok\.com\/([\w.-]+)/;
  * Detecta automaticamente a seção recomendada com base no formato da URL:
  * - youtube.com/shorts, TikTok e Instagram Reels -> SHORTS
  * - links normais do YouTube (watch?v=, youtu.be) -> TOP_VIDEOS
+ * - padrão caso não seja shorts/tiktok/reels: TOP_VIDEOS
  */
 export function detectVideoSection(rawUrl: string): VideoSection {
-  if (!rawUrl || typeof rawUrl !== 'string') return 'SHORTS';
+  if (!rawUrl || typeof rawUrl !== 'string') return 'TOP_VIDEOS';
   const url = rawUrl.trim().toLowerCase();
 
   if (url.includes('/shorts/') || url.includes('tiktok.com') || url.includes('instagram.com')) {
@@ -36,17 +37,17 @@ export function detectVideoSection(rawUrl: string): VideoSection {
     return 'TOP_VIDEOS';
   }
 
-  return 'SHORTS';
+  return 'TOP_VIDEOS';
 }
 
 /**
  * Retorna a etiqueta correta conforme a seção e plataforma:
- * - Se TOP_VIDEOS: "CLIPE"
+ * - Se TOP_VIDEOS: "" (Top Vídeos usa número de ranking 1, 2, 3...)
  * - Se SHORTS: "SHORTS", "TIKTOK" ou "REELS"
  */
 export function getVideoBadgeLabel(section?: string | null, platform?: string | null): string {
   if (section === 'TOP_VIDEOS') {
-    return 'CLIPE';
+    return 'TOP VÍDEOS';
   }
   const plat = (platform || '').toLowerCase();
   if (plat === 'tiktok') return 'TIKTOK';
