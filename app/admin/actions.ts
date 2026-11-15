@@ -14,7 +14,7 @@ import {
   getClientIp,
 } from '@/lib/auth';
 import { cleanEmail } from '@/lib/env';
-import { parseAndValidateVideoUrl } from '@/lib/videos';
+import { parseAndValidateVideoUrl, detectVideoSectionWithOEmbed, VideoSection } from '@/lib/videos';
 import { logAuditEvent } from '@/lib/audit';
 import { isRadioAvailable } from '@/lib/radio';
 import { parseAndValidatePlaylistUrl, PlaylistInfo } from '@/lib/playlist';
@@ -327,6 +327,14 @@ export async function switchVideoSectionAction(videoId: string) {
  * Salva a configuração da Playlist da Onda no SystemConfig (Formulário independente).
  * Campo vazio significa desativar/limpar a playlist sem erro.
  */
+/**
+ * Consulta a oEmbed pública do YouTube no servidor para sugerir a seção (Top Vídeos vs Shorts da Onda).
+ */
+export async function suggestVideoSectionAction(rawUrl: string): Promise<VideoSection> {
+  await verifyAdminSession();
+  return await detectVideoSectionWithOEmbed(rawUrl);
+}
+
 export async function savePlaylistConfigAction(prevState: any, formData: FormData) {
   const admin = await verifyAdminSession();
 

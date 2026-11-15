@@ -317,152 +317,157 @@ export default function ShortVideosCarousel({ videos }: Props) {
               ref={(el) => {
                 cardRefs.current[video.id] = el;
               }}
-              className={`short-video-card ${isActive ? 'is-active-card' : ''}`}
+              className="video-carousel-item"
             >
-              {isActive ? (
-                <div className="short-video-iframe-wrapper">
-                  {/* Container do Player */}
-                  {isYt ? (
-                    <div
-                      id={`yt-player-shorts-${video.id}`}
-                      className="short-video-iframe"
-                    />
-                  ) : embedUrl ? (
-                    <iframe
-                      src={embedUrl}
-                      title={video.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="short-video-iframe"
-                    />
-                  ) : null}
+              {/* Card de Vídeo (Capa inativa ou Player ativo - 100% livre de controles sobrepostos) */}
+              <div className={`short-video-card ${isActive ? 'is-active-card' : ''}`}>
+                {isActive ? (
+                  <div className="short-video-iframe-wrapper">
+                    {/* Container do Player */}
+                    {isYt ? (
+                      <div
+                        id={`yt-player-shorts-${video.id}`}
+                        className="short-video-iframe"
+                      />
+                    ) : embedUrl ? (
+                      <iframe
+                        src={embedUrl}
+                        title={video.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="short-video-iframe"
+                      />
+                    ) : null}
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="short-video-trigger"
+                    onClick={() => playVideo(video, false)}
+                    aria-label={`Reproduzir vídeo: ${video.title}`}
+                  >
+                    {/* Thumbnail com fallback elegante */}
+                    {thumbnail ? (
+                      <img
+                        src={thumbnail}
+                        alt=""
+                        className="short-video-thumb"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    ) : null}
 
-                  {/* Barra de Controles Superiores no Card Ativo */}
-                  <div className="video-card-top-controls">
+                    {/* Fallback de ícone da plataforma */}
+                    <div className="short-video-fallback-thumb" aria-hidden="true">
+                      {video.platform === 'youtube' && (
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9c1.68.49 7.68.49 7.68.49s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81zM9.75 15.02V8.98l5.5 3.02-5.5 3.02z" />
+                        </svg>
+                      )}
+                      {video.platform === 'instagram' && (
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" fill="var(--bg-card)" />
+                          <circle cx="17.5" cy="6.5" r="1.5" fill="var(--bg-card)" />
+                        </svg>
+                      )}
+                      {video.platform === 'tiktok' && (
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.86.12V9.42a6.34 6.34 0 0 0-.86-.06 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V7.57a8.16 8.16 0 0 0 4.63 1.45V5.57a4.83 4.83 0 0 1-.86-2.88z" />
+                        </svg>
+                      )}
+                    </div>
+
+                    {/* Gradient overlay */}
+                    <div className="short-video-overlay" aria-hidden="true" />
+
+                    {/* Play Button Icon */}
+                    <div className="short-video-play-btn" aria-hidden="true">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="6 3 20 12 6 21 6 3" />
+                      </svg>
+                    </div>
+
+                    {/* Platform Badge */}
+                    <span className="short-video-platform-badge">
+                      {badgeLabel}
+                    </span>
+
+                    {/* Title */}
+                    <p className="short-video-title">{video.title}</p>
+                  </button>
+                )}
+              </div>
+
+              {/* Barra de Controles Própria Logo ABAIXO do Card que está tocando */}
+              {isActive && (
+                <div
+                  className="video-player-bottom-bar"
+                  role="toolbar"
+                  aria-label="Controles de reprodução do vídeo"
+                >
+                  {/* Botão Sequência (só ícone, min 44px) */}
+                  <button
+                    type="button"
+                    onClick={handleToggleSequence}
+                    className={`video-bottom-ctrl-btn sequence-btn ${isSequenceActive ? 'is-active' : ''}`}
+                    aria-label={`Sequência de reprodução: ${isSequenceActive ? 'ligada' : 'desligada'}`}
+                    title={isSequenceActive ? 'Sequência ligada (toca o próximo automaticamente)' : 'Sequência desligada (pausa ao terminar)'}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <polyline points="17 1 21 5 17 9" />
+                      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                      <polyline points="7 23 3 19 7 15" />
+                      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                    </svg>
+                  </button>
+
+                  {/* Fallback Safari Autoplay Bloqueado ou Botão Próximo */}
+                  {needsUserInteraction ? (
                     <button
                       type="button"
-                      onClick={handleToggleSequence}
-                      className={`video-ctrl-btn sequence-toggle ${isSequenceActive ? 'active' : ''}`}
-                      aria-label={`Sequência de reprodução: ${isSequenceActive ? 'ligada' : 'desligada'}`}
-                      title={isSequenceActive ? 'Sequência ligada (toca o próximo automaticamente)' : 'Sequência desligada'}
+                      onClick={handleManualResume}
+                      className="video-bottom-ctrl-btn resume-btn is-attention"
+                      aria-label="Tocar próximo vídeo"
+                      title="Navegador pausou o vídeo. Toque para iniciar o próximo."
                     >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <polyline points="17 1 21 5 17 9" />
-                        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                        <polyline points="7 23 3 19 7 15" />
-                        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <polygon points="6 3 20 12 6 21 6 3" />
                       </svg>
-                      <span>{isSequenceActive ? 'Sequência: ligada' : 'Sequência: desligada'}</span>
                     </button>
-
-                    <div className="video-ctrl-right-group">
-                      {!isLast && (
-                        <button
-                          type="button"
-                          onClick={() => goToNextVideo(true)}
-                          className="video-ctrl-btn next-video-btn"
-                          aria-label="Tocar próximo vídeo"
-                          title="Tocar próximo vídeo"
-                        >
-                          <span>Próximo</span>
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" />
-                            <line x1="19" y1="5" x2="19" y2="19" />
-                          </svg>
-                        </button>
-                      )}
-
+                  ) : (
+                    !isLast && (
                       <button
                         type="button"
-                        onClick={closePlayer}
-                        className="video-ctrl-btn close-video-btn"
-                        aria-label="Fechar vídeo"
-                        title="Fechar vídeo"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <line x1="18" y1="6" x2="6" y2="18" />
-                          <line x1="6" y1="6" x2="18" y2="18" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Fallback de Autoplay Bloqueado (iOS Safari) */}
-                  {needsUserInteraction && (
-                    <div className="video-autoplay-blocked-overlay">
-                      <button
-                        type="button"
-                        onClick={handleManualResume}
-                        className="video-resume-big-btn"
+                        onClick={() => goToNextVideo(true)}
+                        className="video-bottom-ctrl-btn next-btn"
                         aria-label="Tocar próximo vídeo"
+                        title="Tocar próximo vídeo"
                       >
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <polygon points="6 3 20 12 6 21 6 3" />
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" />
+                          <line x1="19" y1="5" x2="19" y2="19" />
                         </svg>
-                        <span>Tocar próximo</span>
                       </button>
-                    </div>
+                    )
                   )}
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  className="short-video-trigger"
-                  onClick={() => playVideo(video, false)}
-                  aria-label={`Reproduzir vídeo: ${video.title}`}
-                >
-                  {/* Thumbnail com fallback elegante */}
-                  {thumbnail ? (
-                    <img
-                      src={thumbnail}
-                      alt=""
-                      className="short-video-thumb"
-                      loading="lazy"
-                      onError={(e) => {
-                        (e.target as HTMLElement).style.display = 'none';
-                      }}
-                    />
-                  ) : null}
 
-                  {/* Fallback de ícone da plataforma */}
-                  <div className="short-video-fallback-thumb" aria-hidden="true">
-                    {video.platform === 'youtube' && (
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9c1.68.49 7.68.49 7.68.49s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81zM9.75 15.02V8.98l5.5 3.02-5.5 3.02z" />
-                      </svg>
-                    )}
-                    {video.platform === 'instagram' && (
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" fill="var(--bg-card)" />
-                        <circle cx="17.5" cy="6.5" r="1.5" fill="var(--bg-card)" />
-                      </svg>
-                    )}
-                    {video.platform === 'tiktok' && (
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.86.12V9.42a6.34 6.34 0 0 0-.86-.06 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V7.57a8.16 8.16 0 0 0 4.63 1.45V5.57a4.83 4.83 0 0 1-.86-2.88z" />
-                      </svg>
-                    )}
-                  </div>
-
-                  {/* Gradient overlay */}
-                  <div className="short-video-overlay" aria-hidden="true" />
-
-                  {/* Play Button Icon */}
-                  <div className="short-video-play-btn" aria-hidden="true">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="6 3 20 12 6 21 6 3" />
+                  {/* Botão Fechar (só ícone, min 44px) */}
+                  <button
+                    type="button"
+                    onClick={closePlayer}
+                    className="video-bottom-ctrl-btn close-btn"
+                    aria-label="Fechar vídeo"
+                    title="Fechar vídeo e voltar para a capa"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
-                  </div>
-
-                  {/* Platform Badge */}
-                  <span className="short-video-platform-badge">
-                    {badgeLabel}
-                  </span>
-
-                  {/* Title */}
-                  <p className="short-video-title">{video.title}</p>
-                </button>
+                  </button>
+                </div>
               )}
             </div>
           );

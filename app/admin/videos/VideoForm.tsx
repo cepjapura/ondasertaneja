@@ -2,8 +2,8 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
-import { createVideoAction } from '../actions';
-import { detectVideoSection, VideoSection } from '@/lib/videos';
+import { createVideoAction, suggestVideoSectionAction } from '../actions';
+import { VideoSection } from '@/lib/videos';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -37,13 +37,39 @@ export default function VideoForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [url, setUrl] = useState('');
   const [section, setSection] = useState<VideoSection>('TOP_VIDEOS');
+  const [isDetecting, setIsDetecting] = useState(false);
+  const latestUrlRef = useRef('');
+
+  const checkSuggestedSection = async (candidateUrl: string) => {
+    const trimmed = candidateUrl.trim();
+    if (!trimmed || !trimmed.startsWith('http')) return;
+
+    latestUrlRef.current = trimmed;
+    setIsDetecting(true);
+    try {
+      const suggested = await suggestVideoSectionAction(trimmed);
+      if (latestUrlRef.current === trimmed) {
+        setSection(suggested);
+      }
+    } catch {
+      if (latestUrlRef.current === trimmed) {
+        setSection('TOP_VIDEOS');
+      }
+    } finally {
+      setIsDetecting(false);
+    }
+  };
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUrl = e.target.value;
     setUrl(newUrl);
-    const detected = detectVideoSection(newUrl);
-    if (detected) {
-      setSection(detected);
+    checkSuggestedSection(newUrl);
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData('text');
+    if (pasted) {
+      checkSuggestedSection(pasted);
     }
   };
 
@@ -97,6 +123,7 @@ export default function VideoForm() {
               required
               value={url}
               onChange={handleUrlChange}
+              onPaste={handlePaste}
               placeholder="https://www.youtube.com/watch?v=... ou https://www.youtube.com/shorts/..."
               className="admin-form-input"
             />
@@ -120,7 +147,9 @@ export default function VideoForm() {
               <option value="SHORTS">Shorts da Onda</option>
             </select>
             <span className="admin-form-hint">
-              Seção padrão: Top Vídeos. Sugestão automática ao colar o link, com opção de trocar.
+              {isDetecting
+                ? 'Consultando canal do YouTube...'
+                : 'Sugerido automaticamente com base no canal (canal Onda Sertaneja → Shorts da Onda; outros canais → Top Vídeos). Você pode alterar a qualquer momento.'}
             </span>
           </div>
 

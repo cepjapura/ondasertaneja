@@ -314,138 +314,143 @@ export default function TopVideosCarousel({ videos }: Props) {
               ref={(el) => {
                 cardRefs.current[video.id] = el;
               }}
-              className={`top-video-card ${isActive ? 'is-active-card' : ''}`}
+              className="video-carousel-item"
             >
-              {isActive ? (
-                <div className="top-video-iframe-wrapper">
-                  {/* Container do Player */}
-                  {isYt ? (
-                    <div
-                      id={`yt-player-top-${video.id}`}
-                      className="top-video-iframe"
-                    />
-                  ) : embedUrl ? (
-                    <iframe
-                      src={embedUrl}
-                      title={video.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="top-video-iframe"
-                    />
-                  ) : null}
+              {/* Card de Vídeo (Capa inativa ou Player ativo - 100% livre de controles sobrepostos) */}
+              <div className={`top-video-card ${isActive ? 'is-active-card' : ''}`}>
+                {isActive ? (
+                  <div className="top-video-iframe-wrapper">
+                    {/* Container do Player */}
+                    {isYt ? (
+                      <div
+                        id={`yt-player-top-${video.id}`}
+                        className="top-video-iframe"
+                      />
+                    ) : embedUrl ? (
+                      <iframe
+                        src={embedUrl}
+                        title={video.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="top-video-iframe"
+                      />
+                    ) : null}
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="top-video-trigger"
+                    onClick={() => playVideo(video, false)}
+                    aria-label={`Reproduzir vídeo: ${video.title}`}
+                  >
+                    {/* Thumbnail do vídeo */}
+                    {thumbnail ? (
+                      <img
+                        src={thumbnail}
+                        alt=""
+                        className="top-video-thumb"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    ) : null}
 
-                  {/* Barra de Controles Superiores no Card Ativo */}
-                  <div className="video-card-top-controls">
+                    {/* Fallback de ícone caso thumbnail falhe */}
+                    <div className="top-video-fallback-thumb" aria-hidden="true">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9c1.68.49 7.68.49 7.68.49s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81zM9.75 15.02V8.98l5.5 3.02-5.5 3.02z" />
+                      </svg>
+                    </div>
+
+                    {/* Overlay gradiente */}
+                    <div className="top-video-overlay" aria-hidden="true" />
+
+                    {/* Botão de Play central */}
+                    <div className="top-video-play-btn" aria-hidden="true">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="6 3 20 12 6 21 6 3" />
+                      </svg>
+                    </div>
+
+                    {/* Número de ranking grande no canto (1, 2, 3...) */}
+                    <span className="top-video-rank" aria-label={`Posição ${index + 1}`}>
+                      {index + 1}
+                    </span>
+
+                    {/* Título do vídeo */}
+                    <p className="top-video-title">{video.title}</p>
+                  </button>
+                )}
+              </div>
+
+              {/* Barra de Controles Própria Logo ABAIXO do Card que está tocando */}
+              {isActive && (
+                <div
+                  className="video-player-bottom-bar"
+                  role="toolbar"
+                  aria-label="Controles de reprodução do vídeo"
+                >
+                  {/* Botão Sequência (só ícone, min 44px) */}
+                  <button
+                    type="button"
+                    onClick={handleToggleSequence}
+                    className={`video-bottom-ctrl-btn sequence-btn ${isSequenceActive ? 'is-active' : ''}`}
+                    aria-label={`Sequência de reprodução: ${isSequenceActive ? 'ligada' : 'desligada'}`}
+                    title={isSequenceActive ? 'Sequência ligada (toca o próximo automaticamente)' : 'Sequência desligada (pausa ao terminar)'}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <polyline points="17 1 21 5 17 9" />
+                      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                      <polyline points="7 23 3 19 7 15" />
+                      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                    </svg>
+                  </button>
+
+                  {/* Fallback Safari Autoplay Bloqueado ou Botão Próximo */}
+                  {needsUserInteraction ? (
                     <button
                       type="button"
-                      onClick={handleToggleSequence}
-                      className={`video-ctrl-btn sequence-toggle ${isSequenceActive ? 'active' : ''}`}
-                      aria-label={`Sequência de reprodução: ${isSequenceActive ? 'ligada' : 'desligada'}`}
-                      title={isSequenceActive ? 'Sequência ligada (toca o próximo automaticamente)' : 'Sequência desligada'}
+                      onClick={handleManualResume}
+                      className="video-bottom-ctrl-btn resume-btn is-attention"
+                      aria-label="Tocar próximo vídeo"
+                      title="Navegador pausou o vídeo. Toque para iniciar o próximo."
                     >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <polyline points="17 1 21 5 17 9" />
-                        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                        <polyline points="7 23 3 19 7 15" />
-                        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <polygon points="6 3 20 12 6 21 6 3" />
                       </svg>
-                      <span>{isSequenceActive ? 'Sequência: ligada' : 'Sequência: desligada'}</span>
                     </button>
-
-                    <div className="video-ctrl-right-group">
-                      {!isLast && (
-                        <button
-                          type="button"
-                          onClick={() => goToNextVideo(true)}
-                          className="video-ctrl-btn next-video-btn"
-                          aria-label="Tocar próximo vídeo"
-                          title="Tocar próximo vídeo"
-                        >
-                          <span>Próximo</span>
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" />
-                            <line x1="19" y1="5" x2="19" y2="19" />
-                          </svg>
-                        </button>
-                      )}
-
+                  ) : (
+                    !isLast && (
                       <button
                         type="button"
-                        onClick={closePlayer}
-                        className="video-ctrl-btn close-video-btn"
-                        aria-label="Fechar vídeo"
-                        title="Fechar vídeo"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <line x1="18" y1="6" x2="6" y2="18" />
-                          <line x1="6" y1="6" x2="18" y2="18" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Fallback de Autoplay Bloqueado (iOS Safari) */}
-                  {needsUserInteraction && (
-                    <div className="video-autoplay-blocked-overlay">
-                      <button
-                        type="button"
-                        onClick={handleManualResume}
-                        className="video-resume-big-btn"
+                        onClick={() => goToNextVideo(true)}
+                        className="video-bottom-ctrl-btn next-btn"
                         aria-label="Tocar próximo vídeo"
+                        title="Tocar próximo vídeo"
                       >
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <polygon points="6 3 20 12 6 21 6 3" />
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" />
+                          <line x1="19" y1="5" x2="19" y2="19" />
                         </svg>
-                        <span>Tocar próximo</span>
                       </button>
-                    </div>
+                    )
                   )}
+
+                  {/* Botão Fechar (só ícone, min 44px) */}
+                  <button
+                    type="button"
+                    onClick={closePlayer}
+                    className="video-bottom-ctrl-btn close-btn"
+                    aria-label="Fechar vídeo"
+                    title="Fechar vídeo e voltar para a capa"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
                 </div>
-              ) : (
-                <button
-                  type="button"
-                  className="top-video-trigger"
-                  onClick={() => playVideo(video, false)}
-                  aria-label={`Reproduzir vídeo: ${video.title}`}
-                >
-                  {/* Thumbnail do vídeo */}
-                  {thumbnail ? (
-                    <img
-                      src={thumbnail}
-                      alt=""
-                      className="top-video-thumb"
-                      loading="lazy"
-                      onError={(e) => {
-                        (e.target as HTMLElement).style.display = 'none';
-                      }}
-                    />
-                  ) : null}
-
-                  {/* Fallback de ícone caso thumbnail falhe */}
-                  <div className="top-video-fallback-thumb" aria-hidden="true">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 2 12a28.4 28.4 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.9c1.68.49 7.68.49 7.68.49s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9A28.4 28.4 0 0 0 22 12a28.4 28.4 0 0 0-.42-4.81zM9.75 15.02V8.98l5.5 3.02-5.5 3.02z" />
-                    </svg>
-                  </div>
-
-                  {/* Overlay gradiente */}
-                  <div className="top-video-overlay" aria-hidden="true" />
-
-                  {/* Botão de Play central */}
-                  <div className="top-video-play-btn" aria-hidden="true">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="6 3 20 12 6 21 6 3" />
-                    </svg>
-                  </div>
-
-                  {/* Número de ranking grande no canto (1, 2, 3...) */}
-                  <span className="top-video-rank" aria-label={`Posição ${index + 1}`}>
-                    {index + 1}
-                  </span>
-
-                  {/* Título do vídeo */}
-                  <p className="top-video-title">{video.title}</p>
-                </button>
               )}
             </div>
           );

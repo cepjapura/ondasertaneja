@@ -14,27 +14,69 @@ export interface ParsedVideo {
   suggestedSection: VideoSection;
 }
 
+/**
+ * Endereço oficial do canal da Onda Sertaneja no YouTube.
+ * Constante centralizada e de fácil alteração.
+ */
+export const ONDA_SERTANEJA_CHANNEL_URL = 'https://www.youtube.com/@ondasertaneja';
+
 const YOUTUBE_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:shorts\/|watch\?v=)|youtu\.be\/)([\w-]{11})/;
 const INSTAGRAM_REGEX = /^(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:reel|p)\/([A-Za-z0-9_-]+)/;
 const TIKTOK_DIRECT_REGEX = /^(?:https?:\/\/)?(?:www\.|m\.)?tiktok\.com\/@[\w.-]+\/video\/(\d+)/;
 const TIKTOK_SHORT_REGEX = /^(?:https?:\/\/)?(?:vm|vt)\.tiktok\.com\/([\w.-]+)/;
 
 /**
- * Detecta automaticamente a seção recomendada com base no formato da URL:
- * - youtube.com/shorts, TikTok e Instagram Reels -> SHORTS
- * - links normais do YouTube (watch?v=, youtu.be) -> TOP_VIDEOS
- * - padrão caso não seja shorts/tiktok/reels: TOP_VIDEOS
+ * Consulta a oEmbed pública do YouTube no servidor:
+ * - Se author_url corresponder ao canal da Onda Sertaneja (@ondasertaneja) -> SHORTS ("Shorts da Onda")
+ * - Se for de outro canal -> TOP_VIDEOS ("Top Vídeos")
+ * - Se a consulta falhar ou timeout -> TOP_VIDEOS ("Top Vídeos")
+ */
+export async function detectVideoSectionWithOEmbed(rawUrl: string): Promise<VideoSection> {
+  if (!rawUrl || typeof rawUrl !== 'string') return 'TOP_VIDEOS';
+
+  const trimmed = rawUrl.trim();
+  const ytMatch = trimmed.match(YOUTUBE_REGEX);
+  if (!ytMatch) {
+    return 'TOP_VIDEOS';
+  }
+
+  try {
+    const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(trimmed)}&format=json`;
+    const res = await fetch(oembedUrl, {
+      headers: { 'User-Agent': 'OndaSertanejaBot/1.0' },
+      signal: AbortSignal.timeout(3500),
+    });
+
+    if (!res.ok) {
+      return 'TOP_VIDEOS';
+    }
+
+    const data = await res.json();
+    const authorUrl = (data?.author_url || '').toLowerCase().trim().replace(/\/+$/, '');
+    const targetUrl = ONDA_SERTANEJA_CHANNEL_URL.toLowerCase().trim().replace(/\/+$/, '');
+
+    // Verifica se author_url corresponde ao canal da Onda Sertaneja
+    if (authorUrl === targetUrl || authorUrl.includes('@ondasertaneja')) {
+      return 'SHORTS';
+    }
+
+    return 'TOP_VIDEOS';
+  } catch {
+    // Se a consulta falhar (timeout, rede, erro de JSON), sugere Top Vídeos
+    return 'TOP_VIDEOS';
+  }
+}
+
+/**
+ * Fallback síncrono rápido:
+ * Mantido para retrocompatibilidade quando não for viável aguardar oEmbed.
  */
 export function detectVideoSection(rawUrl: string): VideoSection {
   if (!rawUrl || typeof rawUrl !== 'string') return 'TOP_VIDEOS';
   const url = rawUrl.trim().toLowerCase();
 
-  if (url.includes('/shorts/') || url.includes('tiktok.com') || url.includes('instagram.com')) {
+  if (url.includes('@ondasertaneja')) {
     return 'SHORTS';
-  }
-
-  if (url.includes('watch?v=') || url.includes('youtu.be/')) {
-    return 'TOP_VIDEOS';
   }
 
   return 'TOP_VIDEOS';
@@ -71,10 +113,12 @@ export async function parseAndValidateVideoUrl(rawUrl: string, customThumbnail?:
   if (ytMatch) {
     const videoId = ytMatch[1];
     const isShorts = url.toLowerCase().includes('/shorts/');
-    const suggestedSection: VideoSection = isShorts ? 'SHORTS' : 'TOP_VIDEOS';
     const normalizedUrl = isShorts
       ? `https://www.youtube.com/shorts/${videoId}`
       : `https://www.youtube.com/watch?v=${videoId}`;
+
+    // Consulta oEmbed pública para determinar a seção sugerida
+    const suggestedSection = await detectVideoSectionWithOEmbed(normalizedUrl);
 
     return {
       platform: 'youtube',
@@ -96,7 +140,7 @@ export async function parseAndValidateVideoUrl(rawUrl: string, customThumbnail?:
       normalizedUrl: `https://www.instagram.com/reel/${shortcode}/`,
       embedUrl: `https://www.instagram.com/reel/${shortcode}/embed/`,
       thumbnailUrl: customThumbnail?.trim() || null,
-      suggestedSection: 'SHORTS',
+      suggestedSection: 'TOP_VIDEOS',
     };
   }
 
@@ -110,7 +154,7 @@ export async function parseAndValidateVideoUrl(rawUrl: string, customThumbnail?:
       normalizedUrl: url,
       embedUrl: `https://www.tiktok.com/embed/v2/${videoId}`,
       thumbnailUrl: customThumbnail?.trim() || null,
-      suggestedSection: 'SHORTS',
+      suggestedSection: 'TOP_VIDEOS',
     };
   }
 
@@ -144,7 +188,7 @@ export async function parseAndValidateVideoUrl(rawUrl: string, customThumbnail?:
         normalizedUrl: url,
         embedUrl: `https://www.tiktok.com/embed/v2/${videoId}`,
         thumbnailUrl: customThumbnail?.trim() || oembedData.thumbnail_url || null,
-        suggestedSection: 'SHORTS',
+        suggestedSection: 'TOP_VIDEOS',
       };
     } catch (err: any) {
       throw new Error(`Não foi possível resolver o link curto do TikTok: ${err.message || 'Verifique se o vídeo é público.'}`);
