@@ -5,12 +5,13 @@ import Image from 'next/image';
 
 interface Props {
   sponsorUrl?: string | null;
+  isPlaylistOpen?: boolean;
 }
 
 const DEBOUNCE_MS = 30 * 60 * 1000; // 30 minutos entre cliques do mesmo navegador
 const STORAGE_KEY = 'sponsor_click_mioto_ts';
 
-export default function HomeSponsorBanner({ sponsorUrl }: Props) {
+export default function HomeSponsorBanner({ sponsorUrl, isPlaylistOpen }: Props) {
   const handleClick = () => {
     try {
       // Ignora cliques repetidos do mesmo navegador em menos de 30 minutos
@@ -50,18 +51,21 @@ export default function HomeSponsorBanner({ sponsorUrl }: Props) {
 
   const imageElement = (
     <Image
-      src="/img/sponsors/mioto-2026.png"
+      src="/img/sponsors/mioto-2026-v2.png"
       alt="Patrocinador Alessandro Mioto"
       width={800}
       height={478}
       priority
-      sizes="(max-width: 640px) 80vw, 360px"
+      sizes="(max-width: 899px) 240px, 340px"
       className="home-sponsor-logo"
     />
   );
 
   return (
-    <section className="home-sponsor-strip" aria-label="Oferecimento">
+    <aside
+      className={`home-sponsor-card ${isPlaylistOpen ? 'has-open-playlist' : ''}`}
+      aria-label="Oferecimento"
+    >
       <span className="home-sponsor-label">OFERECIMENTO</span>
 
       {sponsorUrl ? (
@@ -81,6 +85,6 @@ export default function HomeSponsorBanner({ sponsorUrl }: Props) {
           {imageElement}
         </div>
       )}
-    </section>
+    </aside>
   );
 }
