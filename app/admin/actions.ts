@@ -18,6 +18,7 @@ import { parseAndValidateVideoUrl, detectVideoSectionWithOEmbed, VideoSection } 
 import { logAuditEvent } from '@/lib/audit';
 import { isRadioAvailable } from '@/lib/radio';
 import { parseAndValidatePlaylistUrl, PlaylistInfo } from '@/lib/playlist';
+import { validateSponsorUrl } from '@/lib/sponsor';
 
 /**
  * Server Action de Login com proteção contra Timing Attack e Rate Limit.
@@ -479,6 +480,66 @@ export async function saveRadioConfigAction(prevState: any, formData: FormData) 
  * Salva as configurações de Playlist da Onda e Link da Rádio ao Vivo no SystemConfig.
  * Mantida para retrocompatibilidade.
  */
+/**
+ * Salva a configuração do Link do Patrocinador no SystemConfig (Formulário independente).
+ * Campo vazio significa desativar/limpar o link do patrocinador sem erro (logo sem link).
+ */
+export async function saveSponsorConfigAction(prevState: any, formData: FormData) {
+  const admin = await verifyAdminSession();
+
+  const sponsorUrlRaw = (formData.get('sponsorUrl') as string) || '';
+  const trimmed = sponsorUrlRaw.trim();
+
+  // Campo vazio significa desativar/limpar o link do patrocinador sem erro
+  if (!trimmed) {
+    await prisma.systemConfig.upsert({
+      where: { key: 'sponsorUrl' },
+      update: { value: '' },
+      create: { key: 'sponsorUrl', value: '' },
+    });
+
+    await logAuditEvent({
+      entityName: 'SystemConfig',
+      entityId: 'sponsorUrl',
+      action: 'clear',
+      changesJson: { cleared: true, field: 'sponsorUrl' },
+      userId: admin.id,
+    });
+
+    revalidatePath('/');
+    revalidatePath('/admin/configuracoes');
+
+    return { success: true, message: 'Link do patrocinador removido com sucesso (logo exibida sem link).' };
+  }
+
+  // Validação estrita: somente HTTPS, URL válida, sem placeholders
+  let validatedUrl: string;
+  try {
+    validatedUrl = validateSponsorUrl(trimmed);
+  } catch (err: any) {
+    return { error: err.message || 'Link do patrocinador inválido.' };
+  }
+
+  await prisma.systemConfig.upsert({
+    where: { key: 'sponsorUrl' },
+    update: { value: validatedUrl },
+    create: { key: 'sponsorUrl', value: validatedUrl },
+  });
+
+  await logAuditEvent({
+    entityName: 'SystemConfig',
+    entityId: 'sponsorUrl',
+    action: 'update',
+    changesJson: { sponsorUrl: validatedUrl },
+    userId: admin.id,
+  });
+
+  revalidatePath('/');
+  revalidatePath('/admin/configuracoes');
+
+  return { success: true, message: 'Link do patrocinador salvo com sucesso!' };
+}
+
 export async function saveConfigAction(prevState: any, formData: FormData) {
   const admin = await verifyAdminSession();
 
@@ -559,10 +620,24 @@ export async function saveConfigAction(prevState: any, formData: FormData) {
 /**
  * Limpa um campo específico do SystemConfig (Rádio ou Playlist).
  */
-export async function clearConfigFieldAction(field: 'streamAudioUrl' | 'playlistUrl') {
+export async function clearConfigFieldAction(field: 'streamAudioUrl' | 'playlistUrl' | 'sponsorUrl') {
   const admin = await verifyAdminSession();
 
-  if (field === 'streamAudioUrl') {
+  if (field === 'sponsorUrl') {
+    await prisma.systemConfig.upsert({
+      where: { key: 'sponsorUrl' },
+      update: { value: '' },
+      create: { key: 'sponsorUrl', value: '' },
+    });
+
+    await logAuditEvent({
+      entityName: 'SystemConfig',
+      entityId: 'sponsorUrl',
+      action: 'clear',
+      changesJson: { cleared: true, field: 'sponsorUrl' },
+      userId: admin.id,
+    });
+  } else if (field === 'streamAudioUrl') {
     await prisma.systemConfig.upsert({
       where: { key: 'streamAudioUrl' },
       update: { value: '' },
