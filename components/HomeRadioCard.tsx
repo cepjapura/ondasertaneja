@@ -3,17 +3,20 @@
 import React, { useState, useEffect } from 'react';
 import { useAudio } from '@/contexts/AudioContext';
 import { getPlaylistEmbedUrl } from '@/lib/playlist';
+import HomeSponsorBanner from '@/components/HomeSponsorBanner';
 
 interface Props {
   initialIsAvailable?: boolean;
   initialPlaylistEmbedUrl?: string | null;
   initialPlaylistUrl?: string | null;
+  sponsorUrl?: string | null;
 }
 
 export default function HomeRadioCard({
   initialIsAvailable,
   initialPlaylistEmbedUrl,
   initialPlaylistUrl,
+  sponsorUrl,
 }: Props) {
   const {
     isConfigLoaded,
@@ -106,9 +109,10 @@ export default function HomeRadioCard({
         Rádio, lançamentos e agenda. Tudo num toque.
       </p>
 
-      {/* Card da Rádio / Playlist (Fundo escuro fixo #17140F em ambos os modos) */}
-      <div
-        className={`home-radio-card ${showIframe ? 'has-open-playlist' : ''}`}
+      {/* Hero Grid: Card da Rádio/Playlist (2/3) + Patrocinador Oferecimento (1/3) */}
+      <div className="home-hero-grid">
+        <div
+          className={`home-radio-card ${showIframe ? 'has-open-playlist' : ''}`}
         aria-label="Player de Rádio ao Vivo ou Playlist da Onda"
       >
         {/* Topo do Card: Selo e Controles */}
@@ -301,6 +305,9 @@ export default function HomeRadioCard({
             </div>
           </div>
         )}
+        </div>
+
+        <HomeSponsorBanner sponsorUrl={sponsorUrl} isPlaylistOpen={showIframe} />
       </div>
     </div>
   );

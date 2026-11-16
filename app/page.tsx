@@ -5,7 +5,6 @@ import { getStartOfDaySaoPaulo } from '@/lib/dates';
 import { isRadioAvailable } from '@/lib/radio';
 import { getPlaylistEmbedUrl } from '@/lib/playlist';
 import HomeRadioCard from '@/components/HomeRadioCard';
-import HomeSponsorBanner from '@/components/HomeSponsorBanner';
 import TopVideosCarousel from '@/components/TopVideosCarousel';
 import ShortVideosCarousel from '@/components/ShortVideosCarousel';
 
@@ -66,15 +65,13 @@ export default async function HomePage() {
   return (
     <main className="main-content">
       <div className="home-container">
-        {/* 1. TÍTULO + SUBTÍTULO + CARD DA RÁDIO AO VIVO OU PLAYLIST */}
+        {/* 1. TÍTULO + HERO GRID (CARD DA RÁDIO/PLAYLIST 2/3 + PATROCINADOR 1/3) */}
         <HomeRadioCard
           initialIsAvailable={radioAvailable}
           initialPlaylistEmbedUrl={playlistEmbedUrl}
           initialPlaylistUrl={configMap.playlistUrl || configMap.wavePlaylistUrl}
+          sponsorUrl={sponsorUrl}
         />
-
-        {/* 2. FAIXA DE OFERECIMENTO (PATROCINADOR ALESSANDRO MIOTO) */}
-        <HomeSponsorBanner sponsorUrl={sponsorUrl} />
 
         {/* 3. ATALHOS EM FORMATO DE PÍLULA */}
         <nav className="home-shortcuts" aria-label="Atalhos rápidos do site">
