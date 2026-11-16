@@ -2364,11 +2364,11 @@ textarea:focus {
 
 /* ==========================================================================
    FAIXA DE OFERECIMENTO (PATROCINADOR OFICIAL ALESSANDRO MIOTO)
-   Fundo escuro fixo #17140F nos dois temas, logo abaixo do card da rádio
+   Fundo escuro fixo #000000 nos dois temas para fusão perfeita com a logo
    ========================================================================== */
 .home-sponsor-strip {
-  background: #17140F !important;
-  border: 1px solid #2E2920;
+  background: #000000 !important;
+  border: 1px solid #1a1a1a;
   border-radius: 16px;
   padding: 14px 20px 16px 20px;
   margin: 18px 0 24px 0;
@@ -2378,7 +2378,7 @@ textarea:focus {
   justify-content: center;
   gap: 8px;
   text-align: center;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .home-sponsor-label {

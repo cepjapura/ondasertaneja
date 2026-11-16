@@ -7,8 +7,28 @@ interface Props {
   sponsorUrl?: string | null;
 }
 
+const DEBOUNCE_MS = 30 * 60 * 1000; // 30 minutos entre cliques do mesmo navegador
+const STORAGE_KEY = 'sponsor_click_mioto_ts';
+
 export default function HomeSponsorBanner({ sponsorUrl }: Props) {
   const handleClick = () => {
+    try {
+      // Ignora cliques repetidos do mesmo navegador em menos de 30 minutos
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const lastClickStr = localStorage.getItem(STORAGE_KEY);
+        const now = Date.now();
+        if (lastClickStr) {
+          const lastClick = parseInt(lastClickStr, 10);
+          if (!isNaN(lastClick) && now - lastClick < DEBOUNCE_MS) {
+            return;
+          }
+        }
+        localStorage.setItem(STORAGE_KEY, String(now));
+      }
+    } catch {
+      // Fallback silencioso caso localStorage esteja bloqueado
+    }
+
     try {
       if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
         const blob = new Blob([JSON.stringify({ sponsor: 'alessandro-mioto' })], {
@@ -32,8 +52,8 @@ export default function HomeSponsorBanner({ sponsorUrl }: Props) {
     <Image
       src="/img/sponsors/mioto.png"
       alt="Patrocinador Alessandro Mioto"
-      width={1024}
-      height={612}
+      width={800}
+      height={478}
       priority
       sizes="(max-width: 640px) 80vw, 360px"
       className="home-sponsor-logo"
