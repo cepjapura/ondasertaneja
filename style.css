@@ -2382,18 +2382,18 @@ textarea:focus {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  border-radius: 16px !important;
 }
 
 /* Card do Patrocinador: retangular, fundo #000, mesma borda (#2E2920) e border-radius (16px) do card da rádio */
 .home-sponsor-card {
   background: #000000 !important;
-  border: 1px solid #2E2920;
-  border-radius: 16px;
-  padding: 18px 20px;
+  border: 1px solid #2E2920 !important;
+  border-radius: 16px !important;
+  padding: 16px 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   transition: border-color 0.2s ease;
   height: 100%;
-  min-height: 140px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2405,7 +2405,7 @@ textarea:focus {
 }
 
 .home-sponsor-card:hover {
-  border-color: rgba(194, 70, 26, 0.5);
+  border-color: rgba(194, 70, 26, 0.5) !important;
 }
 
 .home-sponsor-label {
@@ -2443,12 +2443,11 @@ textarea:focus {
   border-radius: 8px;
 }
 
-/* Logo centralizada com respiro e sem distorcer (nenhuma linha cinza, borda ou fundo) */
+/* Logo no computador: ocupa cerca de 85% da largura do card, mantendo a proporção */
 .home-sponsor-logo {
-  width: 100%;
-  max-width: 270px;
+  width: 85% !important;
+  max-width: 320px;
   height: auto;
-  max-height: 85px;
   object-fit: contain;
   display: block;
   margin: 0 auto;
@@ -2464,14 +2463,12 @@ textarea:focus {
   opacity: 0.95;
 }
 
-/* Com playlist aberta: o card do patrocinador estica acompanhando a rádio, mas a logo NUNCA estica */
-.home-sponsor-card.has-open-playlist {
-  padding: 24px 20px;
-}
-
-.home-sponsor-card.has-open-playlist .home-sponsor-logo {
-  max-height: 95px;
-  max-width: 280px;
+/* PLAYLIST ABERTA: o card do patrocinador mantém sua altura natural, alinhado ao topo */
+.home-hero-grid .home-sponsor-card.has-open-playlist,
+.home-radio-wrapper.is-playlist-open .home-sponsor-card {
+  align-self: start !important;
+  height: auto !important;
+  min-height: unset !important;
 }
 
 /* Celular (até 899px): card do patrocinador vai logo abaixo, com no máximo 120px de altura */
@@ -2486,6 +2483,7 @@ textarea:focus {
   .home-hero-grid .home-radio-card {
     width: 100%;
     height: auto;
+    border-radius: 16px !important;
   }
 
   .home-sponsor-card {
@@ -2494,7 +2492,8 @@ textarea:focus {
     min-height: unset;
     max-height: 120px;
     padding: 10px 16px;
-    border-radius: 16px;
+    border-radius: 16px !important;
+    align-self: auto !important;
   }
 
   .home-sponsor-label {
@@ -2502,6 +2501,7 @@ textarea:focus {
   }
 
   .home-sponsor-logo {
+    width: auto !important;
     max-height: 60px;
     max-width: 230px;
   }
@@ -2522,18 +2522,7 @@ textarea:focus {
   margin: 36px 0;
 }
 
-.home-sponsor-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 20px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
+/* .home-sponsor-card legada removida */
 
 .home-sponsor-badge {
   font-size: 0.72rem;

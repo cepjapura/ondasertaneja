@@ -51,12 +51,12 @@ export default function HomeSponsorBanner({ sponsorUrl, isPlaylistOpen }: Props)
 
   const imageElement = (
     <Image
-      src="/img/sponsors/mioto-2026.png"
+      src="/img/sponsors/mioto-2026-v2.png"
       alt="Patrocinador Alessandro Mioto"
       width={800}
       height={478}
       priority
-      sizes="(max-width: 899px) 240px, 320px"
+      sizes="(max-width: 899px) 240px, 340px"
       className="home-sponsor-logo"
     />
   );
