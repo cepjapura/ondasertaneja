@@ -50,7 +50,7 @@ export default function HomeSponsorBanner({ sponsorUrl }: Props) {
 
   const imageElement = (
     <Image
-      src="/img/sponsors/mioto.png"
+      src="/img/sponsors/mioto-2026.png"
       alt="Patrocinador Alessandro Mioto"
       width={800}
       height={478}
