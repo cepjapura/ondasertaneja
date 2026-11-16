@@ -18,7 +18,7 @@ model Artist {
   avatarUrl       String?  @db.VarChar(2048)
   coverUrl        String?  @db.VarChar(2048)
   isDuoOrGroup    Boolean  @default(false)
-  genreTags       String?  // JSON string ou tags separadas por virgula
+  genreTags       String? // JSON string ou tags separadas por virgula
   spotifyId       String?
   youtubeChannel  String?
   instagramHandle String?
@@ -53,10 +53,10 @@ model ArtistMember {
 }
 
 model City {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   name      String
-  stateCode String   // e.g. PR, SP
-  slug      String   @unique // e.g. maringa-pr
+  stateCode String // e.g. PR, SP
+  slug      String  @unique // e.g. maringa-pr
   latitude  Float?
   longitude Float?
   ibgeCode  String?
@@ -257,7 +257,7 @@ model ArtistRelationship {
   id           String   @id @default(uuid())
   artistAId    String
   artistBId    String
-  relationType String   // similar_genre, frequent_colab, same_office, duo_split
+  relationType String // similar_genre, frequent_colab, same_office, duo_split
   weight       Int      @default(50)
   createdAt    DateTime @default(now())
 
@@ -303,7 +303,7 @@ model AuditLog {
   id          String   @id @default(uuid())
   entityName  String
   entityId    String
-  action      String   // create, update, delete
+  action      String // create, update, delete
   changesJson String   @db.Text
   userId      String?
   createdAt   DateTime @default(now())
@@ -319,16 +319,16 @@ model SystemConfig {
 }
 
 model ChartEntry {
-  id         String   @id @default(uuid())
-  period     String   // "semana" ou "ano"
-  position   Int
-  artistName String
-  songTitle  String
-  artistId   String?
-  musicId    String?
+  id          String   @id @default(uuid())
+  period      String // "semana" ou "ano"
+  position    Int
+  artistName  String
+  songTitle   String
+  artistId    String?
+  musicId     String?
   isPublished Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   artist Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
   music  Music?  @relation(fields: [musicId], references: [id], onDelete: SetNull)
@@ -342,7 +342,7 @@ model ShortVideo {
   id           String   @id @default(uuid())
   title        String
   url          String   @db.VarChar(2048)
-  platform     String   // tiktok | instagram | youtube
+  platform     String // tiktok | instagram | youtube
   section      String   @default("SHORTS") // TOP_VIDEOS | SHORTS
   thumbnailUrl String?  @db.VarChar(2048)
   isPublished  Boolean  @default(false)
@@ -361,4 +361,13 @@ model LoginAttempt {
 
   @@index([ip, createdAt])
   @@index([email, createdAt])
+}
+
+model SponsorClick {
+  id          String   @id @default(uuid())
+  sponsorSlug String   @default("alessandro-mioto")
+  clickedAt   DateTime @default(now())
+
+  @@index([sponsorSlug, clickedAt])
+  @@index([clickedAt])
 }

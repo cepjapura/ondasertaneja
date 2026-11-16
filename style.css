@@ -2362,7 +2362,88 @@ textarea:focus {
   flex-shrink: 0;
 }
 
-/* 6. PATROCINADOR ALESSANDRO MIOTO */
+/* ==========================================================================
+   FAIXA DE OFERECIMENTO (PATROCINADOR OFICIAL ALESSANDRO MIOTO)
+   Fundo escuro fixo #000000 nos dois temas para fusão perfeita com a logo
+   ========================================================================== */
+.home-sponsor-strip {
+  background: #000000 !important;
+  border: 1px solid #1a1a1a;
+  border-radius: 16px;
+  padding: 14px 20px 16px 20px;
+  margin: 18px 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.home-sponsor-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #E67E22;
+  margin: 0;
+  line-height: 1;
+}
+
+.home-sponsor-link,
+.home-sponsor-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  max-width: 100%;
+}
+
+.home-sponsor-link {
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.home-sponsor-link:hover {
+  opacity: 0.92;
+  transform: scale(1.01);
+}
+
+.home-sponsor-link:focus-visible {
+  outline: 2px solid #E67E22;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.home-sponsor-wrapper {
+  cursor: default;
+}
+
+/* Logo oficial: cerca de 360px no computador e 80% da largura no celular, sem distorcer proporção */
+.home-sponsor-logo {
+  width: 360px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .home-sponsor-strip {
+    padding: 12px 14px 14px 14px;
+    margin: 14px 0 20px 0;
+    border-radius: 14px;
+  }
+
+  .home-sponsor-logo {
+    width: 80vw;
+    max-width: 320px;
+    height: auto;
+  }
+}
+
+/* Compatibilidade legada */
 .home-sponsor-section {
   margin: 36px 0;
 }

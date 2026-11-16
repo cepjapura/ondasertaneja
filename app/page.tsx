@@ -5,6 +5,7 @@ import { getStartOfDaySaoPaulo } from '@/lib/dates';
 import { isRadioAvailable } from '@/lib/radio';
 import { getPlaylistEmbedUrl } from '@/lib/playlist';
 import HomeRadioCard from '@/components/HomeRadioCard';
+import HomeSponsorBanner from '@/components/HomeSponsorBanner';
 import TopVideosCarousel from '@/components/TopVideosCarousel';
 import ShortVideosCarousel from '@/components/ShortVideosCarousel';
 
@@ -13,11 +14,11 @@ export const revalidate = 60; // ISR 60 segundos
 export default async function HomePage() {
   const startOfToday = getStartOfDaySaoPaulo();
 
-  // 0. Status da Rádio ao Vivo e Playlist da Onda
+  // 0. Status da Rádio ao Vivo, Playlist da Onda e Patrocinador
   const configs = await prisma.systemConfig.findMany({
     where: {
       key: {
-        in: ['streamAudioUrl', 'playlistUrl', 'wavePlaylistUrl', 'playlistEmbedUrl'],
+        in: ['streamAudioUrl', 'playlistUrl', 'wavePlaylistUrl', 'playlistEmbedUrl', 'sponsorUrl'],
       },
     },
   });
@@ -27,9 +28,9 @@ export default async function HomePage() {
     configMap.playlistEmbedUrl ||
     (configMap.playlistUrl ? getPlaylistEmbedUrl(configMap.playlistUrl) : null) ||
     (configMap.wavePlaylistUrl ? getPlaylistEmbedUrl(configMap.wavePlaylistUrl) : null);
+  const sponsorUrl = configMap.sponsorUrl || null;
 
-
-  // 1. Top Vídeos (clipes 16:9) e Shorts (vídeos verticais 9:16)
+  // 1. Top Vídeos e Shorts da Onda (ambos 9:16)
   const topVideos = await prisma.shortVideo.findMany({
     where: { isPublished: true, section: 'TOP_VIDEOS' },
     orderBy: { sortOrder: 'asc' },
@@ -72,7 +73,10 @@ export default async function HomePage() {
           initialPlaylistUrl={configMap.playlistUrl || configMap.wavePlaylistUrl}
         />
 
-        {/* 2. ATALHOS EM FORMATO DE PÍLULA */}
+        {/* 2. FAIXA DE OFERECIMENTO (PATROCINADOR ALESSANDRO MIOTO) */}
+        <HomeSponsorBanner sponsorUrl={sponsorUrl} />
+
+        {/* 3. ATALHOS EM FORMATO DE PÍLULA */}
         <nav className="home-shortcuts" aria-label="Atalhos rápidos do site">
           <Link href="/noticias" className="home-pill-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -114,13 +118,13 @@ export default async function HomePage() {
           </Link>
         </nav>
 
-        {/* 3. TOP VÍDEOS (CLIPES 16:9) */}
+        {/* 4. TOP VÍDEOS */}
         {topVideos.length > 0 && <TopVideosCarousel videos={topVideos} />}
 
-        {/* 4. ASSISTA EM 30 SEGUNDOS (VÍDEOS VERTICAIS 9:16) */}
+        {/* 5. SHORTS DA ONDA */}
         {shortVideos.length > 0 && <ShortVideosCarousel videos={shortVideos} />}
 
-        {/* 4. ÚLTIMAS (NOTÍCIAS) */}
+        {/* 6. ÚLTIMAS NOTÍCIAS */}
         <section className="home-news-section" aria-label="Últimas notícias">
           <div className="section-header-compact">
             <h2 className="section-title-clean">Últimas Notícias</h2>
@@ -193,7 +197,7 @@ export default async function HomePage() {
           )}
         </section>
 
-        {/* 5. AGENDA (COMPACTA, ATÉ 3 PRÓXIMOS SHOWS) */}
+        {/* 7. AGENDA (COMPACTA, ATÉ 3 PRÓXIMOS SHOWS) */}
         <section className="home-agenda-section" aria-label="Agenda de shows">
           <div className="section-header-compact">
             <h2 className="section-title-clean">Agenda de Shows</h2>
@@ -293,20 +297,7 @@ export default async function HomePage() {
           )}
         </section>
 
-        {/* 6. PATROCINADOR ALESSANDRO MIOTO */}
-        <section className="home-sponsor-section" aria-label="Apoio e Patrocínio">
-          <div className="home-sponsor-card">
-            <span className="home-sponsor-badge">Apoio e Patrocínio</span>
-            <img
-              src="/img/sponsors/mioto.png"
-              alt="Patrocinador Alessandro Mioto"
-              className="home-sponsor-img"
-              loading="lazy"
-            />
-          </div>
-        </section>
-
-        {/* 7. BLOCO DA MARCA */}
+        {/* 8. BLOCO DA MARCA */}
         <section className="home-brand-block" aria-label="Divulgue sua marca">
           <h2 className="home-brand-text">
             Sua marca no som de quem vive o sertanejo.
