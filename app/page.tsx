@@ -14,19 +14,46 @@ export default async function HomePage() {
   const startOfToday = getStartOfDaySaoPaulo();
 
   // 0. Status da Rádio ao Vivo, Playlist da Onda e Patrocinador
-  const configs = await prisma.systemConfig.findMany({
-    where: {
-      key: {
-        in: ['streamAudioUrl', 'playlistUrl', 'wavePlaylistUrl', 'playlistEmbedUrl', 'sponsorUrl'],
+  const [configs, publishedWeekly] = await Promise.all([
+    prisma.systemConfig.findMany({
+      where: {
+        key: {
+          in: ['streamAudioUrl', 'playlistUrl', 'wavePlaylistUrl', 'playlistEmbedUrl', 'sponsorUrl'],
+        },
       },
-    },
-  });
+    }),
+    prisma.weeklyPlaylist.findFirst({
+      where: { status: 'PUBLISHED' },
+      orderBy: { publishedAt: 'desc' },
+      include: {
+        items: {
+          where: { isRemoved: false },
+          orderBy: { sortOrder: 'asc' },
+        },
+      },
+    }),
+  ]);
+
   const configMap = Object.fromEntries(configs.map((c) => [c.key, c.value]));
   const radioAvailable = isRadioAvailable(configMap.streamAudioUrl);
-  const playlistEmbedUrl =
-    configMap.playlistEmbedUrl ||
-    (configMap.playlistUrl ? getPlaylistEmbedUrl(configMap.playlistUrl) : null) ||
-    (configMap.wavePlaylistUrl ? getPlaylistEmbedUrl(configMap.wavePlaylistUrl) : null);
+
+  let playlistEmbedUrl: string | null = null;
+  let playlistTitle = 'Playlist da Onda';
+
+  if (publishedWeekly && publishedWeekly.items.length > 0) {
+    const firstId = publishedWeekly.items[0].youtubeVideoId;
+    const restIds = publishedWeekly.items.slice(1).map((i) => i.youtubeVideoId).join(',');
+    playlistEmbedUrl = restIds
+      ? `https://www.youtube-nocookie.com/embed/${firstId}?playlist=${restIds}&autoplay=1`
+      : `https://www.youtube-nocookie.com/embed/${firstId}?autoplay=1`;
+    playlistTitle = `Lançamentos da Semana (${publishedWeekly.items.length} músicas)`;
+  } else {
+    playlistEmbedUrl =
+      configMap.playlistEmbedUrl ||
+      (configMap.playlistUrl ? getPlaylistEmbedUrl(configMap.playlistUrl) : null) ||
+      (configMap.wavePlaylistUrl ? getPlaylistEmbedUrl(configMap.wavePlaylistUrl) : null);
+  }
+
   const sponsorUrl = configMap.sponsorUrl || null;
 
   // 1. Top Vídeos e Shorts da Onda (ambos 9:16)
@@ -70,6 +97,7 @@ export default async function HomePage() {
           initialIsAvailable={radioAvailable}
           initialPlaylistEmbedUrl={playlistEmbedUrl}
           initialPlaylistUrl={configMap.playlistUrl || configMap.wavePlaylistUrl}
+          initialPlaylistTitle={playlistTitle}
           sponsorUrl={sponsorUrl}
         />
 
