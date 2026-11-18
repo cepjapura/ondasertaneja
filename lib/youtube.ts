@@ -71,6 +71,43 @@ export function isVerticalVideo(embedHtml?: string): boolean {
   return false;
 }
 
+/**
+ * Palavras-chave no título que desqualificam o vídeo de ser música/clipe (sem diferenciar maiúsculas e acentos).
+ * Facilmente editável conforme necessidade da curadoria.
+ */
+export const BLOCKED_TITLE_KEYWORDS: string[] = [
+  'aftermovie',
+  'teaser',
+  'trailer',
+  'bastidores',
+  'making of',
+  'vlog',
+  'react',
+  'entrevista',
+  'podcast',
+  'live completa',
+  'show completo',
+  'dvd completo',
+  'ensaio',
+  'unboxing',
+];
+
+export function hasBlockedTitle(title: string): boolean {
+  if (!title) return false;
+  const normalized = title
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+  return BLOCKED_TITLE_KEYWORDS.some((kw) => {
+    const normalizedKw = kw
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+    return normalized.includes(normalizedKw);
+  });
+}
+
 function getApiKey(): string {
   const key = cleanEnv(process.env.YOUTUBE_API_KEY);
   if (!key) {
@@ -326,108 +363,216 @@ export async function batchFetchChannelStats(channelIds: string[]): Promise<Map<
   return map;
 }
 
+export interface RawUploadVideo {
+  videoId: string;
+  title: string;
+  publishedAt: Date;
+  channelTitle: string;
+  channelId: string;
+}
+
+export interface ChannelUploadsResult {
+  items: RawUploadVideo[];
+  totalRead: number;
+  outOfWindowCount: number;
+  quotaCalls: number;
+}
+
 /**
- * Lê os vídeos recentes da playlist de uploads do canal (maxResults=25, custo = 1 cota).
+ * Lê os vídeos recentes da playlist de uploads do canal com paginação automática via nextPageToken.
+ * Percorre até o item mais antigo ser anterior ao início da janela, com limite de 6 páginas por canal.
+ */
+export async function fetchRecentUploadsWithPagination(
+  uploadsPlaylistId: string,
+  sinceDate: Date,
+  channelTitleFallback: string = '',
+  channelIdFallback: string = '',
+  maxPages: number = 6
+): Promise<ChannelUploadsResult> {
+  const apiKey = getApiKey();
+  const items: RawUploadVideo[] = [];
+
+  let pageToken = '';
+  let pageCount = 0;
+  let quotaCalls = 0;
+  let totalRead = 0;
+  let outOfWindowCount = 0;
+
+  while (pageCount < maxPages) {
+    pageCount++;
+    quotaCalls++;
+
+    let url = `https://www.googleapis.com/youtube/v3/playlistItems?playlistId=${encodeURIComponent(uploadsPlaylistId)}&part=snippet,contentDetails&maxResults=50&key=${apiKey}`;
+    if (pageToken) {
+      url += `&pageToken=${encodeURIComponent(pageToken)}`;
+    }
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      const errorBody = await res.text();
+      console.error(`[YouTube API playlistItems error ${res.status}]:`, sanitizeError(errorBody, apiKey));
+      break;
+    }
+
+    const data = await res.json();
+    const pageItems = data.items || [];
+    totalRead += pageItems.length;
+
+    let oldestOnPage = new Date();
+
+    for (const item of pageItems) {
+      const videoId = item.contentDetails?.videoId || item.snippet?.resourceId?.videoId;
+      const publishedAtStr = item.contentDetails?.videoPublishedAt || item.snippet?.publishedAt;
+      if (!videoId || !publishedAtStr) continue;
+
+      const publishedAt = new Date(publishedAtStr);
+      if (publishedAt < oldestOnPage) {
+        oldestOnPage = publishedAt;
+      }
+
+      if (publishedAt >= sinceDate) {
+        items.push({
+          videoId,
+          title: item.snippet?.title || '',
+          publishedAt,
+          channelTitle: item.snippet?.channelTitle || channelTitleFallback,
+          channelId: item.snippet?.channelId || channelIdFallback,
+        });
+      } else {
+        outOfWindowCount++;
+      }
+    }
+
+    if (oldestOnPage < sinceDate || !data.nextPageToken) {
+      break;
+    }
+
+    pageToken = data.nextPageToken;
+  }
+
+  return {
+    items,
+    totalRead,
+    outOfWindowCount,
+    quotaCalls,
+  };
+}
+
+/**
+ * Wrapper simples para manter compatibilidade retroativa.
  */
 export async function fetchRecentUploads(
   uploadsPlaylistId: string,
   sinceDate: Date,
   maxResults: number = 25
 ): Promise<Array<{ videoId: string; title: string; publishedAt: Date; channelTitle: string; channelId: string }>> {
-  const apiKey = getApiKey();
-  const safeMax = Math.min(Math.max(maxResults, 1), 50);
-  const url = `https://www.googleapis.com/youtube/v3/playlistItems?playlistId=${encodeURIComponent(uploadsPlaylistId)}&part=snippet,contentDetails&maxResults=${safeMax}&key=${apiKey}`;
+  const res = await fetchRecentUploadsWithPagination(uploadsPlaylistId, sinceDate, '', '', 1);
+  return res.items.slice(0, maxResults);
+}
 
-  const res = await fetch(url);
-  if (!res.ok) {
-    const errorBody = await res.text(); console.error(`[YouTube API playlistItems error ${res.status}]:`, sanitizeError(errorBody, apiKey));
-    return [];
-  }
-
-  const data = await res.json();
-  const items = data.items || [];
-  const results: Array<{ videoId: string; title: string; publishedAt: Date; channelTitle: string; channelId: string }> = [];
-
-  for (const item of items) {
-    const videoId = item.contentDetails?.videoId || item.snippet?.resourceId?.videoId;
-    const publishedAtStr = item.contentDetails?.videoPublishedAt || item.snippet?.publishedAt;
-    if (!videoId || !publishedAtStr) continue;
-
-    const publishedAt = new Date(publishedAtStr);
-    if (publishedAt >= sinceDate) {
-      results.push({
-        videoId,
-        title: item.snippet?.title || '',
-        publishedAt,
-        channelTitle: item.snippet?.channelTitle || '',
-        channelId: item.snippet?.channelId || '',
-      });
-    }
-  }
-
-  return results;
+export interface VideoDetailsResult {
+  validVideos: Map<string, VideoCandidate>;
+  quotaCalls: number;
+  discards: {
+    notEmbeddable: number;
+    notMusicCategory: number;
+    liveOrPremiere: number;
+    under60s: number;
+    over10m: number;
+    isShortOrVertical: number;
+    blockedTitle: number;
+  };
 }
 
 /**
- * Busca detalhes em lote dos vídeos (até 50 por chamada, custo = 1 cota).
- * Aplica os filtros exigidos:
- * - Duração mínima: >= 60s
- * - Duração máxima: <= 600s (10 minutos)
- * - Categoria: 10 (Música)
- * - liveBroadcastContent: 'none'
- * - status.embeddable: true
- * - status.privacyStatus: 'public'
- * - Formato: descartar verticais (embedHeight > embedWidth) e #shorts no título
+ * Busca detalhes em lote dos vídeos com auditoria detalhada de motivos de descarte e custo de cota.
  */
-export async function batchFetchVideoDetails(videoIds: string[]): Promise<Map<string, VideoCandidate>> {
+export async function batchFetchVideoDetailsWithAudit(videoIds: string[]): Promise<VideoDetailsResult> {
   const apiKey = getApiKey();
   const validVideos = new Map<string, VideoCandidate>();
+  let quotaCalls = 0;
 
-  if (videoIds.length === 0) return validVideos;
+  const discards = {
+    notEmbeddable: 0,
+    notMusicCategory: 0,
+    liveOrPremiere: 0,
+    under60s: 0,
+    over10m: 0,
+    isShortOrVertical: 0,
+    blockedTitle: 0,
+  };
 
-  // Lotes de 50 IDs (limite máximo do YouTube Data API por chamada)
+  if (videoIds.length === 0) {
+    return { validVideos, quotaCalls, discards };
+  }
+
   const chunkSize = 50;
   for (let i = 0; i < videoIds.length; i += chunkSize) {
     const chunk = videoIds.slice(i, i + chunkSize);
+    quotaCalls++;
     const url = `https://www.googleapis.com/youtube/v3/videos?id=${encodeURIComponent(chunk.join(','))}&part=snippet,contentDetails,status,player&maxHeight=720&key=${apiKey}`;
 
     const res = await fetch(url);
     if (!res.ok) {
-      const errorBody = await res.text(); console.error(`[YouTube API videos error ${res.status}]:`, sanitizeError(errorBody, apiKey));
+      const errorBody = await res.text();
+      console.error(`[YouTube API videos error ${res.status}]:`, sanitizeError(errorBody, apiKey));
+      discards.notEmbeddable += chunk.length;
       continue;
     }
 
     const data = await res.json();
     const items = data.items || [];
+    const foundIds = new Set<string>();
 
     for (const item of items) {
       const videoId = item.id;
+      foundIds.add(videoId);
+
       const snippet = item.snippet || {};
       const contentDetails = item.contentDetails || {};
       const status = item.status || {};
       const player = item.player || {};
 
-      // 1. Incorporação permitida
-      if (status.embeddable !== true) continue;
+      // 1. Título não musical bloqueado
+      if (hasBlockedTitle(snippet.title || '')) {
+        discards.blockedTitle++;
+        continue;
+      }
 
-      // 2. Privacidade pública
-      if (status.privacyStatus !== 'public') continue;
+      // 2. Não incorporável ou não público
+      if (status.embeddable !== true || status.privacyStatus !== 'public') {
+        discards.notEmbeddable++;
+        continue;
+      }
 
       // 3. Categoria estritamente 10 (Música)
-      if (snippet.categoryId !== '10') continue;
+      if (snippet.categoryId !== '10') {
+        discards.notMusicCategory++;
+        continue;
+      }
 
-      // 4. Sem transmissões ao vivo ou estreias agendadas
-      if (snippet.liveBroadcastContent && snippet.liveBroadcastContent !== 'none') continue;
+      // 4. Live / estreia
+      if (snippet.liveBroadcastContent && snippet.liveBroadcastContent !== 'none') {
+        discards.liveOrPremiere++;
+        continue;
+      }
 
-      // 5. Duração entre 60s e 600s (1 a 10 minutos)
+      // 5. Duração entre 60s e 600s
       const durationSeconds = parseIsoDuration(contentDetails.duration);
-      if (durationSeconds < 60 || durationSeconds > 600) continue;
+      if (durationSeconds < 60) {
+        discards.under60s++;
+        continue;
+      }
+      if (durationSeconds > 600) {
+        discards.over10m++;
+        continue;
+      }
 
-      // 6. Descarte de Shorts verticais (embedHeight > embedWidth)
-      if (isVerticalVideo(player.embedHtml)) continue;
-
-      // 7. Descarte adicional se tiver tag #shorts no título
-      if (/#shorts\b/i.test(snippet.title || '')) continue;
+      // 6. Shorts verticais ou #shorts
+      if (isVerticalVideo(player.embedHtml) || /#shorts\b/i.test(snippet.title || '')) {
+        discards.isShortOrVertical++;
+        continue;
+      }
 
       const thumbnailUrl =
         snippet.thumbnails?.maxres?.url ||
@@ -447,7 +592,22 @@ export async function batchFetchVideoDetails(videoIds: string[]): Promise<Map<st
         publishedAt: new Date(snippet.publishedAt || Date.now()),
       });
     }
+
+    // IDs do chunk que não foram retornados pela API (excluídos/privados)
+    for (const cid of chunk) {
+      if (!foundIds.has(cid)) {
+        discards.notEmbeddable++;
+      }
+    }
   }
 
-  return validVideos;
+  return { validVideos, quotaCalls, discards };
+}
+
+/**
+ * Busca detalhes em lote dos vídeos (wrapper simples).
+ */
+export async function batchFetchVideoDetails(videoIds: string[]): Promise<Map<string, VideoCandidate>> {
+  const res = await batchFetchVideoDetailsWithAudit(videoIds);
+  return res.validVideos;
 }

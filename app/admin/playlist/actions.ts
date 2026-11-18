@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminSession } from '@/lib/auth';
 import { resolveChannel } from '@/lib/youtube';
-import { syncWeeklyPlaylist, publishWeeklyPlaylist } from '@/lib/playlistSync';
+import { syncWeeklyPlaylist, publishWeeklyPlaylist, SyncResult } from '@/lib/playlistSync';
 
 export async function addChannelAction(formData: FormData) {
   const admin = await verifyAdminSession();
@@ -232,7 +232,7 @@ export async function approveDraftAction(playlistId: string) {
   }
 }
 
-export async function manualSyncAction() {
+export async function manualSyncAction(): Promise<SyncResult> {
   const admin = await verifyAdminSession();
 
   try {

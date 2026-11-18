@@ -14,6 +14,28 @@ import {
   manualSyncAction,
 } from './actions';
 
+export interface DiscardCounts {
+  outOfWindow: number;
+  isShortOrVertical: number;
+  under60s: number;
+  over10m: number;
+  notMusicCategory: number;
+  liveOrPremiere: number;
+  notEmbeddable: number;
+  blockedTitle: number;
+  duplicate: number;
+  channelLimit: number;
+  inTopVideos: number;
+}
+
+export interface SyncAuditStats {
+  totalRead: number;
+  selected: number;
+  windowDays: number;
+  quotaCost: number;
+  discards: DiscardCounts;
+}
+
 interface Channel {
   id: string;
   channelId: string;
@@ -86,6 +108,7 @@ export default function PlaylistAdminClient({
   const [mode, setMode] = useState<'MANUAL_REVIEW' | 'AUTO'>(initialMode);
   const [channelInput, setChannelInput] = useState('');
   const [channelError, setChannelError] = useState<string | null>(null);
+  const [syncStats, setSyncStats] = useState<SyncAuditStats | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const handleAddChannel = (e: React.FormEvent) => {
@@ -156,6 +179,9 @@ export default function PlaylistAdminClient({
     setFeedback(null);
     startTransition(async () => {
       const res = await manualSyncAction();
+      if (res.stats) {
+        setSyncStats(res.stats as SyncAuditStats);
+      }
       if (res.ok) {
         setFeedback({
           type: 'success',
@@ -206,6 +232,69 @@ export default function PlaylistAdminClient({
         <div className={`admin-alert ${feedback.type === 'success' ? 'admin-alert-success' : 'admin-alert-error'}`}>
           <span>{feedback.message}</span>
           <button type="button" onClick={() => setFeedback(null)} className="admin-alert-close">×</button>
+        </div>
+      )}
+
+      {/* Raio-X da Execução */}
+      {(syncStats || lastLog?.message?.includes('📊 Raio-X')) && (
+        <div className="admin-card" style={{ borderLeft: '4px solid #3b82f6', background: 'rgba(59, 130, 246, 0.03)', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+            <h4 style={{ margin: 0, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              📊 Raio-X da Execução
+              {syncStats && (
+                <span className="admin-badge" style={{ background: '#3b82f6', color: '#fff' }}>
+                  {syncStats.selected} selecionados • Janela de {syncStats.windowDays} dias
+                </span>
+              )}
+            </h4>
+            {syncStats && (
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                Cota da API gasta: <strong>{syncStats.quotaCost} unidades</strong> • Lidos: <strong>{syncStats.totalRead}</strong>
+              </span>
+            )}
+          </div>
+
+          {syncStats ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '10px', fontSize: '0.85rem' }}>
+              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Fora da janela:</span> <strong>{syncStats.discards.outOfWindow}</strong>
+              </div>
+              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Short (vertical ou #shorts):</span> <strong>{syncStats.discards.isShortOrVertical}</strong>
+              </div>
+              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Menos de 60s:</span> <strong>{syncStats.discards.under60s}</strong>
+              </div>
+              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Mais de 10 min:</span> <strong>{syncStats.discards.over10m}</strong>
+              </div>
+              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Categoria ≠ Música:</span> <strong>{syncStats.discards.notMusicCategory}</strong>
+              </div>
+              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Live/estreia:</span> <strong>{syncStats.discards.liveOrPremiere}</strong>
+              </div>
+              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Não incorporável:</span> <strong>{syncStats.discards.notEmbeddable}</strong>
+              </div>
+              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Título bloqueado:</span> <strong>{syncStats.discards.blockedTitle}</strong>
+              </div>
+              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Repetido:</span> <strong>{syncStats.discards.duplicate}</strong>
+              </div>
+              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Limite por canal:</span> <strong>{syncStats.discards.channelLimit}</strong>
+              </div>
+              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Já está em Top Vídeos:</span> <strong>{syncStats.discards.inTopVideos}</strong>
+              </div>
+            </div>
+          ) : (
+            <pre style={{ margin: 0, fontSize: '0.85rem', whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: 'var(--text-muted)' }}>
+              {lastLog?.message}
+            </pre>
+          )}
         </div>
       )}
 

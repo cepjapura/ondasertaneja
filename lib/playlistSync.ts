@@ -1,9 +1,33 @@
 import { prisma } from './prisma';
 import {
-  fetchRecentUploads,
-  batchFetchVideoDetails,
+  fetchRecentUploadsWithPagination,
+  batchFetchVideoDetailsWithAudit,
+  hasBlockedTitle,
   VideoCandidate,
+  RawUploadVideo,
 } from './youtube';
+
+export interface DiscardCounts {
+  outOfWindow: number;          // fora da janela
+  isShortOrVertical: number;    // Short (vertical ou #shorts)
+  under60s: number;             // menos de 60s
+  over10m: number;              // mais de 10 min
+  notMusicCategory: number;     // categoria diferente de Música
+  liveOrPremiere: number;       // live/estreia
+  notEmbeddable: number;        // não incorporável
+  blockedTitle: number;         // título bloqueado
+  duplicate: number;            // repetido
+  channelLimit: number;         // limite por canal
+  inTopVideos: number;          // já está em Top Vídeos
+}
+
+export interface SyncAuditStats {
+  totalRead: number;
+  selected: number;
+  windowDays: number;
+  quotaCost: number;
+  discards: DiscardCounts;
+}
 
 export interface SyncResult {
   ok: boolean;
@@ -11,8 +35,28 @@ export interface SyncResult {
   videosFound: number;
   videosSelected: number;
   windowDays?: number;
+  quotaCost?: number;
+  stats?: SyncAuditStats;
   status: 'DRAFT' | 'PUBLISHED' | 'SKIPPED';
   message: string;
+}
+
+export function formatRaioX(stats: SyncAuditStats): string {
+  const d = stats.discards;
+  return [
+    `📊 Raio-X da Execução (${stats.totalRead} vídeos lidos • Cota da API gasta: ${stats.quotaCost} unidades):`,
+    `• Fora da janela: ${d.outOfWindow}`,
+    `• Short (vertical ou #shorts): ${d.isShortOrVertical}`,
+    `• Menos de 60s: ${d.under60s}`,
+    `• Mais de 10 min: ${d.over10m}`,
+    `• Categoria diferente de Música: ${d.notMusicCategory}`,
+    `• Live/estreia: ${d.liveOrPremiere}`,
+    `• Não incorporável: ${d.notEmbeddable}`,
+    `• Título bloqueado: ${d.blockedTitle}`,
+    `• Repetido: ${d.duplicate}`,
+    `• Limite por canal: ${d.channelLimit}`,
+    `• Já está em Top Vídeos: ${d.inTopVideos}`,
+  ].join('\n');
 }
 
 /**
@@ -229,8 +273,47 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
       if (id) excludedVideoIds.add(id);
     }
 
-    // Helper para completar com vídeos da playlist publicada anterior
-    const completeWithPreviousPlaylist = async (currentList: VideoCandidate[], usedIds: Set<string>) => {
+    // 5. Varredura com paginação (até 6 páginas por canal) cobrindo a janela máxima de 90 dias
+    let quotaCost = 0;
+    let totalRead = 0;
+    let totalOutOfWindowOnPages = 0;
+    const since90 = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+    const allRawUploads: RawUploadVideo[] = [];
+
+    for (const ch of channels) {
+      try {
+        const res = await fetchRecentUploadsWithPagination(
+          ch.uploadsPlaylistId,
+          since90,
+          ch.channelTitle,
+          ch.channelId,
+          6
+        );
+        quotaCost += res.quotaCalls;
+        totalRead += res.totalRead;
+        totalOutOfWindowOnPages += res.outOfWindowCount;
+        allRawUploads.push(...res.items);
+      } catch (err: any) {
+        console.error(`Erro ao buscar uploads paginados do canal ${ch.channelTitle}:`, err.message);
+      }
+    }
+
+    // Candidatos únicos nos últimos 90 dias
+    const candidateIdsSet = new Set<string>();
+    for (const u of allRawUploads) {
+      if (u.publishedAt >= since90) {
+        candidateIdsSet.add(u.videoId);
+      }
+    }
+    const candidateIds = Array.from(candidateIdsSet);
+
+    // 6. Consulta de detalhes em lote com auditoria
+    const detailsAudit = await batchFetchVideoDetailsWithAudit(candidateIds);
+    quotaCost += detailsAudit.quotaCalls;
+    const validMap = detailsAudit.validVideos;
+
+    // Helper para carregar fallback da playlist publicada anterior
+    const getPreviousPlaylistFallback = async (usedIds: Set<string>): Promise<VideoCandidate[]> => {
       const lastPublished = await prisma.weeklyPlaylist.findFirst({
         where: {
           status: 'PUBLISHED',
@@ -245,10 +328,11 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
         },
       });
 
+      const fallback: VideoCandidate[] = [];
       if (lastPublished && lastPublished.items.length > 0) {
         for (const prevItem of lastPublished.items) {
           if (!usedIds.has(prevItem.youtubeVideoId) && !excludedVideoIds.has(prevItem.youtubeVideoId)) {
-            currentList.push({
+            fallback.push({
               videoId: prevItem.youtubeVideoId,
               title: prevItem.title,
               channelTitle: prevItem.channelTitle,
@@ -258,134 +342,149 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
               publishedAt: prevItem.publishedAt,
             });
             usedIds.add(prevItem.youtubeVideoId);
-            if (currentList.length >= 20) break;
           }
         }
       }
+      return fallback;
     };
 
-    // 5. Janela inicial padrão: 14 dias (maxResults=25, limite de 2 por canal)
-    let windowDays = 14;
-    const since14 = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
-    const candidateIdsByChannel14 = new Map<string, string[]>();
-    const allCandidateIds14: string[] = [];
+    // 7. Avalia as janelas progressivas: 14 -> 30 -> 60 -> 90
+    // Janela 14: max 2 por canal. Janelas 30, 60, 90: max 4 por canal.
+    const windowStages = [
+      { days: 14, maxPerChannel: 2 },
+      { days: 30, maxPerChannel: 4 },
+      { days: 60, maxPerChannel: 4 },
+      { days: 90, maxPerChannel: 4 },
+    ];
 
-    for (const ch of channels) {
-      try {
-        const uploads = await fetchRecentUploads(ch.uploadsPlaylistId, since14, 25);
-        const list: string[] = [];
-        for (const u of uploads) {
-          if (!excludedVideoIds.has(u.videoId)) {
-            list.push(u.videoId);
-            allCandidateIds14.push(u.videoId);
+    let chosenWindow = 14;
+    let chosenSelectedVideos: VideoCandidate[] = [];
+    let chosenDiscards: DiscardCounts = {
+      outOfWindow: 0,
+      isShortOrVertical: 0,
+      under60s: 0,
+      over10m: 0,
+      notMusicCategory: 0,
+      liveOrPremiere: 0,
+      notEmbeddable: 0,
+      blockedTitle: 0,
+      duplicate: 0,
+      channelLimit: 0,
+      inTopVideos: 0,
+    };
+
+    for (const stage of windowStages) {
+      const cutoff = new Date(Date.now() - stage.days * 24 * 60 * 60 * 1000);
+      const stageDiscards: DiscardCounts = {
+        outOfWindow: totalOutOfWindowOnPages,
+        isShortOrVertical: detailsAudit.discards.isShortOrVertical,
+        under60s: detailsAudit.discards.under60s,
+        over10m: detailsAudit.discards.over10m,
+        notMusicCategory: detailsAudit.discards.notMusicCategory,
+        liveOrPremiere: detailsAudit.discards.liveOrPremiere,
+        notEmbeddable: detailsAudit.discards.notEmbeddable,
+        blockedTitle: detailsAudit.discards.blockedTitle,
+        duplicate: 0,
+        channelLimit: 0,
+        inTopVideos: 0,
+      };
+
+      const seenCandidateIds = new Set<string>();
+      const validVideosByChannel = new Map<string, VideoCandidate[]>();
+
+      for (const u of allRawUploads) {
+        if (seenCandidateIds.has(u.videoId)) {
+          stageDiscards.duplicate++;
+          continue;
+        }
+        seenCandidateIds.add(u.videoId);
+
+        if (u.publishedAt < cutoff) {
+          stageDiscards.outOfWindow++;
+          continue;
+        }
+
+        if (excludedVideoIds.has(u.videoId)) {
+          stageDiscards.inTopVideos++;
+          continue;
+        }
+
+        if (hasBlockedTitle(u.title)) {
+          stageDiscards.blockedTitle++;
+          continue;
+        }
+
+        const details = validMap.get(u.videoId);
+        if (!details) {
+          // Já contabilizado nos descartes do batch (shorts, embeddable, música, etc)
+          continue;
+        }
+
+        const chList = validVideosByChannel.get(u.channelId) || [];
+        chList.push(details);
+        validVideosByChannel.set(u.channelId, chList);
+      }
+
+      // Seleção com limite por canal
+      const stageCandidates: VideoCandidate[] = [];
+      const usedIdsForStage = new Set<string>();
+
+      for (const [chId, list] of validVideosByChannel.entries()) {
+        list.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+        const taken = list.slice(0, stage.maxPerChannel);
+        const excess = list.slice(stage.maxPerChannel);
+        stageDiscards.channelLimit += excess.length;
+
+        for (const item of taken) {
+          if (!usedIdsForStage.has(item.videoId)) {
+            stageCandidates.push(item);
+            usedIdsForStage.add(item.videoId);
+          } else {
+            stageDiscards.duplicate++;
           }
         }
-        candidateIdsByChannel14.set(ch.channelId, list);
-      } catch (err: any) {
-        console.error(`Erro ao buscar uploads 14d do canal ${ch.channelTitle}:`, err.message);
       }
-    }
 
-    let totalFound = allCandidateIds14.length;
-    const validVideosMap14 = await batchFetchVideoDetails(allCandidateIds14);
+      stageCandidates.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
-    const selectedVideos14: VideoCandidate[] = [];
-    const usedVideoIds14 = new Set<string>();
-
-    for (const [chId, candidateIds] of candidateIdsByChannel14.entries()) {
-      let count = 0;
-      for (const vId of candidateIds) {
-        const details = validVideosMap14.get(vId);
-        if (details && !usedVideoIds14.has(vId) && count < 2) {
-          selectedVideos14.push(details);
-          usedVideoIds14.add(vId);
-          count++;
-        }
-      }
-    }
-
-    selectedVideos14.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
-
-    // Se faltar para 20, completa com itens da playlist anterior
-    if (selectedVideos14.length < 20) {
-      await completeWithPreviousPlaylist(selectedVideos14, usedVideoIds14);
-    }
-
-    let selectedVideos = selectedVideos14;
-
-    // 6. JANELA PROGRESSIVA (30 -> 60 -> 90 dias, maxResults=50, até 4 por canal)
-    // Se, depois de completar com a playlist anterior, ainda houver menos de 20 vídeos:
-    if (selectedVideos.length < 20) {
-      const since90 = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
-      const uploads90ByChannel = new Map<string, Array<{ videoId: string; publishedAt: Date }>>();
-      const allCandidateIds90: string[] = [];
-
-      for (const ch of channels) {
-        try {
-          const uploads = await fetchRecentUploads(ch.uploadsPlaylistId, since90, 50);
-          const channelUploads: Array<{ videoId: string; publishedAt: Date }> = [];
-          for (const u of uploads) {
-            if (!excludedVideoIds.has(u.videoId)) {
-              channelUploads.push({ videoId: u.videoId, publishedAt: u.publishedAt });
-              allCandidateIds90.push(u.videoId);
-            }
-          }
-          uploads90ByChannel.set(ch.channelId, channelUploads);
-        } catch (err: any) {
-          console.error(`Erro ao buscar uploads ampliados do canal ${ch.channelTitle}:`, err.message);
+      // Completa com itens da playlist anterior se faltar para 20
+      if (stageCandidates.length < 20) {
+        const fallbacks = await getPreviousPlaylistFallback(new Set(usedIdsForStage));
+        for (const fb of fallbacks) {
+          stageCandidates.push(fb);
+          if (stageCandidates.length >= 20) break;
         }
       }
 
-      totalFound = allCandidateIds90.length;
-      const validVideosMap90 = await batchFetchVideoDetails(allCandidateIds90);
+      chosenWindow = stage.days;
+      chosenSelectedVideos = stageCandidates;
+      chosenDiscards = stageDiscards;
 
-      const expandedWindows = [30, 60, 90];
-      for (const days of expandedWindows) {
-        const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-        const candidateList: VideoCandidate[] = [];
-        const usedIdsForWindow = new Set<string>();
-
-        for (const [chId, uploads] of uploads90ByChannel.entries()) {
-          let count = 0;
-          for (const u of uploads) {
-            if (u.publishedAt >= cutoff && count < 4) {
-              const details = validVideosMap90.get(u.videoId);
-              if (details && !usedIdsForWindow.has(u.videoId)) {
-                candidateList.push(details);
-                usedIdsForWindow.add(u.videoId);
-                count++;
-              }
-            }
-          }
-        }
-
-        candidateList.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
-
-        if (candidateList.length < 20) {
-          await completeWithPreviousPlaylist(candidateList, usedIdsForWindow);
-        }
-
-        windowDays = days;
-        selectedVideos = candidateList;
-
-        // Para assim que chegar a 20 vídeos
-        if (selectedVideos.length >= 20) {
-          break;
-        }
+      // Se atingiu o mínimo de 20, encerra a busca progressiva!
+      if (chosenSelectedVideos.length >= 20) {
+        break;
       }
     }
 
-    // 7. Limite máximo de 40 vídeos
-    const finalList = selectedVideos.slice(0, 40);
+    const finalList = chosenSelectedVideos.slice(0, 40);
+    const windowDays = chosenWindow;
+
+    const stats: SyncAuditStats = {
+      totalRead,
+      selected: finalList.length,
+      windowDays,
+      quotaCost,
+      discards: chosenDiscards,
+    };
 
     if (finalList.length === 0) {
-      const noVideoMsg = 'Nenhum vídeo qualificado foi encontrado nos canais cadastrados.';
+      const noVideoMsg = `Nenhum vídeo qualificado foi encontrado nos canais cadastrados.\n${formatRaioX(stats)}`;
       await prisma.playlistSyncLog.create({
         data: {
           status: 'FAILED',
           trigger,
           weekIdentifier: weekId,
-          videosFound: totalFound,
+          videosFound: totalRead,
           videosSelected: 0,
           message: noVideoMsg,
         },
@@ -393,11 +492,13 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
       return {
         ok: false,
         weekIdentifier: weekId,
-        videosFound: totalFound,
+        videosFound: totalRead,
         videosSelected: 0,
         windowDays,
+        quotaCost,
+        stats,
         status: 'SKIPPED',
-        message: noVideoMsg,
+        message: 'Nenhum vídeo qualificado foi encontrado nos canais cadastrados.',
       };
     }
 
@@ -472,14 +573,14 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
       });
     }
 
-    const summaryMsg = `${finalList.length} vídeos, janela de ${windowDays} dias`;
-    const fullSuccessMsg = `Playlist semanal gerada com sucesso: ${finalList.length} vídeos (janela de ${windowDays} dias). Modo: ${mode}.`;
+    const summaryMsg = `${finalList.length} vídeos, janela de ${windowDays} dias (Cota: ${quotaCost} unidades)`;
+    const fullSuccessMsg = `Playlist semanal gerada com sucesso: ${finalList.length} vídeos selecionados (janela de ${windowDays} dias).\n${formatRaioX(stats)}`;
     await prisma.playlistSyncLog.create({
       data: {
         status: 'SUCCESS',
         trigger,
         weekIdentifier: weekId,
-        videosFound: totalFound,
+        videosFound: totalRead,
         videosSelected: finalList.length,
         message: fullSuccessMsg,
       },
@@ -488,9 +589,11 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
     return {
       ok: true,
       weekIdentifier: weekId,
-      videosFound: totalFound,
+      videosFound: totalRead,
       videosSelected: finalList.length,
       windowDays,
+      quotaCost,
+      stats,
       status: mode === 'AUTO' ? 'PUBLISHED' : 'DRAFT',
       message: summaryMsg,
     };
