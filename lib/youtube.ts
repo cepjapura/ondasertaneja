@@ -60,92 +60,186 @@ function getApiKey(): string {
 }
 
 /**
- * Resolve qualquer formato de link/handle do canal do YouTube para obter channelId oficial.
+ * Remove qualquer ocorrência da chave da API das mensagens de erro ou logs.
+ */
+export function sanitizeError(text: string, apiKey?: string): string {
+  if (!text) return '';
+  if (!apiKey) return text;
+  return text.split(apiKey).join('[REDACTED_API_KEY]');
+}
+
+/**
+ * Converte respostas de erro da YouTube API em mensagens amigáveis para o usuário.
+ */
+export function parseYouTubeApiError(status: number, responseBody: string): string {
+  try {
+    const parsed = JSON.parse(responseBody);
+    const errorObj = parsed.error || {};
+    const message = (errorObj.message || '').toLowerCase();
+    const reason = errorObj.errors?.[0]?.reason || '';
+
+    if (
+      status === 400 ||
+      reason === 'keyInvalid' ||
+      reason === 'badRequest' ||
+      message.includes('api key') ||
+      message.includes('key not valid')
+    ) {
+      return 'Chave da API do YouTube inválida ou ainda não ativada. Confira a YOUTUBE_API_KEY.';
+    }
+
+    if (reason === 'quotaExceeded' || message.includes('quota')) {
+      return 'Cota diária da API do YouTube excedida. Tente novamente mais tarde.';
+    }
+
+    if (status === 403 || reason === 'accessNotConfigured') {
+      return 'Acesso à API do YouTube bloqueado ou não ativado no Google Cloud. Confira as permissões da YOUTUBE_API_KEY.';
+    }
+
+    if (status === 404) {
+      return 'Canal não encontrado no YouTube. Verifique o link ou @handle.';
+    }
+
+    if (status >= 500) {
+      return 'Serviço do YouTube temporariamente indisponível. Tente novamente em instantes.';
+    }
+  } catch {
+    // Se o corpo não for JSON
+  }
+
+  if (status === 400) {
+    return 'Chave da API do YouTube inválida ou ainda não ativada. Confira a YOUTUBE_API_KEY.';
+  }
+  if (status === 403) {
+    return 'Acesso à API do YouTube bloqueado ou não ativado no Google Cloud. Confira as permissões da YOUTUBE_API_KEY.';
+  }
+
+  return 'Erro ao consultar a API do YouTube. Tente novamente mais tarde.';
+}
+
+export interface ParsedChannelTarget {
+  type: 'handle' | 'channelId' | 'customName';
+  value: string;
+}
+
+/**
+ * Validação rigorosa do link de canal:
+ * - Aceita @handle digitado sozinho.
+ * - Parse via new URL(): protocolo https, host youtube.com / www.youtube.com / m.youtube.com.
+ * - Aceita exclusivamente caminhos /@handle, /channel/UC... e /c/nome.
+ * - Qualquer outro formato lança "Link de canal do YouTube inválido."
+ */
+export function validateAndParseChannelInput(input: string): ParsedChannelTarget {
+  const trimmed = (input || '').trim();
+  if (!trimmed) {
+    throw new Error('Link de canal do YouTube inválido.');
+  }
+
+  // 1. Aceite também um @handle digitado sozinho
+  if (trimmed.startsWith('@')) {
+    const handleMatch = trimmed.match(/^@([\w.-]+)$/);
+    if (!handleMatch) {
+      throw new Error('Link de canal do YouTube inválido.');
+    }
+    return { type: 'handle', value: handleMatch[1] };
+  }
+
+  // 2. Parse com new URL()
+  let url: URL;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    throw new Error('Link de canal do YouTube inválido.');
+  }
+
+  // 3. Exija protocolo https
+  if (url.protocol !== 'https:') {
+    throw new Error('Link de canal do YouTube inválido.');
+  }
+
+  // 4. Hostname EXATAMENTE youtube.com, www.youtube.com ou m.youtube.com
+  const allowedHosts = ['youtube.com', 'www.youtube.com', 'm.youtube.com'];
+  const host = url.hostname.toLowerCase();
+  if (!allowedHosts.includes(host)) {
+    throw new Error('Link de canal do YouTube inválido.');
+  }
+
+  // 5. Aceite só os caminhos /@handle, /channel/UC... e /c/nome
+  const pathname = url.pathname;
+
+  // /@handle (ex.: /@gusttavolima ou /@gusttavolima/)
+  const handleMatch = pathname.match(/^\/@([\w.-]+)\/?$/);
+  if (handleMatch) {
+    return { type: 'handle', value: handleMatch[1] };
+  }
+
+  // /channel/UC... (ex.: /channel/UCwPf4y1u3fVve1u0o_H95eQ)
+  const channelMatch = pathname.match(/^\/channel\/(UC[\w-]{22})\/?$/);
+  if (channelMatch) {
+    return { type: 'channelId', value: channelMatch[1] };
+  }
+
+  // /c/nome (ex.: /c/gusttavolimaoficial)
+  const customMatch = pathname.match(/^\/c\/([\w.-]+)\/?$/);
+  if (customMatch) {
+    return { type: 'customName', value: customMatch[1] };
+  }
+
+  // Qualquer outra coisa deve mostrar "Link de canal do YouTube inválido."
+  throw new Error('Link de canal do YouTube inválido.');
+}
+
+/**
+ * Resolve canal oficial do YouTube a partir de URL validada ou @handle.
  */
 export async function resolveChannel(inputUrlOrHandle: string): Promise<ChannelResolved> {
+  const target = validateAndParseChannelInput(inputUrlOrHandle);
   const apiKey = getApiKey();
-  let trimmed = inputUrlOrHandle.trim();
-
-  if (!trimmed) {
-    throw new Error('Informe o link ou identificador do canal do YouTube.');
-  }
-
-  // Normalização do input
-  let handle: string | null = null;
-  let channelId: string | null = null;
-  let customName: string | null = null;
-
-  if (trimmed.startsWith('@')) {
-    handle = trimmed;
-  } else {
-    // Tenta parsear como URL
-    if (!/^https?:\/\//i.test(trimmed)) {
-      trimmed = `https://${trimmed}`;
-    }
-    try {
-      const url = new URL(trimmed);
-      const host = url.hostname.toLowerCase().replace(/^www\./, '');
-      if (!host.includes('youtube.com') && !host.includes('youtu.be')) {
-        throw new Error('O link informado deve ser do YouTube (youtube.com).');
-      }
-
-      const pathname = url.pathname;
-      if (pathname.includes('/@')) {
-        const match = pathname.match(/\/(@[\w.-]+)/);
-        if (match) handle = match[1];
-      } else if (pathname.includes('/channel/')) {
-        const match = pathname.match(/\/channel\/(UC[\w-]{22})/);
-        if (match) channelId = match[1];
-      } else if (pathname.includes('/c/')) {
-        const match = pathname.match(/\/c\/([\w.-]+)/);
-        if (match) customName = match[1];
-      } else if (pathname.includes('/user/')) {
-        const match = pathname.match(/\/user\/([\w.-]+)/);
-        if (match) customName = match[1];
-      } else {
-        const parts = pathname.split('/').filter(Boolean);
-        if (parts.length === 1) {
-          if (parts[0].startsWith('@')) handle = parts[0];
-          else if (parts[0].startsWith('UC')) channelId = parts[0];
-          else handle = `@${parts[0]}`;
-        }
-      }
-    } catch (err: any) {
-      if (err.message?.includes('YouTube')) throw err;
-      throw new Error('URL de canal do YouTube inválida.');
-    }
-  }
 
   let apiUrl = '';
-  if (channelId) {
-    apiUrl = `https://www.googleapis.com/youtube/v3/channels?id=${encodeURIComponent(channelId)}&part=snippet,contentDetails&key=${apiKey}`;
-  } else if (handle) {
-    const cleanHandle = handle.replace(/^@/, '');
-    apiUrl = `https://www.googleapis.com/youtube/v3/channels?forHandle=${encodeURIComponent(cleanHandle)}&part=snippet,contentDetails&key=${apiKey}`;
-  } else if (customName) {
-    apiUrl = `https://www.googleapis.com/youtube/v3/channels?forUsername=${encodeURIComponent(customName)}&part=snippet,contentDetails&key=${apiKey}`;
-  } else {
-    throw new Error('Não foi possível identificar o canal pelo link fornecido.');
+  if (target.type === 'channelId') {
+    apiUrl = `https://www.googleapis.com/youtube/v3/channels?id=${encodeURIComponent(target.value)}&part=snippet,contentDetails&key=${apiKey}`;
+  } else if (target.type === 'handle') {
+    apiUrl = `https://www.googleapis.com/youtube/v3/channels?forHandle=${encodeURIComponent(target.value)}&part=snippet,contentDetails&key=${apiKey}`;
+  } else if (target.type === 'customName') {
+    apiUrl = `https://www.googleapis.com/youtube/v3/channels?forUsername=${encodeURIComponent(target.value)}&part=snippet,contentDetails&key=${apiKey}`;
   }
 
-  const res = await fetch(apiUrl);
+  let res: Response;
+  try {
+    res = await fetch(apiUrl);
+  } catch (netErr: any) {
+    console.error('[YouTube API fetch network error]', sanitizeError(netErr?.message || '', apiKey));
+    throw new Error('Falha de conexão com a API do YouTube. Tente novamente mais tarde.');
+  }
+
   if (!res.ok) {
     const errorBody = await res.text();
-    throw new Error(`Erro ao consultar API do YouTube (${res.status}): ${errorBody}`);
+    // Registra detalhe no log do servidor sem vazar a chave
+    console.error(`[YouTube API channels error ${res.status}]:`, sanitizeError(errorBody, apiKey));
+    // Lança mensagem amigável sem JSON bruto
+    throw new Error(parseYouTubeApiError(res.status, errorBody));
   }
 
   const data = await res.json();
   const items = data.items || [];
   if (items.length === 0) {
     // Tenta fallback com forHandle se customName falhou
-    if (customName && !handle) {
-      const fallbackUrl = `https://www.googleapis.com/youtube/v3/channels?forHandle=${encodeURIComponent(customName)}&part=snippet,contentDetails&key=${apiKey}`;
-      const fallbackRes = await fetch(fallbackUrl);
-      if (fallbackRes.ok) {
-        const fallbackData = await fallbackRes.json();
-        if (fallbackData.items?.length > 0) {
-          return parseChannelItem(fallbackData.items[0]);
+    if (target.type === 'customName') {
+      const fallbackUrl = `https://www.googleapis.com/youtube/v3/channels?forHandle=${encodeURIComponent(target.value)}&part=snippet,contentDetails&key=${apiKey}`;
+      try {
+        const fallbackRes = await fetch(fallbackUrl);
+        if (fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json();
+          if (fallbackData.items?.length > 0) {
+            return parseChannelItem(fallbackData.items[0]);
+          }
+        } else {
+          const fallbackBody = await fallbackRes.text();
+          console.error(`[YouTube API fallback error ${fallbackRes.status}]:`, sanitizeError(fallbackBody, apiKey));
         }
+      } catch (fbErr: any) {
+        console.error('[YouTube API fallback network error]', sanitizeError(fbErr?.message || '', apiKey));
       }
     }
     throw new Error('Canal não encontrado no YouTube. Verifique o link ou @handle.');
@@ -188,7 +282,7 @@ export async function fetchRecentUploads(
 
   const res = await fetch(url);
   if (!res.ok) {
-    console.error(`Erro ao buscar uploads (${uploadsPlaylistId}): ${res.status}`);
+    const errorBody = await res.text(); console.error(`[YouTube API playlistItems error ${res.status}]:`, sanitizeError(errorBody, apiKey));
     return [];
   }
 
@@ -241,7 +335,7 @@ export async function batchFetchVideoDetails(videoIds: string[]): Promise<Map<st
 
     const res = await fetch(url);
     if (!res.ok) {
-      console.error(`Erro ao consultar detalhes de vídeos em lote (${res.status})`);
+      const errorBody = await res.text(); console.error(`[YouTube API videos error ${res.status}]:`, sanitizeError(errorBody, apiKey));
       continue;
     }
 

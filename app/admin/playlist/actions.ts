@@ -11,7 +11,7 @@ export async function addChannelAction(formData: FormData) {
   const input = formData.get('channelUrlOrHandle') as string;
 
   if (!input || !input.trim()) {
-    return { ok: false, error: 'Informe a URL ou @handle do canal.' };
+    return { ok: false, error: 'Link de canal do YouTube inválido.' };
   }
 
   try {

@@ -81,6 +81,7 @@ export default function PlaylistAdminClient({
   const [isPending, startTransition] = useTransition();
   const [mode, setMode] = useState<'MANUAL_REVIEW' | 'AUTO'>(initialMode);
   const [channelInput, setChannelInput] = useState('');
+  const [channelError, setChannelError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const handleAddChannel = (e: React.FormEvent) => {
@@ -88,15 +89,19 @@ export default function PlaylistAdminClient({
     if (!channelInput.trim()) return;
 
     setFeedback(null);
+    setChannelError(null);
     startTransition(async () => {
       const formData = new FormData();
       formData.set('channelUrlOrHandle', channelInput.trim());
       const res = await addChannelAction(formData);
       if (res.ok) {
         setChannelInput('');
+        setChannelError(null);
         setFeedback({ type: 'success', message: 'Canal cadastrado com sucesso!' });
       } else {
-        setFeedback({ type: 'error', message: res.error || 'Erro ao cadastrar canal.' });
+        const errorMsg = res.error || 'Erro ao cadastrar canal.';
+        setChannelError(errorMsg);
+        setFeedback({ type: 'error', message: errorMsg });
       }
     });
   };
@@ -230,7 +235,19 @@ export default function PlaylistAdminClient({
               className="admin-btn-primary"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
             >
-              {isPending ? 'Sincronizando...' : '⚡ Gerar Agora'}
+              {isPending ? (
+                <>
+                  <span className="admin-spinner" aria-hidden="true" />
+                  <span>Sincronizando...</span>
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                  <span>Gerar Agora</span>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -383,19 +400,29 @@ export default function PlaylistAdminClient({
         </p>
 
         {/* Formulário de Adicionar Canal */}
-        <form onSubmit={handleAddChannel} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
-          <input
-            type="text"
-            className="admin-input"
-            style={{ flex: 1, minWidth: '300px' }}
-            placeholder="Cole o link ou @handle (ex.: https://www.youtube.com/@GusttavoLimaOficial)"
-            value={channelInput}
-            onChange={(e) => setChannelInput(e.target.value)}
-            disabled={isPending}
-          />
-          <button type="submit" disabled={isPending || !channelInput.trim()} className="admin-btn-primary">
-            + Cadastrar Canal
-          </button>
+        <form onSubmit={handleAddChannel} style={{ marginBottom: '20px' }}>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <input
+              type="text"
+              className="admin-input"
+              style={{ flex: 1, minWidth: '300px' }}
+              placeholder="Cole o link ou @handle (ex.: https://www.youtube.com/@GusttavoLimaOficial)"
+              value={channelInput}
+              onChange={(e) => {
+                setChannelInput(e.target.value);
+                if (channelError) setChannelError(null);
+              }}
+              disabled={isPending}
+            />
+            <button type="submit" disabled={isPending || !channelInput.trim()} className="admin-btn-primary">
+              + Cadastrar Canal
+            </button>
+          </div>
+          {channelError && (
+            <div style={{ marginTop: '8px', color: '#ef4444', fontSize: '0.875rem', fontWeight: 500 }}>
+              {channelError}
+            </div>
+          )}
         </form>
 
         {/* Tabela de Canais */}
