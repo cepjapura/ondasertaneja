@@ -90,6 +90,80 @@ function extractYouTubeId(url: string): string | null {
 }
 
 /**
+ * Intercala uma lista de vídeos por canal (estilo rodízio: 1 de cada artista/canal por vez),
+ * evitando duas músicas seguidas do mesmo canal sempre que possível.
+ * Mantém dentro de cada canal a ordem do mais recente para o mais antigo.
+ */
+export function interleaveVideosByChannel(videos: VideoCandidate[]): VideoCandidate[] {
+  if (videos.length <= 1) return [...videos];
+
+  // 1. Agrupa por canal preservando a ordem
+  const byChannel = new Map<string, VideoCandidate[]>();
+  for (const v of videos) {
+    const key = v.channelId || v.channelTitle || 'unknown';
+    const list = byChannel.get(key) || [];
+    list.push(v);
+    byChannel.set(key, list);
+  }
+
+  // 2. Ordena os vídeos dentro de cada canal: do mais recente para o mais antigo
+  for (const list of byChannel.values()) {
+    list.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+  }
+
+  // 3. Ordena os canais pelo lançamento mais recente do primeiro vídeo de cada um
+  const queues = Array.from(byChannel.values());
+  queues.sort((a, b) => b[0].publishedAt.getTime() - a[0].publishedAt.getTime());
+
+  // 4. Rodízio inteligente (1 por canal a cada volta, evitando canais repetidos consecutivos)
+  const result: VideoCandidate[] = [];
+  let remainingCount = videos.length;
+
+  while (remainingCount > 0) {
+    let progressed = false;
+
+    for (let qIdx = 0; qIdx < queues.length; qIdx++) {
+      const q = queues[qIdx];
+      if (q.length === 0) continue;
+
+      const lastChannel = result.length > 0
+        ? (result[result.length - 1].channelId || result[result.length - 1].channelTitle)
+        : null;
+      const currentChannel = q[0].channelId || q[0].channelTitle;
+
+      // Se este canal for igual ao último adicionado e houver outro canal com música disponível,
+      // prioriza o outro canal para evitar repetições consecutivas
+      if (lastChannel && currentChannel === lastChannel) {
+        const otherQueue = queues.find(other => other !== q && other.length > 0);
+        if (otherQueue) {
+          result.push(otherQueue.shift()!);
+          remainingCount--;
+          progressed = true;
+          continue;
+        }
+      }
+
+      result.push(q.shift()!);
+      remainingCount--;
+      progressed = true;
+    }
+
+    if (!progressed) {
+      // Fallback de segurança para esvaziar qualquer sobra restante
+      for (const q of queues) {
+        while (q.length > 0) {
+          result.push(q.shift()!);
+          remainingCount--;
+        }
+      }
+      break;
+    }
+  }
+
+  return result;
+}
+
+/**
  * Publica uma playlist semanal e arquiva a anterior.
  */
 export async function publishWeeklyPlaylist(playlistId: string, publishedBy: string = 'ADMIN'): Promise<void> {
@@ -495,7 +569,7 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
       }
     }
 
-    const finalList = chosenSelectedVideos.slice(0, 40);
+    const finalList = interleaveVideosByChannel(chosenSelectedVideos).slice(0, 40);
     const windowDays = chosenWindow;
 
     const stats: SyncAuditStats = {

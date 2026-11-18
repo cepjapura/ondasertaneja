@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getStartOfDaySaoPaulo } from '@/lib/dates';
 import { isRadioAvailable } from '@/lib/radio';
-import { getPlaylistEmbedUrl } from '@/lib/playlist';
+import { getPlaylistEmbedUrl, getSimpleHash } from '@/lib/playlist';
 import HomeRadioCard from '@/components/HomeRadioCard';
 import TopVideosCarousel from '@/components/TopVideosCarousel';
 import ShortVideosCarousel from '@/components/ShortVideosCarousel';
@@ -39,19 +39,38 @@ export default async function HomePage() {
 
   let playlistEmbedUrl: string | null = null;
   let playlistTitle = 'Playlist da Onda';
+  let playlistKey: string | null = null;
+  let playlistVideoIds: string[] = [];
+  let playlistListId: string | null = null;
 
   if (publishedWeekly && publishedWeekly.items.length > 0) {
-    const firstId = publishedWeekly.items[0].youtubeVideoId;
-    const restIds = publishedWeekly.items.slice(1).map((i) => i.youtubeVideoId).join(',');
+    const ids = publishedWeekly.items.map((i) => i.youtubeVideoId);
+    playlistVideoIds = ids;
+    playlistKey = publishedWeekly.weekIdentifier;
+    const firstId = ids[0];
+    const restIds = ids.slice(1).join(',');
     playlistEmbedUrl = restIds
-      ? `https://www.youtube-nocookie.com/embed/${firstId}?playlist=${restIds}&autoplay=1`
-      : `https://www.youtube-nocookie.com/embed/${firstId}?autoplay=1`;
+      ? `https://www.youtube-nocookie.com/embed/${firstId}?playlist=${restIds}&enablejsapi=1`
+      : `https://www.youtube-nocookie.com/embed/${firstId}?enablejsapi=1`;
     playlistTitle = `Lançamentos da Semana (${publishedWeekly.items.length} músicas)`;
   } else {
-    playlistEmbedUrl =
-      configMap.playlistEmbedUrl ||
-      (configMap.playlistUrl ? getPlaylistEmbedUrl(configMap.playlistUrl) : null) ||
-      (configMap.wavePlaylistUrl ? getPlaylistEmbedUrl(configMap.wavePlaylistUrl) : null);
+    const manualUrl = configMap.playlistUrl || configMap.wavePlaylistUrl || '';
+    if (manualUrl) {
+      playlistEmbedUrl =
+        configMap.playlistEmbedUrl ||
+        (configMap.playlistUrl ? getPlaylistEmbedUrl(configMap.playlistUrl) : null) ||
+        (configMap.wavePlaylistUrl ? getPlaylistEmbedUrl(configMap.wavePlaylistUrl) : null);
+      if (playlistEmbedUrl && !playlistEmbedUrl.includes('enablejsapi=1')) {
+        playlistEmbedUrl += (playlistEmbedUrl.includes('?') ? '&' : '?') + 'enablejsapi=1';
+      }
+      const listMatch = manualUrl.match(/[?&]list=([a-zA-Z0-9_-]+)/i);
+      if (listMatch) {
+        playlistListId = listMatch[1];
+        playlistKey = `manual-${playlistListId}`;
+      } else {
+        playlistKey = getSimpleHash(manualUrl);
+      }
+    }
   }
 
   const sponsorUrl = configMap.sponsorUrl || null;
@@ -98,6 +117,9 @@ export default async function HomePage() {
           initialPlaylistEmbedUrl={playlistEmbedUrl}
           initialPlaylistUrl={configMap.playlistUrl || configMap.wavePlaylistUrl}
           initialPlaylistTitle={playlistTitle}
+          initialPlaylistKey={playlistKey}
+          initialPlaylistVideoIds={playlistVideoIds}
+          initialPlaylistListId={playlistListId}
           sponsorUrl={sponsorUrl}
         />
 
