@@ -10,6 +10,7 @@ export interface SyncResult {
   weekIdentifier: string;
   videosFound: number;
   videosSelected: number;
+  windowDays?: number;
   status: 'DRAFT' | 'PUBLISHED' | 'SKIPPED';
   message: string;
 }
@@ -228,53 +229,8 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
       if (id) excludedVideoIds.add(id);
     }
 
-    // 5. Janela de busca: últimos 14 dias
-    const sinceDate = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
-    const candidateIdsByChannel = new Map<string, string[]>();
-    const allCandidateIds: string[] = [];
-
-    for (const ch of channels) {
-      try {
-        const uploads = await fetchRecentUploads(ch.uploadsPlaylistId, sinceDate);
-        const channelCandidates: string[] = [];
-        for (const u of uploads) {
-          if (!excludedVideoIds.has(u.videoId)) {
-            channelCandidates.push(u.videoId);
-            allCandidateIds.push(u.videoId);
-          }
-        }
-        candidateIdsByChannel.set(ch.channelId, channelCandidates);
-      } catch (err: any) {
-        console.error(`Erro ao buscar uploads do canal ${ch.channelTitle}:`, err.message);
-      }
-    }
-
-    const totalFound = allCandidateIds.length;
-
-    // 6. Detalhes em lote e filtros estritos (música, duração, sem Shorts verticais, embeddable)
-    const validVideosMap = await batchFetchVideoDetails(allCandidateIds);
-
-    // 7. Seleciona até 2 vídeos por canal
-    const selectedVideos: VideoCandidate[] = [];
-    const usedVideoIds = new Set<string>();
-
-    for (const [chId, candidateIds] of candidateIdsByChannel.entries()) {
-      let channelCount = 0;
-      for (const vId of candidateIds) {
-        const details = validVideosMap.get(vId);
-        if (details && !usedVideoIds.has(vId) && channelCount < 2) {
-          selectedVideos.push(details);
-          usedVideoIds.add(vId);
-          channelCount++;
-        }
-      }
-    }
-
-    // Ordena os novos lançamentos por data de publicação decrescente
-    selectedVideos.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
-
-    // 8. Regra do Mínimo de 20 vídeos: se faltar, completa com os mais recentes da playlist publicada anterior
-    if (selectedVideos.length < 20) {
+    // Helper para completar com vídeos da playlist publicada anterior
+    const completeWithPreviousPlaylist = async (currentList: VideoCandidate[], usedIds: Set<string>) => {
       const lastPublished = await prisma.weeklyPlaylist.findFirst({
         where: {
           status: 'PUBLISHED',
@@ -291,8 +247,8 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
 
       if (lastPublished && lastPublished.items.length > 0) {
         for (const prevItem of lastPublished.items) {
-          if (!usedVideoIds.has(prevItem.youtubeVideoId) && !excludedVideoIds.has(prevItem.youtubeVideoId)) {
-            selectedVideos.push({
+          if (!usedIds.has(prevItem.youtubeVideoId) && !excludedVideoIds.has(prevItem.youtubeVideoId)) {
+            currentList.push({
               videoId: prevItem.youtubeVideoId,
               title: prevItem.title,
               channelTitle: prevItem.channelTitle,
@@ -301,26 +257,159 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
               durationSeconds: prevItem.durationSeconds,
               publishedAt: prevItem.publishedAt,
             });
-            usedVideoIds.add(prevItem.youtubeVideoId);
-            if (selectedVideos.length >= 20) break;
+            usedIds.add(prevItem.youtubeVideoId);
+            if (currentList.length >= 20) break;
           }
+        }
+      }
+    };
+
+    // 5. Janela inicial padrão: 14 dias (maxResults=25, limite de 2 por canal)
+    let windowDays = 14;
+    const since14 = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+    const candidateIdsByChannel14 = new Map<string, string[]>();
+    const allCandidateIds14: string[] = [];
+
+    for (const ch of channels) {
+      try {
+        const uploads = await fetchRecentUploads(ch.uploadsPlaylistId, since14, 25);
+        const list: string[] = [];
+        for (const u of uploads) {
+          if (!excludedVideoIds.has(u.videoId)) {
+            list.push(u.videoId);
+            allCandidateIds14.push(u.videoId);
+          }
+        }
+        candidateIdsByChannel14.set(ch.channelId, list);
+      } catch (err: any) {
+        console.error(`Erro ao buscar uploads 14d do canal ${ch.channelTitle}:`, err.message);
+      }
+    }
+
+    let totalFound = allCandidateIds14.length;
+    const validVideosMap14 = await batchFetchVideoDetails(allCandidateIds14);
+
+    const selectedVideos14: VideoCandidate[] = [];
+    const usedVideoIds14 = new Set<string>();
+
+    for (const [chId, candidateIds] of candidateIdsByChannel14.entries()) {
+      let count = 0;
+      for (const vId of candidateIds) {
+        const details = validVideosMap14.get(vId);
+        if (details && !usedVideoIds14.has(vId) && count < 2) {
+          selectedVideos14.push(details);
+          usedVideoIds14.add(vId);
+          count++;
         }
       }
     }
 
-    // 9. Limite máximo de 40 vídeos
+    selectedVideos14.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+
+    // Se faltar para 20, completa com itens da playlist anterior
+    if (selectedVideos14.length < 20) {
+      await completeWithPreviousPlaylist(selectedVideos14, usedVideoIds14);
+    }
+
+    let selectedVideos = selectedVideos14;
+
+    // 6. JANELA PROGRESSIVA (30 -> 60 -> 90 dias, maxResults=50, até 4 por canal)
+    // Se, depois de completar com a playlist anterior, ainda houver menos de 20 vídeos:
+    if (selectedVideos.length < 20) {
+      const since90 = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+      const uploads90ByChannel = new Map<string, Array<{ videoId: string; publishedAt: Date }>>();
+      const allCandidateIds90: string[] = [];
+
+      for (const ch of channels) {
+        try {
+          const uploads = await fetchRecentUploads(ch.uploadsPlaylistId, since90, 50);
+          const channelUploads: Array<{ videoId: string; publishedAt: Date }> = [];
+          for (const u of uploads) {
+            if (!excludedVideoIds.has(u.videoId)) {
+              channelUploads.push({ videoId: u.videoId, publishedAt: u.publishedAt });
+              allCandidateIds90.push(u.videoId);
+            }
+          }
+          uploads90ByChannel.set(ch.channelId, channelUploads);
+        } catch (err: any) {
+          console.error(`Erro ao buscar uploads ampliados do canal ${ch.channelTitle}:`, err.message);
+        }
+      }
+
+      totalFound = allCandidateIds90.length;
+      const validVideosMap90 = await batchFetchVideoDetails(allCandidateIds90);
+
+      const expandedWindows = [30, 60, 90];
+      for (const days of expandedWindows) {
+        const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+        const candidateList: VideoCandidate[] = [];
+        const usedIdsForWindow = new Set<string>();
+
+        for (const [chId, uploads] of uploads90ByChannel.entries()) {
+          let count = 0;
+          for (const u of uploads) {
+            if (u.publishedAt >= cutoff && count < 4) {
+              const details = validVideosMap90.get(u.videoId);
+              if (details && !usedIdsForWindow.has(u.videoId)) {
+                candidateList.push(details);
+                usedIdsForWindow.add(u.videoId);
+                count++;
+              }
+            }
+          }
+        }
+
+        candidateList.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+
+        if (candidateList.length < 20) {
+          await completeWithPreviousPlaylist(candidateList, usedIdsForWindow);
+        }
+
+        windowDays = days;
+        selectedVideos = candidateList;
+
+        // Para assim que chegar a 20 vídeos
+        if (selectedVideos.length >= 20) {
+          break;
+        }
+      }
+    }
+
+    // 7. Limite máximo de 40 vídeos
     const finalList = selectedVideos.slice(0, 40);
 
-    // 10. Modo de aprovação (SystemConfig ou padrão MANUAL_REVIEW)
+    if (finalList.length === 0) {
+      const noVideoMsg = 'Nenhum vídeo qualificado foi encontrado nos canais cadastrados.';
+      await prisma.playlistSyncLog.create({
+        data: {
+          status: 'FAILED',
+          trigger,
+          weekIdentifier: weekId,
+          videosFound: totalFound,
+          videosSelected: 0,
+          message: noVideoMsg,
+        },
+      });
+      return {
+        ok: false,
+        weekIdentifier: weekId,
+        videosFound: totalFound,
+        videosSelected: 0,
+        windowDays,
+        status: 'SKIPPED',
+        message: noVideoMsg,
+      };
+    }
+
+    // 8. Modo de aprovação (SystemConfig ou padrão MANUAL_REVIEW)
     const modeConfig = await prisma.systemConfig.findUnique({
       where: { key: 'weeklyPlaylistMode' },
     });
     const mode = (modeConfig?.value === 'AUTO') ? 'AUTO' : 'MANUAL_REVIEW';
 
-    // 11. Salva ou atualiza a WeeklyPlaylist e seus itens
+    // 9. Salva ou atualiza a WeeklyPlaylist e seus itens
     let playlistRecord: any;
     if (existingPlaylist) {
-      // Se já era DRAFT, remove os itens antigos e regera
       await prisma.weeklyPlaylistItem.deleteMany({
         where: { playlistId: existingPlaylist.id },
       });
@@ -331,6 +420,7 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
           status: mode === 'AUTO' ? 'PUBLISHED' : 'DRAFT',
           autoPublishAt: mode === 'MANUAL_REVIEW' ? new Date(Date.now() + 48 * 60 * 60 * 1000) : null,
           publishedAt: mode === 'AUTO' ? new Date() : null,
+          windowDays,
           generatedAt: new Date(),
         },
       });
@@ -343,6 +433,7 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
           status: mode === 'AUTO' ? 'PUBLISHED' : 'DRAFT',
           autoPublishAt: mode === 'MANUAL_REVIEW' ? new Date(Date.now() + 48 * 60 * 60 * 1000) : null,
           publishedAt: mode === 'AUTO' ? new Date() : null,
+          windowDays,
           generatedAt: new Date(),
         },
       });
@@ -381,7 +472,8 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
       });
     }
 
-    const successMsg = `Playlist semanal gerada com sucesso: ${finalList.length} vídeos selecionados (${totalFound} analisados). Modo: ${mode}.`;
+    const summaryMsg = `${finalList.length} vídeos, janela de ${windowDays} dias`;
+    const fullSuccessMsg = `Playlist semanal gerada com sucesso: ${finalList.length} vídeos (janela de ${windowDays} dias). Modo: ${mode}.`;
     await prisma.playlistSyncLog.create({
       data: {
         status: 'SUCCESS',
@@ -389,7 +481,7 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
         weekIdentifier: weekId,
         videosFound: totalFound,
         videosSelected: finalList.length,
-        message: successMsg,
+        message: fullSuccessMsg,
       },
     });
 
@@ -398,8 +490,9 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
       weekIdentifier: weekId,
       videosFound: totalFound,
       videosSelected: finalList.length,
+      windowDays,
       status: mode === 'AUTO' ? 'PUBLISHED' : 'DRAFT',
-      message: successMsg,
+      message: summaryMsg,
     };
   } catch (err: any) {
     const errorMsg = `Falha na sincronização da playlist semanal: ${err.message}`;

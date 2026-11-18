@@ -6,6 +6,26 @@ export interface ChannelResolved {
   channelUrl: string;
   avatarUrl: string | null;
   uploadsPlaylistId: string;
+  subscriberCount: string | null;
+  isVerified: boolean;
+}
+
+/**
+ * Formata contagem de inscritos de forma legível em português (ex: "21,9 mi inscritos", "850 mil inscritos").
+ */
+export function formatSubscriberCount(countStr?: string | null): string | null {
+  if (!countStr) return null;
+  const num = parseInt(countStr, 10);
+  if (isNaN(num)) return null;
+  if (num >= 1_000_000) {
+    const val = (num / 1_000_000).toFixed(1).replace('.', ',');
+    return `${val.endsWith(',0') ? val.slice(0, -2) : val} mi inscritos`;
+  }
+  if (num >= 1_000) {
+    const val = (num / 1_000).toFixed(1).replace('.', ',');
+    return `${val.endsWith(',0') ? val.slice(0, -2) : val} mil inscritos`;
+  }
+  return `${num} inscritos`;
 }
 
 export interface VideoCandidate {
@@ -198,11 +218,11 @@ export async function resolveChannel(inputUrlOrHandle: string): Promise<ChannelR
 
   let apiUrl = '';
   if (target.type === 'channelId') {
-    apiUrl = `https://www.googleapis.com/youtube/v3/channels?id=${encodeURIComponent(target.value)}&part=snippet,contentDetails&key=${apiKey}`;
+    apiUrl = `https://www.googleapis.com/youtube/v3/channels?id=${encodeURIComponent(target.value)}&part=snippet,contentDetails,statistics,status&key=${apiKey}`;
   } else if (target.type === 'handle') {
-    apiUrl = `https://www.googleapis.com/youtube/v3/channels?forHandle=${encodeURIComponent(target.value)}&part=snippet,contentDetails&key=${apiKey}`;
+    apiUrl = `https://www.googleapis.com/youtube/v3/channels?forHandle=${encodeURIComponent(target.value)}&part=snippet,contentDetails,statistics,status&key=${apiKey}`;
   } else if (target.type === 'customName') {
-    apiUrl = `https://www.googleapis.com/youtube/v3/channels?forUsername=${encodeURIComponent(target.value)}&part=snippet,contentDetails&key=${apiKey}`;
+    apiUrl = `https://www.googleapis.com/youtube/v3/channels?forUsername=${encodeURIComponent(target.value)}&part=snippet,contentDetails,statistics,status&key=${apiKey}`;
   }
 
   let res: Response;
@@ -226,7 +246,7 @@ export async function resolveChannel(inputUrlOrHandle: string): Promise<ChannelR
   if (items.length === 0) {
     // Tenta fallback com forHandle se customName falhou
     if (target.type === 'customName') {
-      const fallbackUrl = `https://www.googleapis.com/youtube/v3/channels?forHandle=${encodeURIComponent(target.value)}&part=snippet,contentDetails&key=${apiKey}`;
+      const fallbackUrl = `https://www.googleapis.com/youtube/v3/channels?forHandle=${encodeURIComponent(target.value)}&part=snippet,contentDetails,statistics,status&key=${apiKey}`;
       try {
         const fallbackRes = await fetch(fallbackUrl);
         if (fallbackRes.ok) {
@@ -251,6 +271,8 @@ export async function resolveChannel(inputUrlOrHandle: string): Promise<ChannelR
 function parseChannelItem(item: any): ChannelResolved {
   const channelId = item.id;
   const snippet = item.snippet || {};
+  const status = item.status || {};
+  const statistics = item.statistics || {};
   const channelTitle = snippet.title || 'Canal Oficial';
   const customUrl = snippet.customUrl ? `https://www.youtube.com/${snippet.customUrl}` : `https://www.youtube.com/channel/${channelId}`;
   const avatarUrl = snippet.thumbnails?.medium?.url || snippet.thumbnails?.default?.url || null;
@@ -261,13 +283,47 @@ function parseChannelItem(item: any): ChannelResolved {
     uploadsPlaylistId = 'UU' + channelId.slice(2);
   }
 
+  const subscriberCount = statistics.subscriberCount ? String(statistics.subscriberCount) : null;
+  const isVerified = Boolean(status.isVerified || snippet.isVerified);
+
   return {
     channelId,
     channelTitle,
     channelUrl: customUrl,
     avatarUrl,
     uploadsPlaylistId: uploadsPlaylistId || `UU${channelId.slice(2)}`,
+    subscriberCount,
+    isVerified,
   };
+}
+
+/**
+ * Busca estatísticas e dados de verificação em lote para canais existentes (1 chamada na API, até 50 IDs).
+ */
+export async function batchFetchChannelStats(channelIds: string[]): Promise<Map<string, { subscriberCount: string | null; isVerified: boolean }>> {
+  const apiKey = getApiKey();
+  const map = new Map<string, { subscriberCount: string | null; isVerified: boolean }>();
+  if (channelIds.length === 0) return map;
+
+  const chunkSize = 50;
+  for (let i = 0; i < channelIds.length; i += chunkSize) {
+    const chunk = channelIds.slice(i, i + chunkSize);
+    const url = `https://www.googleapis.com/youtube/v3/channels?id=${encodeURIComponent(chunk.join(','))}&part=snippet,statistics,status&key=${apiKey}`;
+    try {
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        for (const item of data.items || []) {
+          const subscriberCount = item.statistics?.subscriberCount ? String(item.statistics.subscriberCount) : null;
+          const isVerified = Boolean(item.status?.isVerified || item.snippet?.isVerified);
+          map.set(item.id, { subscriberCount, isVerified });
+        }
+      }
+    } catch (err: any) {
+      console.error('[YouTube API batch channel stats error]:', sanitizeError(err.message, apiKey));
+    }
+  }
+  return map;
 }
 
 /**
@@ -275,10 +331,12 @@ function parseChannelItem(item: any): ChannelResolved {
  */
 export async function fetchRecentUploads(
   uploadsPlaylistId: string,
-  sinceDate: Date
+  sinceDate: Date,
+  maxResults: number = 25
 ): Promise<Array<{ videoId: string; title: string; publishedAt: Date; channelTitle: string; channelId: string }>> {
   const apiKey = getApiKey();
-  const url = `https://www.googleapis.com/youtube/v3/playlistItems?playlistId=${encodeURIComponent(uploadsPlaylistId)}&part=snippet,contentDetails&maxResults=25&key=${apiKey}`;
+  const safeMax = Math.min(Math.max(maxResults, 1), 50);
+  const url = `https://www.googleapis.com/youtube/v3/playlistItems?playlistId=${encodeURIComponent(uploadsPlaylistId)}&part=snippet,contentDetails&maxResults=${safeMax}&key=${apiKey}`;
 
   const res = await fetch(url);
   if (!res.ok) {

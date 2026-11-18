@@ -33,6 +33,8 @@ export async function addChannelAction(formData: FormData) {
         channelUrl: resolved.channelUrl,
         avatarUrl: resolved.avatarUrl,
         uploadsPlaylistId: resolved.uploadsPlaylistId,
+        subscriberCount: resolved.subscriberCount,
+        isVerified: resolved.isVerified,
         isActive: true,
       },
     });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminSession } from '@/lib/auth';
+import { batchFetchChannelStats } from '@/lib/youtube';
 import PlaylistAdminClient from './PlaylistAdminClient';
 
 export const dynamic = 'force-dynamic';
@@ -38,6 +39,27 @@ export default async function AdminPlaylistPage() {
       orderBy: { executedAt: 'desc' },
     }),
   ]);
+
+  // Auto-popula estatísticas para canais existentes
+  const unpopulated = channels.filter((c) => c.subscriberCount == null);
+  if (unpopulated.length > 0) {
+    try {
+      const statsMap = await batchFetchChannelStats(unpopulated.map((c) => c.channelId));
+      for (const ch of unpopulated) {
+        const stats = statsMap.get(ch.channelId);
+        if (stats) {
+          ch.subscriberCount = stats.subscriberCount;
+          ch.isVerified = stats.isVerified;
+          await prisma.officialChannel.update({
+            where: { id: ch.id },
+            data: { subscriberCount: stats.subscriberCount, isVerified: stats.isVerified },
+          });
+        }
+      }
+    } catch {
+      // silencioso se falhar
+    }
+  }
 
   const mode = (modeConfig?.value === 'AUTO') ? 'AUTO' : 'MANUAL_REVIEW';
 

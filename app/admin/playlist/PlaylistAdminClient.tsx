@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition } from 'react';
 import Image from 'next/image';
+import { formatSubscriberCount } from '@/lib/youtube';
 import {
   addChannelAction,
   toggleChannelAction,
@@ -19,6 +20,8 @@ interface Channel {
   channelTitle: string;
   channelUrl: string;
   avatarUrl: string | null;
+  subscriberCount?: string | null;
+  isVerified?: boolean;
   isActive: boolean;
   createdAt: Date;
 }
@@ -40,6 +43,7 @@ interface Playlist {
   title: string;
   status: string;
   mode: string;
+  windowDays?: number;
   autoPublishAt: Date | null;
   generatedAt: Date;
   publishedAt: Date | null;
@@ -288,7 +292,7 @@ export default function PlaylistAdminClient({
                 <h3 style={{ margin: 0, fontSize: '1.15rem' }}>Semana {draftPlaylist.weekIdentifier}</h3>
               </div>
               <p style={{ margin: '6px 0 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                {activeDraftItems.length} músicas ativas.
+                {activeDraftItems.length} músicas ativas {draftPlaylist.windowDays ? `(janela de ${draftPlaylist.windowDays} dias)` : ''}.
                 {draftPlaylist.autoPublishAt && (
                   <> Auto-publicação em: <strong>{new Date(draftPlaylist.autoPublishAt).toLocaleString('pt-BR')}</strong> (em 48h após a geração).</>
                 )}
@@ -459,8 +463,45 @@ export default function PlaylistAdminClient({
                       )}
                     </td>
                     <td>
-                      <strong>{ch.channelTitle}</strong>
-                      <div style={{ fontSize: '0.75rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <strong>{ch.channelTitle}</strong>
+                        {ch.isVerified ? (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              fontSize: '0.75rem',
+                              color: '#3b82f6',
+                              background: 'rgba(59, 130, 246, 0.1)',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              fontWeight: 600,
+                            }}
+                            title="Canal Verificado"
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                            </svg>
+                            Verificado
+                          </span>
+                        ) : ch.subscriberCount ? (
+                          <span
+                            style={{
+                              fontSize: '0.75rem',
+                              color: 'var(--text-muted)',
+                              background: 'rgba(255, 255, 255, 0.06)',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              border: '1px solid var(--border-color)',
+                            }}
+                            title={`${parseInt(ch.subscriberCount, 10).toLocaleString('pt-BR')} inscritos`}
+                          >
+                            {formatSubscriberCount(ch.subscriberCount)}
+                          </span>
+                        ) : null}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', marginTop: '2px' }}>
                         <a href={ch.channelUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-text)' }}>
                           Acessar canal ↗
                         </a>

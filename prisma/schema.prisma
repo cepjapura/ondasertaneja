@@ -379,6 +379,8 @@ model OfficialChannel {
   channelUrl        String   @db.VarChar(1024)
   avatarUrl         String?  @db.VarChar(2048)
   uploadsPlaylistId String
+  subscriberCount   String?
+  isVerified        Boolean  @default(false)
   isActive          Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -396,6 +398,7 @@ model WeeklyPlaylist {
   generatedAt    DateTime  @default(now())
   publishedAt    DateTime?
   archivedAt     DateTime?
+  windowDays     Int       @default(14)
 
   items WeeklyPlaylistItem[]
 
