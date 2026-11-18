@@ -1928,6 +1928,30 @@ textarea:focus {
   color: #FFFFFF;
 }
 
+.home-playlist-action-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.home-playlist-restart-link {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.home-playlist-restart-link:hover {
+  color: var(--text-main);
+}
+
 @media (max-width: 600px) {
   .home-radio-body.is-playlist {
     flex-wrap: wrap;
@@ -1936,6 +1960,11 @@ textarea:focus {
     width: 100%;
     margin-top: 8px;
     justify-content: center;
+  }
+  .home-playlist-action-group {
+    width: 100%;
+    align-items: center;
+    margin-top: 8px;
   }
 }
 

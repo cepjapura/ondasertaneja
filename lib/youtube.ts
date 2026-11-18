@@ -90,6 +90,7 @@ export const BLOCKED_TITLE_KEYWORDS: string[] = [
   'dvd completo',
   'ensaio',
   'unboxing',
+  'perguntas',
 ];
 
 export function hasBlockedTitle(title: string): boolean {

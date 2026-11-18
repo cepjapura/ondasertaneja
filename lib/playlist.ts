@@ -109,3 +109,16 @@ export function getPlaylistEmbedUrl(rawUrl?: string | null): string | null {
     return null;
   }
 }
+
+/**
+ * Gera um hash simples e estavel a partir de uma string (IDs de videos ou URL da playlist).
+ */
+export function getSimpleHash(str: string): string {
+  if (!str) return 'manual-empty';
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return 'manual-' + Math.abs(hash).toString(36);
+}
