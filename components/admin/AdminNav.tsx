@@ -16,6 +16,12 @@ export default function AdminNav() {
         Vídeos Curtos
       </Link>
       <Link
+        href="/admin/playlist"
+        className={`admin-nav-link ${pathname.startsWith('/admin/playlist') ? 'active' : ''}`}
+      >
+        Playlist da Semana
+      </Link>
+      <Link
         href="/admin/configuracoes"
         className={`admin-nav-link ${pathname.startsWith('/admin/configuracoes') ? 'active' : ''}`}
       >

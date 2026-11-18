@@ -371,3 +371,69 @@ model SponsorClick {
   @@index([sponsorSlug, clickedAt])
   @@index([clickedAt])
 }
+
+model OfficialChannel {
+  id                String   @id @default(uuid())
+  channelId         String   @unique
+  channelTitle      String
+  channelUrl        String   @db.VarChar(1024)
+  avatarUrl         String?  @db.VarChar(2048)
+  uploadsPlaylistId String
+  subscriberCount   String?
+  isVerified        Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+model WeeklyPlaylist {
+  id             String    @id @default(uuid())
+  weekIdentifier String    @unique // ex: 2026-W47
+  title          String    @default("Lançamentos da Semana")
+  status         String    @default("DRAFT") // DRAFT | PUBLISHED | ARCHIVED
+  mode           String    @default("MANUAL_REVIEW") // AUTO | MANUAL_REVIEW
+  autoPublishAt  DateTime?
+  generatedAt    DateTime  @default(now())
+  publishedAt    DateTime?
+  archivedAt     DateTime?
+  windowDays     Int       @default(14)
+
+  items WeeklyPlaylistItem[]
+
+  @@index([status])
+  @@index([weekIdentifier])
+}
+
+model WeeklyPlaylistItem {
+  id              String   @id @default(uuid())
+  playlistId      String
+  youtubeVideoId  String
+  title           String
+  channelTitle    String
+  channelId       String?
+  thumbnailUrl    String?  @db.VarChar(2048)
+  durationSeconds Int
+  publishedAt     DateTime
+  sortOrder       Int      @default(0)
+  isRemoved       Boolean  @default(false)
+
+  playlist WeeklyPlaylist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+
+  @@index([playlistId, isRemoved, sortOrder])
+  @@index([youtubeVideoId])
+}
+
+model PlaylistSyncLog {
+  id             String   @id @default(uuid())
+  status         String // SUCCESS | FAILED
+  trigger        String   @default("CRON") // CRON | MANUAL
+  weekIdentifier String?
+  videosFound    Int      @default(0)
+  videosSelected Int      @default(0)
+  message        String?  @db.Text
+  executedAt     DateTime @default(now())
+
+  @@index([executedAt])
+}

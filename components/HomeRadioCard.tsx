@@ -10,6 +10,7 @@ interface Props {
   initialPlaylistEmbedUrl?: string | null;
   initialPlaylistUrl?: string | null;
   sponsorUrl?: string | null;
+  initialPlaylistTitle?: string;
 }
 
 export default function HomeRadioCard({
@@ -17,6 +18,7 @@ export default function HomeRadioCard({
   initialPlaylistEmbedUrl,
   initialPlaylistUrl,
   sponsorUrl,
+  initialPlaylistTitle,
 }: Props) {
   const {
     isConfigLoaded,
@@ -37,6 +39,7 @@ export default function HomeRadioCard({
     (initialPlaylistUrl ? getPlaylistEmbedUrl(initialPlaylistUrl) : null);
 
   const [playlistEmbedUrl, setPlaylistEmbedUrl] = useState<string | null>(initialEmbed);
+  const [playlistTitle, setPlaylistTitle] = useState<string>(initialPlaylistTitle || 'Playlist da Onda');
   const [showIframe, setShowIframe] = useState(false);
 
   // Atualização dinâmica via /api/config
@@ -44,6 +47,9 @@ export default function HomeRadioCard({
     fetch('/api/config')
       .then((res) => res.json())
       .then((data) => {
+        if (data?.playlistTitle) {
+          setPlaylistTitle(data.playlistTitle);
+        }
         if (data?.playlistEmbedUrl) {
           setPlaylistEmbedUrl(data.playlistEmbedUrl);
         } else if (data?.playlistUrl) {
@@ -250,7 +256,7 @@ export default function HomeRadioCard({
 
                 <div className="home-radio-info">
                   <h3 className="home-radio-track-title">
-                    Playlist da Onda
+                    {playlistTitle}
                   </h3>
                   <p className="home-radio-track-artist">
                     Enquanto a rádio não chega, aperta o play!
@@ -277,7 +283,7 @@ export default function HomeRadioCard({
                 <iframe
                   className="home-playlist-iframe"
                   src={playlistEmbedUrl || ''}
-                  title="Playlist da Onda"
+                  title={playlistTitle}
                   loading="lazy"
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 />
