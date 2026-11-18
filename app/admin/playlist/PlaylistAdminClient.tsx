@@ -31,6 +31,7 @@ export interface DiscardCounts {
 export interface SyncAuditStats {
   totalRead: number;
   selected: number;
+  fallbackAdded?: number;
   windowDays: number;
   quotaCost: number;
   discards: DiscardCounts;
@@ -236,11 +237,16 @@ export default function PlaylistAdminClient({
       )}
 
       {/* Raio-X da Execução */}
-      {(syncStats || lastLog?.message?.includes('📊 Raio-X')) && (
+      {(syncStats || lastLog?.message?.includes('Raio-X')) && (
         <div className="admin-card" style={{ borderLeft: '4px solid #3b82f6', background: 'rgba(59, 130, 246, 0.03)', marginBottom: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
             <h4 style={{ margin: 0, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              📊 Raio-X da Execução
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ color: '#3b82f6' }}>
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+              </svg>
+              <span>Raio-X da Execução</span>
               {syncStats && (
                 <span className="admin-badge" style={{ background: '#3b82f6', color: '#fff' }}>
                   {syncStats.selected} selecionados • Janela de {syncStats.windowDays} dias
@@ -255,41 +261,77 @@ export default function PlaylistAdminClient({
           </div>
 
           {syncStats ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '10px', fontSize: '0.85rem' }}>
-              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Fora da janela:</span> <strong>{syncStats.discards.outOfWindow}</strong>
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '10px', fontSize: '0.85rem' }}>
+                <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Fora da janela:</span> <strong>{syncStats.discards.outOfWindow}</strong>
+                </div>
+                <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Short (vertical ou #shorts):</span> <strong>{syncStats.discards.isShortOrVertical}</strong>
+                </div>
+                <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Menos de 60s:</span> <strong>{syncStats.discards.under60s}</strong>
+                </div>
+                <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Mais de 10 min:</span> <strong>{syncStats.discards.over10m}</strong>
+                </div>
+                <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Categoria ≠ Música:</span> <strong>{syncStats.discards.notMusicCategory}</strong>
+                </div>
+                <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Live/estreia:</span> <strong>{syncStats.discards.liveOrPremiere}</strong>
+                </div>
+                <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Não incorporável:</span> <strong>{syncStats.discards.notEmbeddable}</strong>
+                </div>
+                <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Título bloqueado:</span> <strong>{syncStats.discards.blockedTitle}</strong>
+                </div>
+                <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Repetido:</span> <strong>{syncStats.discards.duplicate}</strong>
+                </div>
+                <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Limite por canal:</span> <strong>{syncStats.discards.channelLimit}</strong>
+                </div>
+                <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Já está em Top Vídeos:</span> <strong>{syncStats.discards.inTopVideos}</strong>
+                </div>
               </div>
-              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Short (vertical ou #shorts):</span> <strong>{syncStats.discards.isShortOrVertical}</strong>
-              </div>
-              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Menos de 60s:</span> <strong>{syncStats.discards.under60s}</strong>
-              </div>
-              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Mais de 10 min:</span> <strong>{syncStats.discards.over10m}</strong>
-              </div>
-              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Categoria ≠ Música:</span> <strong>{syncStats.discards.notMusicCategory}</strong>
-              </div>
-              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Live/estreia:</span> <strong>{syncStats.discards.liveOrPremiere}</strong>
-              </div>
-              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Não incorporável:</span> <strong>{syncStats.discards.notEmbeddable}</strong>
-              </div>
-              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Título bloqueado:</span> <strong>{syncStats.discards.blockedTitle}</strong>
-              </div>
-              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Repetido:</span> <strong>{syncStats.discards.duplicate}</strong>
-              </div>
-              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Limite por canal:</span> <strong>{syncStats.discards.channelLimit}</strong>
-              </div>
-              <div style={{ padding: '8px 12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Já está em Top Vídeos:</span> <strong>{syncStats.discards.inTopVideos}</strong>
-              </div>
-            </div>
+
+              {(() => {
+                const sumDiscards = Object.values(syncStats.discards).reduce((a, b) => a + b, 0);
+                const isBalanced = syncStats.totalRead === syncStats.selected + sumDiscards;
+                return (
+                  <div style={{
+                    marginTop: '12px',
+                    padding: '10px 14px',
+                    borderRadius: '8px',
+                    background: isBalanced ? 'rgba(37, 211, 102, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+                    border: `1px solid ${isBalanced ? '#25D366' : '#EF4444'}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    fontSize: '0.85rem'
+                  }}>
+                    <span style={{ color: isBalanced ? '#25D366' : '#EF4444', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      {isBalanced ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      ) : '⚠️'}
+                      Conferência: {syncStats.totalRead} lidos = {syncStats.selected} selecionados + {sumDiscards} descartados
+                    </span>
+                    {syncStats.fallbackAdded && syncStats.fallbackAdded > 0 && (
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                        (+ {syncStats.fallbackAdded} vídeos da playlist anterior para fechar o mínimo de 20)
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
+            </>
           ) : (
             <pre style={{ margin: 0, fontSize: '0.85rem', whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: 'var(--text-muted)' }}>
               {lastLog?.message}

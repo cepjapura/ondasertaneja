@@ -416,14 +416,16 @@ export async function fetchRecentUploadsWithPagination(
 
     const data = await res.json();
     const pageItems = data.items || [];
-    totalRead += pageItems.length;
-
     let oldestOnPage = new Date();
 
     for (const item of pageItems) {
+      totalRead++;
       const videoId = item.contentDetails?.videoId || item.snippet?.resourceId?.videoId;
       const publishedAtStr = item.contentDetails?.videoPublishedAt || item.snippet?.publishedAt;
-      if (!videoId || !publishedAtStr) continue;
+      if (!videoId || !publishedAtStr) {
+        outOfWindowCount++;
+        continue;
+      }
 
       const publishedAt = new Date(publishedAtStr);
       if (publishedAt < oldestOnPage) {
@@ -470,8 +472,24 @@ export async function fetchRecentUploads(
   return res.items.slice(0, maxResults);
 }
 
+export type VideoDiscardReason =
+  | 'notEmbeddable'
+  | 'notMusicCategory'
+  | 'liveOrPremiere'
+  | 'under60s'
+  | 'over10m'
+  | 'isShortOrVertical'
+  | 'blockedTitle';
+
+export interface VideoAuditDetail {
+  status: 'VALID' | 'DISCARDED';
+  candidate?: VideoCandidate;
+  discardReason?: VideoDiscardReason;
+}
+
 export interface VideoDetailsResult {
   validVideos: Map<string, VideoCandidate>;
+  auditMap: Map<string, VideoAuditDetail>;
   quotaCalls: number;
   discards: {
     notEmbeddable: number;
@@ -490,6 +508,7 @@ export interface VideoDetailsResult {
 export async function batchFetchVideoDetailsWithAudit(videoIds: string[]): Promise<VideoDetailsResult> {
   const apiKey = getApiKey();
   const validVideos = new Map<string, VideoCandidate>();
+  const auditMap = new Map<string, VideoAuditDetail>();
   let quotaCalls = 0;
 
   const discards = {
@@ -503,7 +522,7 @@ export async function batchFetchVideoDetailsWithAudit(videoIds: string[]): Promi
   };
 
   if (videoIds.length === 0) {
-    return { validVideos, quotaCalls, discards };
+    return { validVideos, auditMap, quotaCalls, discards };
   }
 
   const chunkSize = 50;
@@ -517,6 +536,9 @@ export async function batchFetchVideoDetailsWithAudit(videoIds: string[]): Promi
       const errorBody = await res.text();
       console.error(`[YouTube API videos error ${res.status}]:`, sanitizeError(errorBody, apiKey));
       discards.notEmbeddable += chunk.length;
+      for (const cid of chunk) {
+        auditMap.set(cid, { status: 'DISCARDED', discardReason: 'notEmbeddable' });
+      }
       continue;
     }
 
@@ -536,24 +558,28 @@ export async function batchFetchVideoDetailsWithAudit(videoIds: string[]): Promi
       // 1. Título não musical bloqueado
       if (hasBlockedTitle(snippet.title || '')) {
         discards.blockedTitle++;
+        auditMap.set(videoId, { status: 'DISCARDED', discardReason: 'blockedTitle' });
         continue;
       }
 
       // 2. Não incorporável ou não público
       if (status.embeddable !== true || status.privacyStatus !== 'public') {
         discards.notEmbeddable++;
+        auditMap.set(videoId, { status: 'DISCARDED', discardReason: 'notEmbeddable' });
         continue;
       }
 
       // 3. Categoria estritamente 10 (Música)
       if (snippet.categoryId !== '10') {
         discards.notMusicCategory++;
+        auditMap.set(videoId, { status: 'DISCARDED', discardReason: 'notMusicCategory' });
         continue;
       }
 
       // 4. Live / estreia
       if (snippet.liveBroadcastContent && snippet.liveBroadcastContent !== 'none') {
         discards.liveOrPremiere++;
+        auditMap.set(videoId, { status: 'DISCARDED', discardReason: 'liveOrPremiere' });
         continue;
       }
 
@@ -561,16 +587,19 @@ export async function batchFetchVideoDetailsWithAudit(videoIds: string[]): Promi
       const durationSeconds = parseIsoDuration(contentDetails.duration);
       if (durationSeconds < 60) {
         discards.under60s++;
+        auditMap.set(videoId, { status: 'DISCARDED', discardReason: 'under60s' });
         continue;
       }
       if (durationSeconds > 600) {
         discards.over10m++;
+        auditMap.set(videoId, { status: 'DISCARDED', discardReason: 'over10m' });
         continue;
       }
 
       // 6. Shorts verticais ou #shorts
       if (isVerticalVideo(player.embedHtml) || /#shorts\b/i.test(snippet.title || '')) {
         discards.isShortOrVertical++;
+        auditMap.set(videoId, { status: 'DISCARDED', discardReason: 'isShortOrVertical' });
         continue;
       }
 
@@ -582,7 +611,7 @@ export async function batchFetchVideoDetailsWithAudit(videoIds: string[]): Promi
         snippet.thumbnails?.default?.url ||
         null;
 
-      validVideos.set(videoId, {
+      const candidate: VideoCandidate = {
         videoId,
         title: snippet.title || 'Sem título',
         channelTitle: snippet.channelTitle || '',
@@ -590,18 +619,22 @@ export async function batchFetchVideoDetailsWithAudit(videoIds: string[]): Promi
         thumbnailUrl,
         durationSeconds,
         publishedAt: new Date(snippet.publishedAt || Date.now()),
-      });
+      };
+
+      validVideos.set(videoId, candidate);
+      auditMap.set(videoId, { status: 'VALID', candidate });
     }
 
     // IDs do chunk que não foram retornados pela API (excluídos/privados)
     for (const cid of chunk) {
       if (!foundIds.has(cid)) {
         discards.notEmbeddable++;
+        auditMap.set(cid, { status: 'DISCARDED', discardReason: 'notEmbeddable' });
       }
     }
   }
 
-  return { validVideos, quotaCalls, discards };
+  return { validVideos, auditMap, quotaCalls, discards };
 }
 
 /**

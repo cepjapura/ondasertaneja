@@ -24,6 +24,7 @@ export interface DiscardCounts {
 export interface SyncAuditStats {
   totalRead: number;
   selected: number;
+  fallbackAdded?: number;
   windowDays: number;
   quotaCost: number;
   discards: DiscardCounts;
@@ -43,8 +44,14 @@ export interface SyncResult {
 
 export function formatRaioX(stats: SyncAuditStats): string {
   const d = stats.discards;
+  const totalDiscards = Object.values(d).reduce((a, b) => a + b, 0);
+  const isBalanced = stats.totalRead === stats.selected + totalDiscards;
+  const fallbackNote = stats.fallbackAdded && stats.fallbackAdded > 0
+    ? ` (+ ${stats.fallbackAdded} da playlist anterior para fechar o mínimo de 20)`
+    : '';
+
   return [
-    `📊 Raio-X da Execução (${stats.totalRead} vídeos lidos • Cota da API gasta: ${stats.quotaCost} unidades):`,
+    `Raio-X da Execução (${stats.totalRead} vídeos lidos • Cota da API gasta: ${stats.quotaCost} unidades):`,
     `• Fora da janela: ${d.outOfWindow}`,
     `• Short (vertical ou #shorts): ${d.isShortOrVertical}`,
     `• Menos de 60s: ${d.under60s}`,
@@ -56,6 +63,7 @@ export function formatRaioX(stats: SyncAuditStats): string {
     `• Repetido: ${d.duplicate}`,
     `• Limite por canal: ${d.channelLimit}`,
     `• Já está em Top Vídeos: ${d.inTopVideos}`,
+    `${isBalanced ? '✓' : '⚠️'} Conferência: ${stats.totalRead} lidos = ${stats.selected} selecionados + ${totalDiscards} descartados${fallbackNote}`,
   ].join('\n');
 }
 
@@ -359,6 +367,8 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
 
     let chosenWindow = 14;
     let chosenSelectedVideos: VideoCandidate[] = [];
+    let chosenSelectedFromUploads = 0;
+    let chosenFallbackCount = 0;
     let chosenDiscards: DiscardCounts = {
       outOfWindow: 0,
       isShortOrVertical: 0,
@@ -377,13 +387,13 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
       const cutoff = new Date(Date.now() - stage.days * 24 * 60 * 60 * 1000);
       const stageDiscards: DiscardCounts = {
         outOfWindow: totalOutOfWindowOnPages,
-        isShortOrVertical: detailsAudit.discards.isShortOrVertical,
-        under60s: detailsAudit.discards.under60s,
-        over10m: detailsAudit.discards.over10m,
-        notMusicCategory: detailsAudit.discards.notMusicCategory,
-        liveOrPremiere: detailsAudit.discards.liveOrPremiere,
-        notEmbeddable: detailsAudit.discards.notEmbeddable,
-        blockedTitle: detailsAudit.discards.blockedTitle,
+        isShortOrVertical: 0,
+        under60s: 0,
+        over10m: 0,
+        notMusicCategory: 0,
+        liveOrPremiere: 0,
+        notEmbeddable: 0,
+        blockedTitle: 0,
         duplicate: 0,
         channelLimit: 0,
         inTopVideos: 0,
@@ -393,40 +403,47 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
       const validVideosByChannel = new Map<string, VideoCandidate[]>();
 
       for (const u of allRawUploads) {
+        // 1. Repetido nos uploads
         if (seenCandidateIds.has(u.videoId)) {
           stageDiscards.duplicate++;
           continue;
         }
         seenCandidateIds.add(u.videoId);
 
+        // 2. Fora da janela de publicação deste estágio
         if (u.publishedAt < cutoff) {
           stageDiscards.outOfWindow++;
           continue;
         }
 
+        // 3. Já está em Top Vídeos
         if (excludedVideoIds.has(u.videoId)) {
           stageDiscards.inTopVideos++;
           continue;
         }
 
+        // 4. Título não musical bloqueado no upload
         if (hasBlockedTitle(u.title)) {
           stageDiscards.blockedTitle++;
           continue;
         }
 
-        const details = validMap.get(u.videoId);
-        if (!details) {
-          // Já contabilizado nos descartes do batch (shorts, embeddable, música, etc)
+        // 5. Avaliação da API de detalhes
+        const evalDetail = detailsAudit.auditMap.get(u.videoId);
+        if (!evalDetail || evalDetail.status === 'DISCARDED') {
+          const reason = evalDetail?.discardReason || 'notEmbeddable';
+          stageDiscards[reason]++;
           continue;
         }
 
+        // 6. Vídeo qualificado disputa vaga no canal
         const chList = validVideosByChannel.get(u.channelId) || [];
-        chList.push(details);
+        chList.push(evalDetail.candidate!);
         validVideosByChannel.set(u.channelId, chList);
       }
 
-      // Seleção com limite por canal
-      const stageCandidates: VideoCandidate[] = [];
+      // 7. Seleção com limite por canal
+      const stageUploadCandidates: VideoCandidate[] = [];
       const usedIdsForStage = new Set<string>();
 
       for (const [chId, list] of validVideosByChannel.entries()) {
@@ -437,7 +454,7 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
 
         for (const item of taken) {
           if (!usedIdsForStage.has(item.videoId)) {
-            stageCandidates.push(item);
+            stageUploadCandidates.push(item);
             usedIdsForStage.add(item.videoId);
           } else {
             stageDiscards.duplicate++;
@@ -445,22 +462,34 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
         }
       }
 
-      stageCandidates.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+      stageUploadCandidates.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
-      // Completa com itens da playlist anterior se faltar para 20
+      // Se o total de uploads qualificados ultrapassar o teto máximo de 40, descarta o excedente por limite
+      if (stageUploadCandidates.length > 40) {
+        const excessGlobal = stageUploadCandidates.length - 40;
+        stageDiscards.channelLimit += excessGlobal;
+        stageUploadCandidates.splice(40);
+      }
+
+      // 8. Se faltar para 20 vídeos, completa com a playlist anterior
+      const stageCandidates = [...stageUploadCandidates];
+      let fallbackAdded = 0;
       if (stageCandidates.length < 20) {
         const fallbacks = await getPreviousPlaylistFallback(new Set(usedIdsForStage));
         for (const fb of fallbacks) {
           stageCandidates.push(fb);
+          fallbackAdded++;
           if (stageCandidates.length >= 20) break;
         }
       }
 
       chosenWindow = stage.days;
       chosenSelectedVideos = stageCandidates;
+      chosenSelectedFromUploads = stageUploadCandidates.length;
+      chosenFallbackCount = fallbackAdded;
       chosenDiscards = stageDiscards;
 
-      // Se atingiu o mínimo de 20, encerra a busca progressiva!
+      // Se atingiu o mínimo de 20 (incluindo eventual fallback), encerra a busca progressiva!
       if (chosenSelectedVideos.length >= 20) {
         break;
       }
@@ -471,7 +500,8 @@ export async function syncWeeklyPlaylist(options: SyncOptions = {}): Promise<Syn
 
     const stats: SyncAuditStats = {
       totalRead,
-      selected: finalList.length,
+      selected: chosenSelectedFromUploads,
+      fallbackAdded: chosenFallbackCount,
       windowDays,
       quotaCost,
       discards: chosenDiscards,
