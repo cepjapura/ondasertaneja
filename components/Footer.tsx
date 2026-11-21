@@ -1,12 +1,15 @@
 import React from 'react';
 import Link from 'next/link';
+import LogoO from '@/components/LogoO';
 
 export default function Footer() {
   return (
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-brand">
-          <h3>ONDA<span>SERTANEJA</span></h3>
+          <Link href="/" className="logo" aria-label="Onda Sertaneja — página inicial">
+            <LogoO />NDA<span>SERTANEJA</span>
+          </Link>
           <p>A batida que move o Brasil. As melhores músicas e notícias você encontra aqui, 24 horas por dia com você.</p>
           <div className="social-links">
             <a href="https://instagram.com/ondasertaneja" target="_blank" rel="noreferrer"><i className="fa-brands fa-instagram"></i></a>
