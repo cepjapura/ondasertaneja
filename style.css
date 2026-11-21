@@ -260,6 +260,15 @@ button:active {
   margin-left: 2px;
 }
 
+.logo-o {
+  display: inline-block;
+  height: 0.70em;
+  width: 0.666em;
+  margin-right: 0.03em;
+  vertical-align: -0.008em;
+  color: var(--primary-text);
+}
+
 .nav-menu {
   display: flex;
   gap: 10px;
@@ -1077,7 +1086,12 @@ textarea:focus {
   margin-bottom: 60px;
 }
 
-.footer-brand h3 {
+.footer-brand h3,
+.footer-brand .logo {
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+  margin-right: 0;
   font-family: var(--font-title);
   font-size: 1.8rem;
   font-weight: 900;

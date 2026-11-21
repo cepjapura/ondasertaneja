@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ThemeToggle from '@/components/ThemeToggle';
+import LogoO from '@/components/LogoO';
 
 export default function Header() {
   const router = useRouter();
@@ -84,8 +85,8 @@ export default function Header() {
   return (
     <header className="header">
       <div className="header-container">
-        <Link href="/" className="logo">
-          ONDA<span>SERTANEJA</span>
+        <Link href="/" className="logo" aria-label="Onda Sertaneja — página inicial">
+          <LogoO />NDA<span>SERTANEJA</span>
         </Link>
 
         <nav className={`nav-menu ${mobileMenuOpen ? 'active' : ''} ${isSearchExpanded ? 'search-active' : ''}`} id="navMenu">
