@@ -58,6 +58,13 @@ export const metadata: Metadata = {
     locale: 'pt_BR',
     type: 'website',
   },
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? {
+        verification: {
+          google: process.env.GOOGLE_SITE_VERIFICATION,
+        },
+      }
+    : {}),
 };
 
 export default function RootLayout({
