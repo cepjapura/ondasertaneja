@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AudioProvider } from '@/contexts/AudioContext';
 import '@/style.css';
+import CloudflareAnalytics from '@/components/CloudflareAnalytics';
 
 const bricolageGrotesque = localFont({
   src: [
@@ -64,6 +65,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const cfAnalyticsToken = process.env.NEXT_PUBLIC_CF_ANALYTICS_TOKEN;
   return (
     <html lang="pt-BR" className={`${bricolageGrotesque.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
@@ -109,6 +112,7 @@ export default function RootLayout({
             <i className="fa-brands fa-whatsapp"></i>
           </a>
         </ThemeProvider>
+        {isProduction && cfAnalyticsToken && <CloudflareAnalytics token={cfAnalyticsToken} />}
       </body>
     </html>
   );
